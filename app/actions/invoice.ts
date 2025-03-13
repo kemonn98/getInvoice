@@ -3,15 +3,16 @@
 import { revalidatePath } from "next/cache"
 import { prisma } from "@/lib/prisma"
 import { MOCK_USER_ID } from "../lib/constants"
+import { InvoiceStatus } from "@prisma/client"
 
 export async function getInvoices() {
   try {
     const invoices = await prisma.invoice.findMany({
       where: {
-        userId: MOCK_USER_ID
-      },
-      include: {
-        client: true  // Include the client relationship
+        userId: MOCK_USER_ID,
+        status: {
+          in: [InvoiceStatus.PENDING, InvoiceStatus.PAID, InvoiceStatus.OVERDUE, InvoiceStatus.CANCELLED]
+        }
       },
       orderBy: {
         createdAt: 'desc'
@@ -20,7 +21,7 @@ export async function getInvoices() {
     return invoices
   } catch (error) {
     console.error('Failed to fetch invoices:', error)
-    return [] // Return empty array instead of throwing error
+    throw error
   }
 }
 
@@ -64,45 +65,32 @@ export async function createInvoice(formData: FormData) {
     const tax = subtotal * 0.1
     const total = subtotal + tax
 
-    // Create invoice with all required fields
-    const invoice = await prisma.invoice.create({
-      data: {
-        // Invoice details
-        invoiceNumber: formData.get('invoiceNumber') as string,
-        status: formData.get('status') as string || 'pending',
-        amount: total,
-        issueDate: new Date(formData.get('issueDate') as string),
-        dueDate: new Date(formData.get('dueDate') as string),
-        notes: formData.get('notes') as string || '',
-        
-        // Our details (with defaults if not provided)
-        ourName: formData.get('ourName') as string || "Nadia Tateanna",
-        ourBusinessName: formData.get('ourBusinessName') as string || "PT. SlabPixel Creative Group",
-        ourAddress: formData.get('ourAddress') as string || "Jl. Raya Tajem No.A09, RT.05/RW.27, Kenayan, Wedomartani, Kec. Ngemplak, Kabupaten Sleman, Daerah Istimewa Yogyakarta 55584",
-        
-        // Client details
-        clientName: formData.get('clientName') as string,
-        clientBusinessName: formData.get('clientBusinessName') as string || null,
-        clientAddress: formData.get('clientAddress') as string,
-        
-        // Relations
-        userId: MOCK_USER_ID,
-        clientId: defaultClient.id,
-        
-        // Line items
-        items: {
-          create: items.map((item: any) => ({
-            description: item.description,
-            quantity: item.quantity,
-            unitPrice: item.price
-          }))
-        }
-      },
-      include: {
-        items: true,
-        client: true
+    const status = formData.get('status') as keyof typeof InvoiceStatus
+    const data = {
+      userId: MOCK_USER_ID,
+      invoiceNumber: formData.get('invoiceNumber') as string,
+      status: InvoiceStatus[status],
+      amount: total,
+      issueDate: new Date(formData.get('issueDate') as string),
+      dueDate: new Date(formData.get('dueDate') as string),
+      notes: formData.get('notes') as string || '',
+      ourName: formData.get('ourName') as string || "Nadia Tateanna",
+      ourBusinessName: formData.get('ourBusinessName') as string || "PT. SlabPixel Creative Group",
+      ourAddress: formData.get('ourAddress') as string || "Jl. Raya Tajem No.A09, RT.05/RW.27, Kenayan, Wedomartani, Kec. Ngemplak, Kabupaten Sleman, Daerah Istimewa Yogyakarta 55584",
+      clientName: formData.get('clientName') as string,
+      clientBusinessName: formData.get('clientBusinessName') as string || null,
+      clientAddress: formData.get('clientAddress') as string,
+      clientId: defaultClient.id,
+      items: {
+        create: items.map((item: any) => ({
+          description: item.description,
+          quantity: item.quantity,
+          unitPrice: item.price
+        }))
       }
-    })
+    }
+
+    const invoice = await prisma.invoice.create({ data })
 
     revalidatePath('/dashboard')
     return { success: true, data: invoice }
@@ -156,34 +144,25 @@ export async function getClients() {
 
 export async function updateInvoice(id: string, formData: FormData) {
   try {
-    // Calculate total from items
-    const items = JSON.parse(formData.get('items') as string)
-    const subtotal = items.reduce((sum: number, item: any) => 
-      sum + (item.quantity * item.unitPrice), 0)
-    const tax = subtotal * 0.1 // 10% tax
-    const total = subtotal + tax
-
+    const status = formData.get('status') as keyof typeof InvoiceStatus
+    const data = {
+      status: InvoiceStatus[status],
+      invoiceNumber: formData.get('invoiceNumber') as string,
+      dueDate: new Date(formData.get('dueDate') as string),
+      amount: formData.get('amount') as number,
+      notes: formData.get('notes') as string || '',
+      items: {
+        deleteMany: {},
+        create: JSON.parse(formData.get('items') as string).map((item: any) => ({
+          description: item.description,
+          quantity: item.quantity,
+          unitPrice: item.unitPrice
+        }))
+      }
+    }
     const invoice = await prisma.invoice.update({
       where: { id },
-      data: {
-        invoiceNumber: formData.get('invoiceNumber') as string,
-        status: formData.get('status') as string,
-        dueDate: new Date(formData.get('dueDate') as string),
-        amount: total,
-        notes: formData.get('notes') as string || '',
-        items: {
-          deleteMany: {}, // Delete existing items
-          create: items.map((item: any) => ({
-            description: item.description,
-            quantity: item.quantity,
-            unitPrice: item.unitPrice
-          }))
-        }
-      },
-      include: {
-        items: true,
-        client: true
-      }
+      data
     })
 
     revalidatePath('/dashboard')

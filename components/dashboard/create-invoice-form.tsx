@@ -176,14 +176,15 @@ export function CreateInvoiceForm() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="status">Status</Label>
-                <Select name="status" defaultValue="pending">
+                <Select name="status" defaultValue="PENDING">
                   <SelectTrigger>
                     <SelectValue placeholder="Select status" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="pending">Pending</SelectItem>
-                    <SelectItem value="paid">Paid</SelectItem>
-                    <SelectItem value="overdue">Overdue</SelectItem>
+                    <SelectItem value="PENDING">Pending</SelectItem>
+                    <SelectItem value="PAID">Paid</SelectItem>
+                    <SelectItem value="OVERDUE">Overdue</SelectItem>
+                    <SelectItem value="CANCELLED">Cancelled</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

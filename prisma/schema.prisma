@@ -1,0 +1,71 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  invoices      Invoice[]
+  clients       Client[]
+}
+
+model Client {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id])
+  name      String
+  email     String
+  phone     String?
+  address   String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  invoices  Invoice[]
+}
+
+model Invoice {
+  id              String      @id @default(cuid())
+  invoiceNumber   String
+  status          String
+  amount          Float
+  issueDate       DateTime    @default(now())
+  dueDate         DateTime
+  notes           String?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  
+  // New fields
+  ourName         String      @default("Nadia Tateanna")
+  ourBusinessName String      @default("PT. SlabPixel Creative Group")
+  ourAddress      String      @default("Jl. Raya Tajem No.A09, RT.05/RW.27, Kenayan, Wedomartani, Kec. Ngemplak, Kabupaten Sleman, Daerah Istimewa Yogyakarta 55584")
+  clientName      String
+  clientBusinessName String?
+  clientAddress   String
+  
+  userId          String
+  clientId        String
+  items           InvoiceItem[]
+  user           User        @relation(fields: [userId], references: [id])
+  client         Client      @relation(fields: [clientId], references: [id])
+}
+
+model InvoiceItem {
+  id          String   @id @default(cuid())
+  description String
+  quantity    Int
+  unitPrice   Float
+  invoiceId   String
+  invoice     Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  @@index([invoiceId])
+}
+

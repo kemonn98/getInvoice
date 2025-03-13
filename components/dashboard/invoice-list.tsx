@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import Link from "next/link"
 import { ArrowUpDown, Download, Eye, MoreHorizontal, Pencil, Trash2 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -15,49 +16,30 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
-
-// Sample invoice data
-const invoices = [
-  {
-    id: "INV-001",
-    client: "Acme Inc.",
-    amount: 1250.0,
-    status: "paid",
-    date: "2023-04-15",
-  },
-  {
-    id: "INV-002",
-    client: "Globex Corp",
-    amount: 850.75,
-    status: "pending",
-    date: "2023-04-20",
-  },
-  {
-    id: "INV-003",
-    client: "Stark Industries",
-    amount: 3200.5,
-    status: "paid",
-    date: "2023-04-25",
-  },
-  {
-    id: "INV-004",
-    client: "Wayne Enterprises",
-    amount: 1800.25,
-    status: "overdue",
-    date: "2023-04-10",
-  },
-  {
-    id: "INV-005",
-    client: "Umbrella Corp",
-    amount: 950.0,
-    status: "pending",
-    date: "2023-04-30",
-  },
-]
+import { getInvoices } from "@/app/actions/invoice"
 
 export function InvoiceList() {
+  const [invoices, setInvoices] = useState<any[]>([])
+  const [error, setError] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
   const [sortColumn, setSortColumn] = useState<string | null>(null)
+  
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc")
+
+  useEffect(() => {
+    const fetchInvoices = async () => {
+      try {
+        const data = await getInvoices()
+        setInvoices(data || [])
+      } catch (err) {
+        setError('Failed to load invoices')
+        console.error(err)
+      }
+      setIsLoading(false)
+    }
+
+    fetchInvoices()
+  }, [])
 
   const handleSort = (column: string) => {
     if (sortColumn === column) {
@@ -71,8 +53,14 @@ export function InvoiceList() {
   const sortedInvoices = [...invoices].sort((a, b) => {
     if (!sortColumn) return 0
 
-    const aValue = a[sortColumn as keyof typeof a]
-    const bValue = b[sortColumn as keyof typeof b]
+    let aValue = a[sortColumn as keyof typeof a]
+    let bValue = b[sortColumn as keyof typeof b]
+
+    // Handle nested properties like client.name
+    if (sortColumn === "client") {
+      aValue = a.client.name
+      bValue = b.client.name
+    }
 
     if (typeof aValue === "string" && typeof bValue === "string") {
       return sortDirection === "asc" ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue)
@@ -82,6 +70,11 @@ export function InvoiceList() {
       return sortDirection === "asc" ? aValue - bValue : bValue - aValue
     }
 
+    // Handle dates
+    if (aValue instanceof Date && bValue instanceof Date) {
+      return sortDirection === "asc" ? aValue.getTime() - bValue.getTime() : bValue.getTime() - aValue.getTime()
+    }
+
     return 0
   })
 
@@ -89,13 +82,43 @@ export function InvoiceList() {
     switch (status) {
       case "paid":
         return "bg-green-100 text-green-800 hover:bg-green-100/80"
-      case "pending":
-        return "bg-yellow-100 text-yellow-800 hover:bg-yellow-100/80"
+      case "sent":
+        return "bg-blue-100 text-blue-800 hover:bg-blue-100/80"
+      case "draft":
+        return "bg-gray-100 text-gray-800 hover:bg-gray-100/80"
       case "overdue":
         return "bg-red-100 text-red-800 hover:bg-red-100/80"
       default:
         return "bg-gray-100 text-gray-800 hover:bg-gray-100/80"
     }
+  }
+
+  const calculateTotal = (invoice: any) => {
+    if (!invoice.items || !Array.isArray(invoice.items)) {
+      return invoice.amount || 0 // Fallback to invoice.amount if no items
+    }
+    const subtotal = invoice.items.reduce((sum: number, item: any) => 
+      sum + (item.quantity * item.price), 0)
+    const tax = subtotal * 0.1
+    return subtotal + tax
+  }
+
+  if (error) return <div>Error: {error}</div>
+
+  if (isLoading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Recent Invoices</CardTitle>
+          <CardDescription>Loading invoices...</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="h-[400px] flex items-center justify-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          </div>
+        </CardContent>
+      </Card>
+    )
   }
 
   return (
@@ -105,108 +128,82 @@ export function InvoiceList() {
         <CardDescription>Manage your recent invoices and their status.</CardDescription>
       </CardHeader>
       <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>
-                <Button
-                  variant="ghost"
-                  onClick={() => handleSort("id")}
-                  className="flex items-center gap-1 p-0 font-medium"
-                >
-                  Invoice
-                  <ArrowUpDown className="h-3 w-3" />
-                </Button>
-              </TableHead>
-              <TableHead>
-                <Button
-                  variant="ghost"
-                  onClick={() => handleSort("client")}
-                  className="flex items-center gap-1 p-0 font-medium"
-                >
-                  Client
-                  <ArrowUpDown className="h-3 w-3" />
-                </Button>
-              </TableHead>
-              <TableHead>
-                <Button
-                  variant="ghost"
-                  onClick={() => handleSort("amount")}
-                  className="flex items-center gap-1 p-0 font-medium"
-                >
-                  Amount
-                  <ArrowUpDown className="h-3 w-3" />
-                </Button>
-              </TableHead>
-              <TableHead>
-                <Button
-                  variant="ghost"
-                  onClick={() => handleSort("status")}
-                  className="flex items-center gap-1 p-0 font-medium"
-                >
-                  Status
-                  <ArrowUpDown className="h-3 w-3" />
-                </Button>
-              </TableHead>
-              <TableHead>
-                <Button
-                  variant="ghost"
-                  onClick={() => handleSort("date")}
-                  className="flex items-center gap-1 p-0 font-medium"
-                >
-                  Date
-                  <ArrowUpDown className="h-3 w-3" />
-                </Button>
-              </TableHead>
-              <TableHead className="w-[80px]">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {sortedInvoices.map((invoice) => (
-              <TableRow key={invoice.id}>
-                <TableCell className="font-medium">{invoice.id}</TableCell>
-                <TableCell>{invoice.client}</TableCell>
-                <TableCell>${invoice.amount.toFixed(2)}</TableCell>
-                <TableCell>
-                  <Badge variant="outline" className={getStatusColor(invoice.status)}>
-                    {invoice.status.charAt(0).toUpperCase() + invoice.status.slice(1)}
-                  </Badge>
-                </TableCell>
-                <TableCell>{invoice.date}</TableCell>
-                <TableCell>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="h-8 w-8 p-0">
-                        <span className="sr-only">Open menu</span>
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                      <DropdownMenuItem>
-                        <Eye className="mr-2 h-4 w-4" />
-                        <span>View</span>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem>
-                        <Download className="mr-2 h-4 w-4" />
-                        <span>Download</span>
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem>
-                        <Pencil className="mr-2 h-4 w-4" />
-                        <span>Edit</span>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem className="text-red-600">
-                        <Trash2 className="mr-2 h-4 w-4" />
-                        <span>Delete</span>
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
+        {invoices.length === 0 ? (
+          <div className="text-center py-8">
+            <p className="text-muted-foreground mb-4">No invoices found</p>
+            <Link href="/dashboard/invoices/new">
+              <Button>Create your first invoice</Button>
+            </Link>
+          </div>
+        ) : (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Invoice Number</TableHead>
+                <TableHead>Client</TableHead>
+                <TableHead>Issue Date</TableHead>
+                <TableHead>Due Date</TableHead>
+                <TableHead>Amount</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {sortedInvoices.map((invoice) => (
+                <TableRow key={invoice.id}>
+                  <TableCell className="font-medium">{invoice.invoiceNumber}</TableCell>
+                  <TableCell>{invoice.clientName}</TableCell>
+                  <TableCell>{new Date(invoice.issueDate).toLocaleDateString()}</TableCell>
+                  <TableCell>{new Date(invoice.dueDate).toLocaleDateString()}</TableCell>
+                  <TableCell>${calculateTotal(invoice).toFixed(2)}</TableCell>
+                  <TableCell>
+                    <Badge variant="outline" className={getStatusColor(invoice.status)}>
+                      {invoice.status}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className="h-8 w-8 p-0">
+                          <span className="sr-only">Open menu</span>
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                        <DropdownMenuItem asChild>
+                          <Link href={`/dashboard/invoices/${invoice.id}`}>
+                            <Eye className="mr-2 h-4 w-4" />
+                            <span>View</span>
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link href={`/dashboard/invoices/${invoice.id}`}>
+                            <Download className="mr-2 h-4 w-4" />
+                            <span>Download</span>
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem asChild>
+                          <Link href={`/dashboard/invoices/${invoice.id}/edit`}>
+                            <Pencil className="mr-2 h-4 w-4" />
+                            <span>Edit</span>
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link href={`/dashboard/invoices/${invoice.id}`} className="text-red-600">
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            <span>Delete</span>
+                          </Link>
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
       </CardContent>
     </Card>
   )

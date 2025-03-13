@@ -79,15 +79,15 @@ export function InvoiceList() {
   })
 
   const getStatusColor = (status: string) => {
-    switch (status) {
-      case "paid":
+    switch (status.toUpperCase()) {
+      case "PENDING":
+        return "bg-yellow-100 text-yellow-800 hover:bg-yellow-100/80"
+      case "PAID":
         return "bg-green-100 text-green-800 hover:bg-green-100/80"
-      case "sent":
-        return "bg-blue-100 text-blue-800 hover:bg-blue-100/80"
-      case "draft":
-        return "bg-gray-100 text-gray-800 hover:bg-gray-100/80"
-      case "overdue":
+      case "OVERDUE":
         return "bg-red-100 text-red-800 hover:bg-red-100/80"
+      case "CANCELLED":
+        return "bg-slate-100 text-slate-800 hover:bg-slate-100/80"
       default:
         return "bg-gray-100 text-gray-800 hover:bg-gray-100/80"
     }
@@ -158,7 +158,7 @@ export function InvoiceList() {
                   <TableCell>${calculateTotal(invoice).toFixed(2)}</TableCell>
                   <TableCell>
                     <Badge variant="outline" className={getStatusColor(invoice.status)}>
-                      {invoice.status}
+                      {invoice.status.charAt(0).toUpperCase() + invoice.status.slice(1).toLowerCase()}
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right">

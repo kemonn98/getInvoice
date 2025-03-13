@@ -53,17 +53,17 @@ export function InvoiceDetails({ invoice }: InvoiceDetailsProps) {
   }
 
   const getStatusColor = (status: string) => {
-    switch (status) {
-      case "paid":
-        return "bg-green-100 text-green-800 hover:bg-green-100/80"
-      case "sent":
-        return "bg-blue-100 text-blue-800 hover:bg-blue-100/80"
-      case "draft":
-        return "bg-gray-100 text-gray-800 hover:bg-gray-100/80"
-      case "overdue":
-        return "bg-red-100 text-red-800 hover:bg-red-100/80"
+    switch (status.toUpperCase()) {
+      case "PENDING":
+        return "bg-yellow-100 text-yellow-800 hover:bg-yellow-100/80 border-yellow-800/20"
+      case "PAID":
+        return "bg-green-100 text-green-800 hover:bg-green-100/80 border-green-800/20"
+      case "OVERDUE":
+        return "bg-red-100 text-red-800 hover:bg-red-100/80 border-red-800/20"
+      case "CANCELLED":
+        return "bg-slate-100 text-slate-800 hover:bg-slate-100/80 border-slate-800/20"
       default:
-        return "bg-gray-100 text-gray-800 hover:bg-gray-100/80"
+        return "bg-gray-100 text-gray-800 hover:bg-gray-100/80 border-gray-800/20"
     }
   }
 
@@ -71,13 +71,16 @@ export function InvoiceDetails({ invoice }: InvoiceDetailsProps) {
     <div className="space-y-6 print:space-y-6">
       <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between print:hidden">
         <div className="flex items-center gap-2">
-          <Badge variant="outline" className={getStatusColor(invoice.status)}>
-            {invoice.status.charAt(0).toUpperCase() + invoice.status.slice(1)}
+          <Badge 
+            variant="secondary" 
+            className={`${getStatusColor(invoice.status)} font-medium px-3 py-1.5 text-sm`}
+          >
+            {invoice.status.charAt(0).toUpperCase() + invoice.status.slice(1).toLowerCase()}
           </Badge>
           {invoice.status !== "paid" && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" disabled={isUpdatingStatus}>
+                <Button variant="outline" className="h-9 px-4" disabled={isUpdatingStatus}>
                   {isUpdatingStatus ? "Updating..." : "Update Status"}
                 </Button>
               </DropdownMenuTrigger>
@@ -99,21 +102,21 @@ export function InvoiceDetails({ invoice }: InvoiceDetailsProps) {
           )}
         </div>
         <div className="flex flex-wrap gap-2">
-          <Button variant="outline" size="sm" onClick={handlePrint}>
+          <Button variant="outline" className="h-9 px-4" onClick={handlePrint}>
             <Printer className="mr-2 h-4 w-4" />
             Print
           </Button>
-          <Button variant="outline" size="sm" onClick={handleDownloadPDF} disabled={isGeneratingPDF}>
+          <Button variant="outline" className="h-9 px-4" onClick={handleDownloadPDF} disabled={isGeneratingPDF}>
             <Download className="mr-2 h-4 w-4" />
             {isGeneratingPDF ? "Generating..." : "Download PDF"}
           </Button>
-          <Button variant="outline" size="sm" onClick={() => router.push(`/dashboard/invoices/${invoice.id}/edit`)}>
+          <Button variant="outline" className="h-9 px-4" onClick={() => router.push(`/dashboard/invoices/${invoice.id}/edit`)}>
             <Pencil className="mr-2 h-4 w-4" />
             Edit
           </Button>
           <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
             <DialogTrigger asChild>
-              <Button variant="destructive" size="sm">
+              <Button variant="destructive" className="h-9 px-4">
                 <Trash2 className="mr-2 h-4 w-4" />
                 Delete
               </Button>

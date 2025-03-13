@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { ArrowUpDown, Download, Eye, MoreHorizontal, Pencil, Trash2 } from "lucide-react"
+import { useRouter } from "next/navigation"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -19,6 +20,7 @@ import { Badge } from "@/components/ui/badge"
 import { getInvoices } from "@/app/actions/invoice"
 
 export function InvoiceList() {
+  const router = useRouter()
   const [invoices, setInvoices] = useState<any[]>([])
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -150,7 +152,11 @@ export function InvoiceList() {
             </TableHeader>
             <TableBody>
               {sortedInvoices.map((invoice) => (
-                <TableRow key={invoice.id}>
+                <TableRow 
+                  key={invoice.id}
+                  onClick={() => router.push(`/dashboard/invoices/${invoice.id}`)}
+                  className="cursor-pointer hover:bg-muted/50"
+                >
                   <TableCell className="font-medium">{invoice.invoiceNumber}</TableCell>
                   <TableCell>{invoice.clientName}</TableCell>
                   <TableCell>{new Date(invoice.issueDate).toLocaleDateString()}</TableCell>
@@ -163,13 +169,13 @@ export function InvoiceList() {
                   </TableCell>
                   <TableCell className="text-right">
                     <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
+                      <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
                         <Button variant="ghost" className="h-8 w-8 p-0">
                           <span className="sr-only">Open menu</span>
                           <MoreHorizontal className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
+                      <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                         <DropdownMenuItem asChild>
                           <Link href={`/dashboard/invoices/${invoice.id}`}>

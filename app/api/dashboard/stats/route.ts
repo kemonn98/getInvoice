@@ -3,7 +3,7 @@ import { NextResponse } from "next/server"
 
 export async function GET() {
   try {
-    // Get total revenue (from paid invoices)
+    // Get total revenue (only from PAID invoices)
     const totalRevenue = await prisma.invoice.aggregate({
       where: {
         status: 'PAID'
@@ -13,53 +13,48 @@ export async function GET() {
       }
     })
 
-    // Get current month and last month dates
-    const now = new Date()
-    const firstDayThisMonth = new Date(now.getFullYear(), now.getMonth(), 1)
-    const firstDayLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1)
-
-    // Get invoice counts
-    const currentMonthInvoices = await prisma.invoice.count({
-      where: {
-        createdAt: {
-          gte: firstDayThisMonth,
-          lt: now
-        }
-      }
-    })
-
-    const lastMonthInvoices = await prisma.invoice.count({
-      where: {
-        createdAt: {
-          gte: firstDayLastMonth,
-          lt: firstDayThisMonth
-        }
-      }
-    })
+    // Get total number of invoices
+    const totalInvoices = await prisma.invoice.count()
 
     // Get status counts
     const statusCounts = await prisma.invoice.groupBy({
       by: ['status'],
-      _count: true
+      _count: {
+        _all: true
+      }
     })
 
-    // Convert to a map of status counts
-    const statusMap = statusCounts.reduce((acc, curr) => {
-      acc[curr.status] = curr._count
-      return acc
-    }, {} as Record<string, number>)
+    // Initialize counts with zeros
+    const counts = {
+      PENDING: 0,
+      PAID: 0,
+      OVERDUE: 0,
+      CANCELLED: 0
+    }
+
+    // Update counts from database results
+    statusCounts.forEach((item) => {
+      if (item.status) {
+        counts[item.status] = item._count._all
+      }
+    })
 
     return NextResponse.json({
       totalRevenue: totalRevenue._sum.amount || 0,
-      currentMonthInvoices,
-      lastMonthInvoices,
-      statusCounts: statusMap
+      totalInvoices,
+      statusCounts: counts
     })
   } catch (error) {
     console.error('Failed to fetch dashboard stats:', error)
-    return NextResponse.json(
-      { error: 'Failed to fetch dashboard stats' },
-      { status: 500 }
-    )
+    return NextResponse.json({
+      totalRevenue: 0,
+      totalInvoices: 0,
+      statusCounts: {
+        PENDING: 0,
+        PAID: 0,
+        OVERDUE: 0,
+        CANCELLED: 0
+      }
+    })
   }
 } 

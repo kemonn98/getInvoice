@@ -2,17 +2,32 @@
 
 import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { ArrowUpRight, DollarSign, FileText, Users } from "lucide-react"
+import { DollarSign, FileText, PieChart } from "lucide-react"
+
+interface Stats {
+  totalRevenue: number
+  totalInvoices: number
+  statusCounts: {
+    PENDING: number
+    PAID: number
+    OVERDUE: number
+    CANCELLED: number
+  }
+}
+
+const defaultStats: Stats = {
+  totalRevenue: 0,
+  totalInvoices: 0,
+  statusCounts: {
+    PENDING: 0,
+    PAID: 0,
+    OVERDUE: 0,
+    CANCELLED: 0
+  }
+}
 
 export function DashboardStats() {
-  const [stats, setStats] = useState({
-    totalInvoices: 0,
-    totalRevenue: 0,
-    activeClients: 0,
-    lastMonthInvoices: 0,
-    lastMonthRevenue: 0,
-    lastMonthClients: 0
-  })
+  const [stats, setStats] = useState<Stats>(defaultStats)
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
@@ -21,15 +36,18 @@ export function DashboardStats() {
         const response = await fetch('/api/dashboard/stats')
         const data = await response.json()
         setStats({
-          totalInvoices: data.totalInvoices || 0,
           totalRevenue: data.totalRevenue || 0,
-          activeClients: data.activeClients || 0,
-          lastMonthInvoices: data.lastMonthInvoices || 0,
-          lastMonthRevenue: data.lastMonthRevenue || 0,
-          lastMonthClients: data.lastMonthClients || 0
+          totalInvoices: data.totalInvoices || 0,
+          statusCounts: {
+            PENDING: data.statusCounts?.PENDING || 0,
+            PAID: data.statusCounts?.PAID || 0,
+            OVERDUE: data.statusCounts?.OVERDUE || 0,
+            CANCELLED: data.statusCounts?.CANCELLED || 0
+          }
         })
       } catch (error) {
         console.error('Failed to fetch dashboard stats:', error)
+        setStats(defaultStats)
       } finally {
         setIsLoading(false)
       }
@@ -56,11 +74,28 @@ export function DashboardStats() {
     )
   }
 
-  const revenueChange = stats.lastMonthRevenue ? 
-    ((stats.totalRevenue - stats.lastMonthRevenue) / stats.lastMonthRevenue * 100) : 0
+  const formattedRevenue = stats.totalRevenue.toLocaleString('en-US', { 
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  })
 
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
+          <DollarSign className="h-4 w-4 text-muted-foreground" />
+        </CardHeader>
+        <CardContent>
+          <div className="text-2xl font-bold">
+            ${formattedRevenue}
+          </div>
+          <p className="text-xs text-muted-foreground">
+            From paid invoices
+          </p>
+        </CardContent>
+      </Card>
+
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Total Invoices</CardTitle>
@@ -69,37 +104,35 @@ export function DashboardStats() {
         <CardContent>
           <div className="text-2xl font-bold">{stats.totalInvoices}</div>
           <p className="text-xs text-muted-foreground">
-            {stats.totalInvoices - stats.lastMonthInvoices > 0 ? '+' : ''}
-            {stats.totalInvoices - stats.lastMonthInvoices} from last month
+            All invoices
           </p>
         </CardContent>
       </Card>
+
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
-          <DollarSign className="h-4 w-4 text-muted-foreground" />
+          <CardTitle className="text-sm font-medium">Invoice Status</CardTitle>
+          <PieChart className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">
-            ${(stats.totalRevenue || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}
+          <div className="grid gap-2">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-yellow-600">Pending</span>
+              <span className="font-bold">{stats.statusCounts.PENDING}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-green-600">Paid</span>
+              <span className="font-bold">{stats.statusCounts.PAID}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-red-600">Overdue</span>
+              <span className="font-bold">{stats.statusCounts.OVERDUE}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-slate-600">Cancelled</span>
+              <span className="font-bold">{stats.statusCounts.CANCELLED}</span>
+            </div>
           </div>
-          <div className="flex items-center text-xs text-green-500">
-            <ArrowUpRight className="mr-1 h-3 w-3" />
-            {revenueChange.toFixed(1)}% from last month
-          </div>
-        </CardContent>
-      </Card>
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Active Clients</CardTitle>
-          <Users className="h-4 w-4 text-muted-foreground" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">{stats.activeClients}</div>
-          <p className="text-xs text-muted-foreground">
-            {stats.activeClients - stats.lastMonthClients > 0 ? '+' : ''}
-            {stats.activeClients - stats.lastMonthClients} new client this month
-          </p>
         </CardContent>
       </Card>
     </div>

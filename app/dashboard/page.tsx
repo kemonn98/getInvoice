@@ -2,7 +2,6 @@ import { DashboardHeader } from "@/components/dashboard/dashboard-header"
 import { DashboardShell } from "@/components/dashboard/dashboard-shell"
 import { InvoiceList } from "@/components/dashboard/invoice-list"
 import { DashboardStats } from "@/components/dashboard/dashboard-stats"
-import { createTestClient } from "../actions/invoice"
 
 export default function DashboardPage() {
   return (

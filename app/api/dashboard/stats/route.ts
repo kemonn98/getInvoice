@@ -14,20 +14,24 @@ export async function GET() {
       }
     })
 
-    // Get current month's invoices
+    // Get current month's invoices (excluding CANCELLED)
     const startOfMonth = new Date()
     startOfMonth.setDate(1)
     startOfMonth.setHours(0, 0, 0, 0)
 
     const currentMonthInvoices = await prisma.invoice.count({
       where: {
-        createdAt: {
-          gte: startOfMonth
-        }
+        AND: [
+          {
+            createdAt: {
+              gte: startOfMonth
+            }
+          }
+        ]
       }
     })
 
-    // Get last month's invoices
+    // Get last month's invoices (excluding CANCELLED)
     const startOfLastMonth = new Date(startOfMonth)
     startOfLastMonth.setMonth(startOfLastMonth.getMonth() - 1)
     const endOfLastMonth = new Date(startOfMonth)
@@ -35,10 +39,19 @@ export async function GET() {
 
     const lastMonthInvoices = await prisma.invoice.count({
       where: {
-        createdAt: {
-          gte: startOfLastMonth,
-          lt: startOfMonth
-        }
+        AND: [
+          {
+            createdAt: {
+              gte: startOfLastMonth,
+              lt: startOfMonth
+            }
+          },
+          {
+            NOT: {
+              status: InvoiceStatus.CANCELLED
+            }
+          }
+        ]
       }
     })
 

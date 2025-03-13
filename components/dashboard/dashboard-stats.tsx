@@ -8,33 +8,17 @@ interface DashboardStats {
   totalRevenue: number
   currentMonthInvoices: number
   lastMonthInvoices: number
-  statusCounts: {
-    PENDING: number
-    PAID: number
-    OVERDUE: number
-    CANCELLED: number
-  }
+  statusCounts: Record<string, number>
 }
 
 export function DashboardStats() {
-  const [stats, setStats] = useState<DashboardStats>({
-    totalRevenue: 0,
-    currentMonthInvoices: 0,
-    lastMonthInvoices: 0,
-    statusCounts: {
-      PENDING: 0,
-      PAID: 0,
-      OVERDUE: 0,
-      CANCELLED: 0
-    }
-  })
+  const [stats, setStats] = useState<DashboardStats | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     const fetchStats = async () => {
       try {
         const response = await fetch('/api/dashboard/stats')
-        if (!response.ok) throw new Error('Failed to fetch stats')
         const data = await response.json()
         setStats(data)
       } catch (error) {
@@ -106,10 +90,6 @@ export function DashboardStats() {
         </CardHeader>
         <CardContent>
           <div className="grid gap-2">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Draft</span>
-              <span className="font-bold">{stats.statusCounts?.DRAFT || 0}</span>
-            </div>
             <div className="flex items-center justify-between">
               <span className="text-sm text-yellow-600">Pending</span>
               <span className="font-bold">{stats.statusCounts?.PENDING || 0}</span>

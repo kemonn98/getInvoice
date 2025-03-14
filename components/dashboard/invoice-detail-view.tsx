@@ -83,17 +83,17 @@ export function InvoiceDetailView({ invoice }: InvoiceDetailViewProps) {
   }
 
   const getStatusColor = (status: string) => {
-    switch (status) {
-      case "paid":
-        return "bg-green-100 text-green-800 hover:bg-green-100/80"
-      case "sent":
-        return "bg-blue-100 text-blue-800 hover:bg-blue-100/80"
-      case "draft":
-        return "bg-gray-100 text-gray-800 hover:bg-gray-100/80"
-      case "overdue":
-        return "bg-red-100 text-red-800 hover:bg-red-100/80"
+    switch (status.toUpperCase()) {
+      case "PENDING":
+        return "bg-yellow-100 text-yellow-800 border-yellow-600/20"
+      case "PAID":
+        return "bg-green-100 text-green-800 border-green-600/20"
+      case "OVERDUE":
+        return "bg-red-100 text-red-800 border-red-600/20"
+      case "CANCELLED":
+        return "bg-slate-100 text-slate-800 border-slate-600/20"
       default:
-        return "bg-gray-100 text-gray-800 hover:bg-gray-100/80"
+        return "bg-gray-100 text-gray-800 border-gray-600/20"
     }
   }
 
@@ -102,8 +102,11 @@ export function InvoiceDetailView({ invoice }: InvoiceDetailViewProps) {
       {/* Action Bar */}
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between print:hidden">
         <div className="flex items-center gap-2">
-          <Badge variant="outline" className={getStatusColor(invoice.status)}>
-            {invoice.status.charAt(0).toUpperCase() + invoice.status.slice(1)}
+          <Badge 
+            variant="secondary" 
+            className={`${getStatusColor(invoice.status)} font-medium px-3 py-1.5 text-sm`}
+          >
+            {invoice.status.charAt(0).toUpperCase() + invoice.status.slice(1).toLowerCase()}
           </Badge>
           {invoice.status !== "paid" && (
             <DropdownMenu>
@@ -146,7 +149,7 @@ export function InvoiceDetailView({ invoice }: InvoiceDetailViewProps) {
             <Pencil className="mr-2 h-4 w-4" />
             Edit
           </Button>
-          <Button variant="destructive" onClick={() => setShowDeleteAlert(true)}>
+          <Button variant="destructive" size="sm" onClick={() => setShowDeleteAlert(true)}>
             <Trash2 className="mr-2 h-4 w-4" />
             Delete
           </Button>

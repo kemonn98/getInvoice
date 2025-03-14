@@ -1,12 +1,26 @@
 import { prisma } from "@/lib/prisma"
 import { NextResponse } from "next/server"
 import { InvoiceStatus } from "@prisma/client"
+import { getServerSession } from "next-auth/next"
+import { headers } from 'next/headers'
 
 export async function GET() {
   try {
-    // Get total revenue (only from PAID invoices)
+    const session = await getServerSession()
+    
+    if (!session?.user) {
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 401 }
+      )
+    }
+
+    const userId = session.user.id
+
+    // Get total revenue (only from PAID invoices for this user)
     const totalRevenue = await prisma.invoice.aggregate({
       where: {
+        userId: userId,
         status: InvoiceStatus.PAID
       },
       _sum: {
@@ -14,13 +28,14 @@ export async function GET() {
       }
     })
 
-    // Get current month's invoices (excluding CANCELLED)
+    // Get current month's invoices for this user
     const startOfMonth = new Date()
     startOfMonth.setDate(1)
     startOfMonth.setHours(0, 0, 0, 0)
 
     const currentMonthInvoices = await prisma.invoice.count({
       where: {
+        userId: userId,
         AND: [
           {
             createdAt: {
@@ -31,7 +46,7 @@ export async function GET() {
       }
     })
 
-    // Get last month's invoices (excluding CANCELLED)
+    // Get last month's invoices for this user
     const startOfLastMonth = new Date(startOfMonth)
     startOfLastMonth.setMonth(startOfLastMonth.getMonth() - 1)
     const endOfLastMonth = new Date(startOfMonth)
@@ -39,6 +54,7 @@ export async function GET() {
 
     const lastMonthInvoices = await prisma.invoice.count({
       where: {
+        userId: userId,
         AND: [
           {
             createdAt: {
@@ -55,12 +71,32 @@ export async function GET() {
       }
     })
 
-    // Get status counts
+    // Get status counts for this user
     const statusCounts = {
-      PENDING: await prisma.invoice.count({ where: { status: InvoiceStatus.PENDING } }),
-      PAID: await prisma.invoice.count({ where: { status: InvoiceStatus.PAID } }),
-      OVERDUE: await prisma.invoice.count({ where: { status: InvoiceStatus.OVERDUE } }),
-      CANCELLED: await prisma.invoice.count({ where: { status: InvoiceStatus.CANCELLED } })
+      PENDING: await prisma.invoice.count({ 
+        where: { 
+          userId: userId,
+          status: InvoiceStatus.PENDING 
+        } 
+      }),
+      PAID: await prisma.invoice.count({ 
+        where: { 
+          userId: userId,
+          status: InvoiceStatus.PAID 
+        } 
+      }),
+      OVERDUE: await prisma.invoice.count({ 
+        where: { 
+          userId: userId,
+          status: InvoiceStatus.OVERDUE 
+        } 
+      }),
+      CANCELLED: await prisma.invoice.count({ 
+        where: { 
+          userId: userId,
+          status: InvoiceStatus.CANCELLED 
+        } 
+      })
     }
 
     return NextResponse.json({
@@ -71,16 +107,9 @@ export async function GET() {
     })
   } catch (error) {
     console.error('Failed to fetch dashboard stats:', error)
-    return NextResponse.json({
-      totalRevenue: 0,
-      currentMonthInvoices: 0,
-      lastMonthInvoices: 0,
-      statusCounts: {
-        PENDING: 0,
-        PAID: 0,
-        OVERDUE: 0,
-        CANCELLED: 0
-      }
-    })
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    )
   }
 } 

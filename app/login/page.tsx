@@ -1,8 +1,9 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+import { signIn, useSession } from "next-auth/react"
 import { ArrowLeft } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -10,16 +11,38 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { GoogleLoginButton } from "@/components/google-login-button"
 
 export default function LoginPage() {
+  const { data: session, status } = useSession()
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (session) {
+      router.push("/dashboard")
+    }
+  }, [session, router])
 
   const handleGoogleLogin = async () => {
-    setIsLoading(true)
-    // In a real application, this would trigger the Google OAuth flow
-    // For demo purposes, we'll just simulate a login
-    setTimeout(() => {
-      router.push("/dashboard")
-    }, 1500)
+    try {
+      setIsLoading(true)
+      setError(null)
+
+      const result = await signIn("google", {
+        callbackUrl: "/dashboard",
+        redirect: false,
+      })
+
+      if (result?.error) {
+        setError("Failed to sign in with Google")
+      } else if (result?.ok) {
+        router.push("/dashboard")
+      }
+    } catch (error) {
+      setError("An unexpected error occurred")
+      console.error("Login error:", error)
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -35,6 +58,11 @@ export default function LoginPage() {
             <CardDescription className="text-center">Sign in to access your invoices</CardDescription>
           </CardHeader>
           <CardContent className="grid gap-4">
+            {error && (
+              <div className="p-3 text-sm text-red-500 bg-red-50 rounded-md">
+                {error}
+              </div>
+            )}
             <GoogleLoginButton onClick={handleGoogleLogin} isLoading={isLoading} />
             <div className="relative">
               <div className="absolute inset-0 flex items-center">

@@ -1,7 +1,8 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
+import { useSession } from "next-auth/react"
 import { Plus, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -10,6 +11,7 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { createInvoice } from "@/app/actions/invoice"
+import type { SessionContextValue } from "next-auth/react"
 
 interface InvoiceItem {
   id: string
@@ -20,7 +22,9 @@ interface InvoiceItem {
 
 export function CreateInvoiceForm() {
   const router = useRouter()
+  const { data: session, status }: SessionContextValue = useSession()
   const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const [items, setItems] = useState<InvoiceItem[]>([
     { id: "1", description: "", quantity: 1, price: 0 }
   ])
@@ -31,6 +35,13 @@ export function CreateInvoiceForm() {
   // Generate default dates
   const today = new Date().toISOString().split('T')[0]
   const thirtyDaysFromNow = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+
+  // Redirect if not authenticated
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.replace("/login")
+    }
+  }, [status, router])
 
   const addItem = () => {
     setItems([
@@ -66,34 +77,75 @@ export function CreateInvoiceForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setIsLoading(true)
-
-    const form = e.target as HTMLFormElement
-    const formData = new FormData(form)
-
-    // Add items as JSON string
-    formData.append(
-      "items",
-      JSON.stringify(
-        items.map((item) => ({
-          description: item.description,
-          quantity: item.quantity,
-          price: item.price,
-        })),
-      ),
-    )
-
-    const result = await createInvoice(formData)
-    setIsLoading(false)
-
-    if (result.success && result.data) {
-      router.push(`/dashboard/invoices/${result.data.id}`)
-      router.refresh()
+    setError(null)
+    
+    if (!session?.user?.id) {
+      setError("You must be signed in to create an invoice")
+      return
     }
+
+    try {
+      setIsLoading(true)
+      const form = e.target as HTMLFormElement
+      const formData = new FormData(form)
+
+      // Add total amount
+      const total = calculateTotal()
+      formData.append("amount", total.toString())
+
+      // Add items
+      formData.append(
+        "items",
+        JSON.stringify(
+          items.map((item) => ({
+            description: item.description,
+            quantity: item.quantity,
+            price: item.price,
+          })),
+        ),
+      )
+
+      // Add user ID explicitly
+      formData.append("userId", session.user.id)
+
+      const result = await createInvoice(formData)
+      
+      if (result.success && result.data) {
+        router.push(`/dashboard/invoices/${result.data.id}`)
+        router.refresh()
+      } else {
+        setError(result.error || "Failed to create invoice")
+      }
+    } catch (error) {
+      console.error("Error creating invoice:", error)
+      setError("An unexpected error occurred")
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  // Show loading state
+  if (status === "loading") {
+    return (
+      <div className="flex items-center justify-center p-8">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    )
+  }
+
+  // Show error if not authenticated
+  if (status === "unauthenticated") {
+    return null // useEffect will handle redirect
   }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
+      {error && (
+        <div className="bg-red-50 text-red-600 p-3 rounded-md mb-4">
+          {error}
+        </div>
+      )}
+      
       {/* Invoice Header Card */}
       <Card>
         <CardHeader>

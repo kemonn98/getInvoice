@@ -81,7 +81,12 @@ export function EditInvoiceForm({ invoice }: EditInvoiceFormProps) {
       formData.set("status", status)
 
       // Format dates
+      const issueDate = formData.get("issueDate") as string
       const dueDate = formData.get("dueDate") as string
+      
+      if (issueDate) {
+        formData.set("issueDate", new Date(issueDate).toISOString())
+      }
       if (dueDate) {
         formData.set("dueDate", new Date(dueDate).toISOString())
       }
@@ -101,14 +106,10 @@ export function EditInvoiceForm({ invoice }: EditInvoiceFormProps) {
         router.push(`/dashboard/invoices/${invoice.id}`)
         router.refresh()
       } else {
-        // Instead of throwing an error, handle it gracefully
         console.error('Update failed:', result.error)
-        // Optionally, you could add state to show error message to user
-        // setError(result.error || 'Failed to update invoice')
       }
     } catch (error) {
       console.error('Failed to update invoice:', error)
-      // Handle any unexpected errors
     } finally {
       setIsSubmitting(false)
     }
@@ -218,6 +219,16 @@ export function EditInvoiceForm({ invoice }: EditInvoiceFormProps) {
                 name="dueDate"
                 type="date"
                 defaultValue={new Date(invoice.dueDate).toISOString().split('T')[0]}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="issueDate">Issue Date</Label>
+              <Input
+                id="issueDate"
+                name="issueDate"
+                type="date"
+                defaultValue={new Date(invoice.issueDate).toISOString().split('T')[0]}
                 required
               />
             </div>

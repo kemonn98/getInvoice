@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import { ArrowUpDown, Download, Eye, MoreHorizontal, Pencil, Trash2 } from "lucide-react"
 import { useRouter } from "next/navigation"
+import { useSession } from "next-auth/react"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -21,27 +22,42 @@ import { getInvoices } from "@/app/actions/invoice"
 
 export function InvoiceList() {
   const router = useRouter()
+  const { data: session, status } = useSession()
   const [invoices, setInvoices] = useState<any[]>([])
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [sortColumn, setSortColumn] = useState<string | null>(null)
-  
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc")
 
   useEffect(() => {
-    const fetchInvoices = async () => {
-      try {
-        const data = await getInvoices()
-        setInvoices(data || [])
-      } catch (err) {
-        setError('Failed to load invoices')
-        console.error(err)
+    if (status === "authenticated" && session) {
+      const fetchInvoices = async () => {
+        try {
+          setIsLoading(true);
+          setError(null);
+          const data = await getInvoices()
+          setInvoices(data || [])
+        } catch (err) {
+          console.error('Error fetching invoices:', err);
+          if (err instanceof Error) {
+            if (err.message.includes("Unauthorized")) {
+              router.replace('/login');
+            } else {
+              setError(err.message);
+            }
+          } else {
+            setError('Failed to load invoices');
+          }
+        } finally {
+          setIsLoading(false);
+        }
       }
-      setIsLoading(false)
-    }
 
-    fetchInvoices()
-  }, [])
+      fetchInvoices()
+    } else if (status === "unauthenticated") {
+      router.replace('/login')
+    }
+  }, [status, session])
 
   const handleSort = (column: string) => {
     if (sortColumn === column) {
@@ -100,7 +116,7 @@ export function InvoiceList() {
       return invoice.amount || 0 // Fallback to invoice.amount if no items
     }
     const subtotal = invoice.items.reduce((sum: number, item: any) => 
-      sum + (item.quantity * item.price), 0)
+      sum + (item.quantity * item.unitPrice), 0)
     const tax = subtotal * 0.1
     return subtotal + tax
   }
@@ -161,7 +177,12 @@ export function InvoiceList() {
                   <TableCell>{invoice.clientName}</TableCell>
                   <TableCell>{new Date(invoice.issueDate).toLocaleDateString()}</TableCell>
                   <TableCell>{new Date(invoice.dueDate).toLocaleDateString()}</TableCell>
-                  <TableCell>${calculateTotal(invoice).toFixed(2)}</TableCell>
+                  <TableCell>
+                    ${invoice.items ? 
+                      calculateTotal(invoice).toFixed(2) : 
+                      invoice.amount.toFixed(2)
+                    }
+                  </TableCell>
                   <TableCell>
                     <Badge variant="outline" className={getStatusColor(invoice.status)}>
                       {invoice.status.charAt(0).toUpperCase() + invoice.status.slice(1).toLowerCase()}

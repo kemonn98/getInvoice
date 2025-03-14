@@ -44,8 +44,20 @@ export function InvoiceDetailView({ invoice }: InvoiceDetailViewProps) {
 
   const handleStatusChange = async (status: string) => {
     setIsUpdatingStatus(true)
-    await updateInvoiceStatus(invoice.id, status)
-    setIsUpdatingStatus(false)
+    try {
+      const result = await updateInvoiceStatus(invoice.id, status)
+      if (result.success) {
+        // Refresh the page to show updated status
+        router.refresh()
+      } else {
+        console.error("Failed to update status:", result.error)
+        // Optionally show an error message to the user
+      }
+    } catch (error) {
+      console.error("Error updating status:", error)
+    } finally {
+      setIsUpdatingStatus(false)
+    }
   }
 
   async function handleDelete() {

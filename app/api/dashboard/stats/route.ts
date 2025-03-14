@@ -1,114 +1,98 @@
+import { getServerSession } from "next-auth/next"
+import { authOptions } from "@/app/auth"
 import { prisma } from "@/lib/prisma"
 import { NextResponse } from "next/server"
-import { InvoiceStatus } from "@prisma/client"
-import { getServerSession } from "next-auth/next"
-import { headers } from 'next/headers'
 
 export async function GET() {
   try {
-    const session = await getServerSession()
-    
-    if (!session?.user) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
+    const session = await getServerSession(authOptions)
+
+    if (!session?.user?.id) {
+      return new NextResponse(
+        JSON.stringify({ error: "Unauthorized" }), 
         { status: 401 }
       )
     }
 
     const userId = session.user.id
 
-    // Get total revenue (only from PAID invoices for this user)
-    const totalRevenue = await prisma.invoice.aggregate({
-      where: {
-        userId: userId,
-        status: InvoiceStatus.PAID
-      },
-      _sum: {
-        amount: true
-      }
-    })
+    // Get current date info
+    const now = new Date()
+    const startOfCurrentMonth = new Date(now.getFullYear(), now.getMonth(), 1)
+    const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1)
+    const endOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0)
 
-    // Get current month's invoices for this user
-    const startOfMonth = new Date()
-    startOfMonth.setDate(1)
-    startOfMonth.setHours(0, 0, 0, 0)
+    // Get all invoices for the user
+    const [
+      totalRevenue,
+      currentMonthInvoices,
+      lastMonthInvoices,
+      statusCounts
+    ] = await Promise.all([
+      // Calculate total revenue from paid invoices
+      prisma.invoice.aggregate({
+        where: {
+          userId,
+          status: 'PAID'
+        },
+        _sum: {
+          amount: true
+        }
+      }),
 
-    const currentMonthInvoices = await prisma.invoice.count({
-      where: {
-        userId: userId,
-        AND: [
-          {
-            createdAt: {
-              gte: startOfMonth
-            }
+      // Count current month invoices
+      prisma.invoice.count({
+        where: {
+          userId,
+          createdAt: {
+            gte: startOfCurrentMonth
           }
-        ]
-      }
-    })
+        }
+      }),
 
-    // Get last month's invoices for this user
-    const startOfLastMonth = new Date(startOfMonth)
-    startOfLastMonth.setMonth(startOfLastMonth.getMonth() - 1)
-    const endOfLastMonth = new Date(startOfMonth)
-    endOfLastMonth.setMilliseconds(-1)
-
-    const lastMonthInvoices = await prisma.invoice.count({
-      where: {
-        userId: userId,
-        AND: [
-          {
-            createdAt: {
-              gte: startOfLastMonth,
-              lt: startOfMonth
-            }
-          },
-          {
-            NOT: {
-              status: InvoiceStatus.CANCELLED
-            }
+      // Count last month invoices
+      prisma.invoice.count({
+        where: {
+          userId,
+          createdAt: {
+            gte: startOfLastMonth,
+            lt: startOfCurrentMonth
           }
-        ]
-      }
-    })
+        }
+      }),
 
-    // Get status counts for this user
-    const statusCounts = {
-      PENDING: await prisma.invoice.count({ 
-        where: { 
-          userId: userId,
-          status: InvoiceStatus.PENDING 
-        } 
-      }),
-      PAID: await prisma.invoice.count({ 
-        where: { 
-          userId: userId,
-          status: InvoiceStatus.PAID 
-        } 
-      }),
-      OVERDUE: await prisma.invoice.count({ 
-        where: { 
-          userId: userId,
-          status: InvoiceStatus.OVERDUE 
-        } 
-      }),
-      CANCELLED: await prisma.invoice.count({ 
-        where: { 
-          userId: userId,
-          status: InvoiceStatus.CANCELLED 
-        } 
+      // Get counts by status
+      prisma.invoice.groupBy({
+        where: {
+          userId
+        },
+        by: ['status'],
+        _count: true
       })
+    ])
+
+    // Format status counts
+    const formattedStatusCounts = {
+      PENDING: 0,
+      PAID: 0,
+      OVERDUE: 0,
+      CANCELLED: 0
     }
+
+    statusCounts.forEach((status) => {
+      formattedStatusCounts[status.status as keyof typeof formattedStatusCounts] = status._count
+    })
 
     return NextResponse.json({
       totalRevenue: totalRevenue._sum.amount || 0,
       currentMonthInvoices,
       lastMonthInvoices,
-      statusCounts
+      statusCounts: formattedStatusCounts
     })
   } catch (error) {
-    console.error('Failed to fetch dashboard stats:', error)
-    return NextResponse.json(
-      { error: "Internal server error" },
+    console.error('Error fetching dashboard stats:', error)
+    return new NextResponse(
+      JSON.stringify({ error: "Internal Server Error" }), 
       { status: 500 }
     )
   }

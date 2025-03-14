@@ -18,19 +18,10 @@ export function DashboardStats() {
       if (status === "loading") return
 
       try {
-        const response = await fetch('/api/dashboard/stats', {
-          credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        })
-
+        const response = await fetch('/api/dashboard/stats')
+        
         if (!response.ok) {
-          if (response.status === 401) {
-            setError("Please sign in to view dashboard statistics")
-            return
-          }
-          throw new Error('Failed to fetch statistics')
+          throw new Error(response.statusText)
         }
 
         const data = await response.json()
@@ -48,6 +39,12 @@ export function DashboardStats() {
       fetchStats()
     }
   }, [session, status])
+
+  const calculateTrend = () => {
+    if (!stats.lastMonthInvoices) return 0
+    return ((stats.currentMonthInvoices - stats.lastMonthInvoices) / 
+      (stats.lastMonthInvoices || 1) * 100)
+  }
 
   if (status === "loading" || isLoading) {
     return <LoadingSkeleton />
@@ -144,7 +141,7 @@ export function DashboardStats() {
         <CardContent>
           <div className="flex flex-col gap-1">
             <div className="text-2xl font-bold text-orange-600">
-              {((stats.currentMonthInvoices - stats.lastMonthInvoices) / stats.lastMonthInvoices * 100).toFixed(1)}%
+              {calculateTrend().toFixed(1)}%
             </div>
             <p className="text-xs text-muted-foreground">
               Compared to last month

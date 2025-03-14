@@ -72,7 +72,7 @@ export async function createInvoice(formData: FormData) {
           connect: { id: client.id }
         },
         invoiceNumber: formData.get("invoiceNumber") as string,
-        status: formData.get("status") as string,
+        status: formData.get("status") as InvoiceStatus,
         amount: parseFloat(formData.get("amount") as string),
         issueDate: new Date(formData.get("issueDate") as string),
         dueDate: new Date(formData.get("dueDate") as string),
@@ -182,7 +182,7 @@ export async function updateInvoice(invoiceId: string, formData: FormData) {
       },
       data: {
         invoiceNumber: formData.get("invoiceNumber") as string,
-        status: formData.get("status") as string,
+        status: formData.get("status") as InvoiceStatus,
         amount: parseFloat(formData.get("amount") as string),
         dueDate: new Date(formData.get("dueDate") as string),
         notes: formData.get("notes") as string || "",
@@ -258,7 +258,7 @@ export async function updateInvoiceStatus(invoiceId: string, status: string) {
         userId: session.user.id
       },
       data: {
-        status: status
+        status: status as InvoiceStatus
       },
       include: {
         items: true,

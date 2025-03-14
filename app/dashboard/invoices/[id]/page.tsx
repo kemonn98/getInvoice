@@ -40,7 +40,7 @@ export default async function InvoicePage({ params }: PageParams) {
   return (
     <DashboardShell>
       <DashboardHeader
-        heading={`Invoice ${invoice.invoiceNumber}`}
+        heading={`Invoice ${invoice.invoiceNo}`}
         text="View and manage invoice details"
       />
       <div className="grid gap-8">

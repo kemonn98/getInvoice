@@ -167,50 +167,59 @@ export async function getClients() {
   }
 }
 
-export async function updateInvoice(id: number, formData: FormData) {
+export async function updateInvoice(id: string | number, formData: FormData) {
   try {
+    // Convert id to number
+    const invoiceId = Number(id)
+
+    // Parse items from form data
     const items = JSON.parse(formData.get("items") as string)
-    
+
     // First delete existing items
     await prisma.invoiceItem.deleteMany({
       where: {
-        invoiceId: id.toString()
+        invoiceId: invoiceId.toString()
       }
     })
 
-    // Then update the invoice with new items
-    const invoice = await prisma.invoice.update({
-      where: {
-        id: id.toString(),
-      },
-      data: {
-        status: formData.get("status") as InvoiceStatus,
-        date: new Date(formData.get("date") as string),
-        dueDate: new Date(formData.get("dueDate") as string),
-        notes: formData.get("notes") as string,
-        ourName: formData.get("ourName") as string,
-        ourBusinessName: formData.get("ourBusinessName") as string,
-        ourAddress: formData.get("ourAddress") as string,
-        clientName: formData.get("clientName") as string,
-        clientBusinessName: formData.get("clientBusinessName") as string,
-        clientAddress: formData.get("clientAddress") as string,
-        items: {
-          create: items.map((item: any) => ({
-            description: item.description,
-            quantity: item.quantity,
-            price: item.price,
-            total: item.total
-          }))
+    // Create new items
+    const itemsData = items.map((item: any) => ({
+      invoiceId: invoiceId,
+      description: item.description,
+      quantity: Number(item.quantity),
+      price: Number(item.price),
+      total: Number(item.quantity) * Number(item.price)
+    }))
+
+    // Update invoice and create new items in a transaction
+    const result = await prisma.$transaction([
+      prisma.invoice.update({
+        where: { id: invoiceId },
+        data: {
+          invoiceNo: formData.get("invoiceNo") as string,
+          status: formData.get("status") as string,
+          date: new Date(formData.get("date") as string),
+          dueDate: new Date(formData.get("dueDate") as string),
+          notes: formData.get("notes") as string,
+          ourName: formData.get("ourName") as string,
+          ourBusinessName: formData.get("ourBusinessName") as string,
+          ourAddress: formData.get("ourAddress") as string,
+          clientName: formData.get("clientName") as string,
+          clientBusinessName: formData.get("clientBusinessName") as string,
+          clientAddress: formData.get("clientAddress") as string,
+          total: Number(formData.get("total"))
         }
-      },
-      include: {
-        items: true,
-      }
-    })
+      }),
+      prisma.invoiceItem.createMany({
+        data: itemsData
+      })
+    ])
 
-    return { success: true, data: invoice }
+    revalidatePath("/dashboard/invoices")
+    return { success: true }
   } catch (error) {
-    return { success: false, error: error instanceof Error ? error.message : "Failed to update invoice" }
+    console.error("Failed to update invoice:", error)
+    return { success: false, error: error instanceof Error ? error.message : "Unknown error occurred" }
   }
 }
 

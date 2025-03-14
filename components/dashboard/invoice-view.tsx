@@ -1,5 +1,13 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 
+interface InvoiceItem {
+  id: number;
+  description: string;
+  quantity: number;
+  price: number;
+  total: number;
+}
+
 interface InvoiceViewProps {
   invoice: any
 }
@@ -8,8 +16,8 @@ export function InvoiceView({ invoice }: InvoiceViewProps) {
   // Calculate totals from items
   const calculateSubtotal = () => {
     if (!invoice.items || !Array.isArray(invoice.items)) return 0
-    return invoice.items.reduce((sum: number, item: any) => 
-      sum + (item.quantity * item.unitPrice), 0)
+    return invoice.items.reduce((sum: number, item: InvoiceItem) => 
+      sum + (item.quantity * item.price), 0)
   }
 
   const calculateTax = () => {
@@ -69,13 +77,13 @@ export function InvoiceView({ invoice }: InvoiceViewProps) {
             </tr>
           </thead>
           <tbody>
-            {invoice.items?.map((item: any, index: number) => (
-              <tr key={index} className="border-b">
+            {invoice.items.map((item: InvoiceItem) => (
+              <tr key={item.id} className="border-b">
                 <td className="py-2">{item.description}</td>
                 <td className="py-2 text-right">{item.quantity}</td>
-                <td className="py-2 text-right">${item.unitPrice.toFixed(2)}</td>
+                <td className="py-2 text-right">${item.price.toFixed(2)}</td>
                 <td className="py-2 text-right">
-                  ${(item.quantity * item.unitPrice).toFixed(2)}
+                  ${(item.quantity * item.price).toFixed(2)}
                 </td>
               </tr>
             ))}

@@ -10,7 +10,7 @@ import { DollarSign } from "lucide-react"
 export function DashboardStats() {
   const { data: session, status } = useSession()
   const [stats, setStats] = useState<any>(null)
-  const [isLoading, setIsLoading] = useState(true)
+  const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
@@ -18,20 +18,22 @@ export function DashboardStats() {
       if (status === "loading") return
 
       try {
+        setLoading(true)
         const response = await fetch('/api/dashboard/stats')
         
         if (!response.ok) {
-          throw new Error(response.statusText)
+          const errorData = await response.json()
+          throw new Error(errorData.error || 'Failed to fetch stats')
         }
 
         const data = await response.json()
         setStats(data)
         setError(null)
-      } catch (error) {
-        console.error('Error:', error)
-        setError('Error loading dashboard statistics')
+      } catch (err) {
+        console.error('Error fetching stats:', err)
+        setError(err instanceof Error ? err.message : 'Failed to fetch stats')
       } finally {
-        setIsLoading(false)
+        setLoading(false)
       }
     }
 
@@ -46,12 +48,12 @@ export function DashboardStats() {
       (stats.lastMonthInvoices || 1) * 100)
   }
 
-  if (status === "loading" || isLoading) {
-    return <LoadingSkeleton />
+  if (status === "loading" || loading) {
+    return <StatsLoading />
   }
 
   if (error) {
-    return <ErrorMessage message={error} />
+    return <div className="text-red-500">Error: {error}</div>
   }
 
   if (!stats) {
@@ -153,7 +155,7 @@ export function DashboardStats() {
   )
 }
 
-function LoadingSkeleton() {
+function StatsLoading() {
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
       {[...Array(4)].map((_, i) => (
@@ -166,14 +168,6 @@ function LoadingSkeleton() {
           </CardContent>
         </Card>
       ))}
-    </div>
-  )
-}
-
-function ErrorMessage({ message }: { message: string }) {
-  return (
-    <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-600">
-      {message}
     </div>
   )
 }

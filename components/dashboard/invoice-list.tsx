@@ -116,7 +116,7 @@ export function InvoiceList() {
       return invoice.amount || 0 // Fallback to invoice.amount if no items
     }
     const subtotal = invoice.items.reduce((sum: number, item: any) => 
-      sum + (item.quantity * item.unitPrice), 0)
+      sum + (item.quantity * item.price), 0)
     const tax = subtotal * 0.1
     return subtotal + tax
   }
@@ -173,9 +173,9 @@ export function InvoiceList() {
                   onClick={() => router.push(`/dashboard/invoices/${invoice.id}`)}
                   className="cursor-pointer hover:bg-muted/50"
                 >
-                  <TableCell className="font-medium">{invoice.invoiceNumber}</TableCell>
+                  <TableCell className="font-medium">{invoice.invoiceNo}</TableCell>
                   <TableCell>{invoice.clientName}</TableCell>
-                  <TableCell>{new Date(invoice.issueDate).toLocaleDateString()}</TableCell>
+                  <TableCell>{new Date(invoice.date).toLocaleDateString()}</TableCell>
                   <TableCell>{new Date(invoice.dueDate).toLocaleDateString()}</TableCell>
                   <TableCell>
                     ${invoice.items ? 

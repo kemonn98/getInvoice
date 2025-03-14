@@ -49,6 +49,15 @@ export async function createInvoice(formData: FormData) {
     const userId = session.user.id
     const items = JSON.parse(formData.get("items") as string)
 
+    // Generate invoice number
+    const now = new Date()
+    const invoiceNo = `INV-${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}-${Math.random().toString(36).slice(-4).toUpperCase()}`
+
+    // Calculate total from items
+    const total = items.reduce((sum: number, item: any) => {
+      return sum + (Number(item.price) * Number(item.quantity))
+    }, 0)
+
     // First, create the client with proper relation
     const client = await prisma.client.create({
       data: {
@@ -71,10 +80,10 @@ export async function createInvoice(formData: FormData) {
         client: {
           connect: { id: client.id }
         },
-        invoiceNumber: formData.get("invoiceNumber") as string,
-        status: formData.get("status") as InvoiceStatus,
-        amount: parseFloat(formData.get("amount") as string),
-        issueDate: new Date(formData.get("issueDate") as string),
+        invoiceNo,  // Use generated invoice number
+        status: formData.get("status") as InvoiceStatus || "PENDING",
+        total,      // Use calculated total
+        date: new Date(formData.get("date") as string || now), // Use current date if not provided
         dueDate: new Date(formData.get("dueDate") as string),
         notes: formData.get("notes") as string || "",
         ourName: formData.get("ourName") as string,
@@ -87,7 +96,8 @@ export async function createInvoice(formData: FormData) {
           create: items.map((item: any) => ({
             description: item.description,
             quantity: parseInt(item.quantity),
-            unitPrice: parseFloat(item.price)
+            price: parseFloat(item.price),
+            total: parseInt(item.quantity) * parseFloat(item.price) // Add total for each item
           }))
         }
       },
@@ -105,6 +115,7 @@ export async function createInvoice(formData: FormData) {
   } catch (error) {
     console.error("Error in createInvoice:", error)
     return {
+      
       success: false,
       error: error instanceof Error ? error.message : "Failed to create invoice"
     }
@@ -120,6 +131,8 @@ async function ensureTestClient() {
   if (!testClient) {
     return await prisma.client.create({
       data: {
+
+        
         userId: MOCK_USER_ID,
         name: "Test Client",
         email: "client@example.com",
@@ -153,69 +166,52 @@ export async function getClients() {
   }
 }
 
-export async function updateInvoice(invoiceId: string, formData: FormData) {
+export async function updateInvoice(id: number, formData: FormData) {
   try {
-    const session = await getServerSession(authOptions)
-    
-    if (!session?.user?.id) {
-      return {
-        success: false,
-        error: "Unauthorized: Please sign in"
-      }
-    }
-
-    // Parse items from formData
     const items = JSON.parse(formData.get("items") as string)
-
-    // First, delete existing items
+    
+    // First delete existing items
     await prisma.invoiceItem.deleteMany({
       where: {
-        invoiceId: invoiceId
+        invoiceId: id
       }
     })
 
     // Then update the invoice with new items
     const invoice = await prisma.invoice.update({
       where: {
-        id: invoiceId,
-        userId: session.user.id
+        id: id,
       },
       data: {
-        invoiceNumber: formData.get("invoiceNumber") as string,
-        status: formData.get("status") as InvoiceStatus,
-        amount: parseFloat(formData.get("amount") as string),
+        invoiceNo: formData.get("invoiceNo") as string,
+        status: formData.get("status") as string,
+        total: parseFloat(formData.get("total") as string),
+        date: new Date(formData.get("date") as string),
         dueDate: new Date(formData.get("dueDate") as string),
-        notes: formData.get("notes") as string || "",
+        notes: formData.get("notes") as string,
         ourName: formData.get("ourName") as string,
         ourBusinessName: formData.get("ourBusinessName") as string,
         ourAddress: formData.get("ourAddress") as string,
         clientName: formData.get("clientName") as string,
-        clientBusinessName: formData.get("clientBusinessName") as string || null,
+        clientBusinessName: formData.get("clientBusinessName") as string,
         clientAddress: formData.get("clientAddress") as string,
         items: {
           create: items.map((item: any) => ({
             description: item.description,
-            quantity: parseInt(item.quantity),
-            unitPrice: parseFloat(item.unitPrice)
+            quantity: item.quantity,
+            price: item.price,
+            total: item.total
           }))
         }
       },
       include: {
         items: true,
-        client: true
       }
     })
 
-    return {
-      success: true,
-      data: invoice
-    }
+    return { success: true, data: invoice }
   } catch (error) {
-    console.error("Error updating invoice:", error)
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : "Failed to update invoice"
-    }
+    return { success: false, error: error.message }
   }
 }
 

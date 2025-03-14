@@ -1,99 +1,94 @@
+import { prisma } from "@/lib/prisma"
 import { getServerSession } from "next-auth/next"
 import { authOptions } from "@/app/auth"
-import { prisma } from "@/lib/prisma"
-import { NextResponse } from "next/server"
 
 export async function GET() {
   try {
+    // Get the user session
     const session = await getServerSession(authOptions)
+    
+    if (!session?.user?.email) {
+      return Response.json({ error: 'Unauthorized' }, { status: 401 })
+    }
 
-    if (!session?.user?.id) {
-      return new NextResponse(
-        JSON.stringify({ error: "Unauthorized" }), 
-        { status: 401 }
+    // Get the user ID from the database
+    const user = await prisma.user.findUnique({
+      where: { email: session.user.email }
+    })
+
+    if (!user) {
+      return Response.json({ error: 'User not found' }, { status: 404 })
+    }
+
+    const userId = user.id
+
+    // Get all status counts first
+    const allStatuses = await prisma.invoice.groupBy({
+      by: ['status'],
+      _count: true,
+      where: {
+        userId
+      }
+    })
+
+    // Convert status counts to the expected format
+    const statusCounts = {
+      PAID: 0,
+      PENDING: 0,
+      OVERDUE: 0,
+      CANCELLED: 0,
+      ...Object.fromEntries(
+        allStatuses.map(({ status, _count }) => [status, _count])
       )
     }
 
-    const userId = session.user.id
-
-    // Get current date info
-    const now = new Date()
-    const startOfCurrentMonth = new Date(now.getFullYear(), now.getMonth(), 1)
-    const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1)
-    const endOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0)
-
-    // Get all invoices for the user
-    const [
-      totalRevenue,
-      currentMonthInvoices,
-      lastMonthInvoices,
-      statusCounts
-    ] = await Promise.all([
+    const [totalRevenue, currentMonthInvoices, lastMonthInvoices] = await Promise.all([
       // Calculate total revenue from paid invoices
       prisma.invoice.aggregate({
+        _sum: {
+          total: true  // Changed from 'amount' to 'total'
+        },
         where: {
           userId,
           status: 'PAID'
-        },
-        _sum: {
-          amount: true
         }
       }),
 
-      // Count current month invoices
+      // Current month invoices
       prisma.invoice.count({
         where: {
           userId,
-          createdAt: {
-            gte: startOfCurrentMonth
+          date: {
+            gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
+            lt: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1)
           }
         }
       }),
 
-      // Count last month invoices
+      // Last month invoices
       prisma.invoice.count({
         where: {
           userId,
-          createdAt: {
-            gte: startOfLastMonth,
-            lt: startOfCurrentMonth
+          date: {
+            gte: new Date(new Date().getFullYear(), new Date().getMonth() - 1, 1),
+            lt: new Date(new Date().getFullYear(), new Date().getMonth(), 1)
           }
         }
-      }),
-
-      // Get counts by status
-      prisma.invoice.groupBy({
-        where: {
-          userId
-        },
-        by: ['status'],
-        _count: true
       })
-    ])
+    ]);
 
-    // Format status counts
-    const formattedStatusCounts = {
-      PENDING: 0,
-      PAID: 0,
-      OVERDUE: 0,
-      CANCELLED: 0
-    }
-
-    statusCounts.forEach((status) => {
-      formattedStatusCounts[status.status as keyof typeof formattedStatusCounts] = status._count
-    })
-
-    return NextResponse.json({
-      totalRevenue: totalRevenue._sum.amount || 0,
+    return Response.json({
+      totalRevenue: totalRevenue._sum.total || 0,
       currentMonthInvoices,
       lastMonthInvoices,
-      statusCounts: formattedStatusCounts
-    })
+      statusCounts
+    });
+
   } catch (error) {
-    console.error('Error fetching dashboard stats:', error)
-    return new NextResponse(
-      JSON.stringify({ error: "Internal Server Error" }), 
+    console.error('Error in dashboard stats:', error);
+    return Response.json(
+      { error: 'Failed to fetch dashboard stats' },
       { status: 500 }
-    )
+    );
   }
 } 

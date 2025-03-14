@@ -12,7 +12,7 @@ async function getInvoice(id: string) {
 
   const invoice = await prisma.invoice.findUnique({
     where: {
-      id: id,
+      id: parseInt(id),
       userId: session.user.id
     },
     include: {
@@ -34,7 +34,7 @@ export default async function EditInvoicePage({ params }: { params: { id: string
   return (
     <DashboardShell>
       <DashboardHeader
-        heading={`Edit Invoice ${invoice.invoiceNumber}`}
+        heading={`Edit Invoice ${invoice.invoiceNo}`}
         text="Update invoice information and items"
       />
       <div className="grid gap-8">

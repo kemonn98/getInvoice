@@ -6,7 +6,7 @@ import { InvoiceDetailView } from "@/components/dashboard/invoice-details"
 import { DashboardHeader } from "@/components/dashboard/dashboard-header"
 import { DashboardShell } from "@/components/dashboard/dashboard-shell"
 
-async function getInvoice(id: string) {
+async function getInvoice(id: number) {
   const session = await getServerSession(authOptions)
   if (!session?.user?.id) return null
 
@@ -17,16 +17,21 @@ async function getInvoice(id: string) {
     },
     include: {
       items: true,
-      client: true,
-      user: true
+      client: true
     }
   })
 
   return invoice
 }
 
-export default async function InvoicePage({ params }: { params: { id: string } }) {
-  const invoice = await getInvoice(params.id)
+type PageParams = {
+  params: {
+    id: string
+  }
+}
+
+export default async function InvoicePage({ params }: PageParams) {
+  const invoice = await getInvoice(parseInt(params.id))
 
   if (!invoice) {
     notFound()

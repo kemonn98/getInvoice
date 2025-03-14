@@ -15,12 +15,22 @@ interface InvoiceItem {
   id: string
   description: string
   quantity: number
-  unitPrice: number
+  price: number
 }
 
 interface EditInvoiceFormProps {
   invoice: any
 }
+
+// Helper function to format date safely
+const formatDate = (date: string | Date | null) => {
+  if (!date) return '';
+  try {
+    return new Date(date).toISOString().split('T')[0];
+  } catch (e) {
+    return '';
+  }
+};
 
 export function EditInvoiceForm({ invoice }: EditInvoiceFormProps) {
   const router = useRouter()
@@ -31,7 +41,7 @@ export function EditInvoiceForm({ invoice }: EditInvoiceFormProps) {
       id: item.id,
       description: item.description,
       quantity: item.quantity,
-      unitPrice: item.unitPrice
+      price: item.price
     })) || []
   )
 
@@ -42,7 +52,7 @@ export function EditInvoiceForm({ invoice }: EditInvoiceFormProps) {
         id: Math.random().toString(36).substring(2, 9),
         description: "",
         quantity: 1,
-        unitPrice: 0,
+        price: 0,
       },
     ])
   }
@@ -56,7 +66,7 @@ export function EditInvoiceForm({ invoice }: EditInvoiceFormProps) {
   }
 
   const calculateSubtotal = () => {
-    return items.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0)
+    return items.reduce((sum, item) => sum + item.quantity * item.price, 0)
   }
 
   const calculateTax = () => {
@@ -75,32 +85,34 @@ export function EditInvoiceForm({ invoice }: EditInvoiceFormProps) {
       const form = e.target as HTMLFormElement
       const formData = new FormData(form)
       
-      // Add calculated values
+      // Calculate total first
       const total = calculateTotal()
-      formData.set("amount", total.toString())
-      formData.set("status", status)
-
-      // Format dates
-      const issueDate = formData.get("issueDate") as string
-      const dueDate = formData.get("dueDate") as string
-      
-      if (issueDate) {
-        formData.set("issueDate", new Date(issueDate).toISOString())
-      }
-      if (dueDate) {
-        formData.set("dueDate", new Date(dueDate).toISOString())
-      }
 
       // Format items with proper types
       const formattedItems = items.map((item) => ({
         description: item.description,
         quantity: Number(item.quantity),
-        unitPrice: Number(item.unitPrice)
+        price: Number(item.price),
+        total: Number(item.quantity) * Number(item.price)
       }))
 
-      formData.set("items", JSON.stringify(formattedItems))
+      // Create the complete form data object
+      const completeFormData = new FormData()
+      completeFormData.set("invoiceNo", formData.get("invoiceNo") as string)
+      completeFormData.set("status", status)
+      completeFormData.set("total", total.toString())
+      completeFormData.set("date", new Date(formData.get("date") as string).toISOString())
+      completeFormData.set("dueDate", new Date(formData.get("dueDate") as string).toISOString())
+      completeFormData.set("notes", formData.get("notes") as string || "")
+      completeFormData.set("ourName", formData.get("ourName") as string)
+      completeFormData.set("ourBusinessName", formData.get("ourBusinessName") as string)
+      completeFormData.set("ourAddress", formData.get("ourAddress") as string)
+      completeFormData.set("clientName", formData.get("clientName") as string)
+      completeFormData.set("clientBusinessName", formData.get("clientBusinessName") as string)
+      completeFormData.set("clientAddress", formData.get("clientAddress") as string)
+      completeFormData.set("items", JSON.stringify(formattedItems))
 
-      const result = await updateInvoice(invoice.id, formData)
+      const result = await updateInvoice(invoice.id, completeFormData)
 
       if (result.success) {
         router.push(`/dashboard/invoices/${invoice.id}`)
@@ -190,11 +202,11 @@ export function EditInvoiceForm({ invoice }: EditInvoiceFormProps) {
           {/* Invoice Details */}
           <div className="grid gap-6 md:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="invoiceNumber">Invoice Number</Label>
+              <Label htmlFor="invoiceNo">Invoice Number</Label>
               <Input 
-                id="invoiceNumber" 
-                name="invoiceNumber" 
-                defaultValue={invoice.invoiceNumber} 
+                id="invoiceNo" 
+                name="invoiceNo" 
+                defaultValue={invoice.invoiceNo} 
                 required 
               />
             </div>
@@ -218,17 +230,17 @@ export function EditInvoiceForm({ invoice }: EditInvoiceFormProps) {
                 id="dueDate"
                 name="dueDate"
                 type="date"
-                defaultValue={new Date(invoice.dueDate).toISOString().split('T')[0]}
+                defaultValue={formatDate(invoice.dueDate)}
                 required
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="issueDate">Issue Date</Label>
+              <Label htmlFor="date">Issue Date</Label>
               <Input
-                id="issueDate"
-                name="issueDate"
+                id="date"
+                name="date"
                 type="date"
-                defaultValue={new Date(invoice.issueDate).toISOString().split('T')[0]}
+                defaultValue={formatDate(invoice.date)}
                 required
               />
             </div>
@@ -276,17 +288,17 @@ export function EditInvoiceForm({ invoice }: EditInvoiceFormProps) {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor={`item-${index}-unitPrice`} className="sr-only">
+                    <Label htmlFor={`item-${index}-price`} className="sr-only">
                       Unit Price
                     </Label>
                     <Input
-                      id={`item-${index}-unitPrice`}
+                      id={`item-${index}-price`}
                       type="number"
                       min="0"
                       step="0.01"
                       placeholder="Price"
-                      value={item.unitPrice}
-                      onChange={(e) => updateItem(item.id, "unitPrice", parseFloat(e.target.value) || 0)}
+                      value={item.price}
+                      onChange={(e) => updateItem(item.id, "price", parseFloat(e.target.value) || 0)}
                       required
                     />
                   </div>

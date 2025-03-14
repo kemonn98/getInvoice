@@ -1,4 +1,4 @@
-import { CreateInvoiceForm } from "@/components/dashboard/create-invoice-form"
+import { CreateInvoiceForm } from "@/components/dashboard/invoice-create"
 import { DashboardHeader } from "@/components/dashboard/dashboard-header"
 import { DashboardShell } from "@/components/dashboard/dashboard-shell"
 

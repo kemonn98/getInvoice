@@ -46,7 +46,7 @@ export function InvoiceView({ invoice }: InvoiceViewProps) {
           <h2 className="text-3xl font-bold tracking-tight text-primary">INVOICE</h2>
           <p className="text-xl font-medium mt-2">#{invoice.invoiceNumber}</p>
           <div className="mt-2 text-sm text-muted-foreground">
-            <p>Issue Date: {new Date(invoice.issueDate).toLocaleDateString()}</p>
+            <p>Issue Date: {new Date(invoice.date).toLocaleDateString()}</p>
             <p>Due Date: {new Date(invoice.dueDate).toLocaleDateString()}</p>
             <p className="mt-2 font-medium uppercase">Status: {invoice.status}</p>
           </div>

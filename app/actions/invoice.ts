@@ -126,13 +126,14 @@ export async function createInvoice(formData: FormData) {
 async function ensureTestClient() {
   const testClient = await prisma.client.findFirst({
     where: { userId: MOCK_USER_ID }
+
   })
 
   if (!testClient) {
     return await prisma.client.create({
       data: {
 
-        
+
         userId: MOCK_USER_ID,
         name: "Test Client",
         email: "client@example.com",
@@ -173,19 +174,17 @@ export async function updateInvoice(id: number, formData: FormData) {
     // First delete existing items
     await prisma.invoiceItem.deleteMany({
       where: {
-        invoiceId: id
+        invoiceId: id.toString()
       }
     })
 
     // Then update the invoice with new items
     const invoice = await prisma.invoice.update({
       where: {
-        id: id,
+        id: id.toString(),
       },
       data: {
-        invoiceNo: formData.get("invoiceNo") as string,
-        status: formData.get("status") as string,
-        total: parseFloat(formData.get("total") as string),
+        status: formData.get("status") as InvoiceStatus,
         date: new Date(formData.get("date") as string),
         dueDate: new Date(formData.get("dueDate") as string),
         notes: formData.get("notes") as string,
@@ -211,7 +210,7 @@ export async function updateInvoice(id: number, formData: FormData) {
 
     return { success: true, data: invoice }
   } catch (error) {
-    return { success: false, error: error.message }
+    return { success: false, error: error instanceof Error ? error.message : "Failed to update invoice" }
   }
 }
 

@@ -75,29 +75,40 @@ export function EditInvoiceForm({ invoice }: EditInvoiceFormProps) {
       const form = e.target as HTMLFormElement
       const formData = new FormData(form)
       
-      // Add status
-      formData.append("status", status)
+      // Add calculated values
+      const total = calculateTotal()
+      formData.set("amount", total.toString())
+      formData.set("status", status)
 
-      // Add items as JSON string
-      formData.append(
-        "items",
-        JSON.stringify(
-          items.map((item) => ({
-            description: item.description,
-            quantity: item.quantity,
-            unitPrice: item.unitPrice,
-          }))
-        )
-      )
+      // Format dates
+      const dueDate = formData.get("dueDate") as string
+      if (dueDate) {
+        formData.set("dueDate", new Date(dueDate).toISOString())
+      }
+
+      // Format items with proper types
+      const formattedItems = items.map((item) => ({
+        description: item.description,
+        quantity: Number(item.quantity),
+        unitPrice: Number(item.unitPrice)
+      }))
+
+      formData.set("items", JSON.stringify(formattedItems))
 
       const result = await updateInvoice(invoice.id, formData)
 
       if (result.success) {
         router.push(`/dashboard/invoices/${invoice.id}`)
         router.refresh()
+      } else {
+        // Instead of throwing an error, handle it gracefully
+        console.error('Update failed:', result.error)
+        // Optionally, you could add state to show error message to user
+        // setError(result.error || 'Failed to update invoice')
       }
     } catch (error) {
       console.error('Failed to update invoice:', error)
+      // Handle any unexpected errors
     } finally {
       setIsSubmitting(false)
     }

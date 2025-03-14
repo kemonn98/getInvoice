@@ -104,7 +104,7 @@ export function InvoiceDetailView({ invoice }: InvoiceDetailViewProps) {
         <div className="flex items-center gap-2">
           <Badge 
             variant="secondary" 
-            className={`${getStatusColor(invoice.status)} font-medium px-3 py-1.5 text-sm`}
+            className={`${getStatusColor(invoice.status)} font-medium px-3 py-1.5`}
           >
             {invoice.status.charAt(0).toUpperCase() + invoice.status.slice(1).toLowerCase()}
           </Badge>
@@ -116,17 +116,17 @@ export function InvoiceDetailView({ invoice }: InvoiceDetailViewProps) {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                {invoice.status !== "draft" && (
-                  <DropdownMenuItem onClick={() => handleStatusChange("draft")}>Mark as Draft</DropdownMenuItem>
-                )}
-                {invoice.status !== "sent" && (
-                  <DropdownMenuItem onClick={() => handleStatusChange("sent")}>Mark as Sent</DropdownMenuItem>
+                {invoice.status !== "pending" && (
+                  <DropdownMenuItem onClick={() => handleStatusChange("PENDING")}>Mark as Pending</DropdownMenuItem>
                 )}
                 {invoice.status !== "paid" && (
-                  <DropdownMenuItem onClick={() => handleStatusChange("paid")}>Mark as Paid</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleStatusChange("PAID")}>Mark as Paid</DropdownMenuItem>
                 )}
                 {invoice.status !== "overdue" && (
-                  <DropdownMenuItem onClick={() => handleStatusChange("overdue")}>Mark as Overdue</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleStatusChange("OVERDUE")}>Mark as Overdue</DropdownMenuItem>
+                )}
+                {invoice.status !== "cancelled" && (
+                  <DropdownMenuItem onClick={() => handleStatusChange("CANCELLED")}>Mark as Cancelled</DropdownMenuItem>
                 )}
               </DropdownMenuContent>
             </DropdownMenu>

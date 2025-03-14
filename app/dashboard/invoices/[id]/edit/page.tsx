@@ -2,7 +2,7 @@ import { notFound } from "next/navigation"
 import { getInvoiceById } from "@/app/actions/invoice"
 import { DashboardHeader } from "@/components/dashboard/dashboard-header"
 import { DashboardShell } from "@/components/dashboard/dashboard-shell"
-import { EditInvoiceForm } from "@/components/dashboard/edit-invoice-form"
+import { EditInvoiceForm } from "@/components/dashboard/invoice-edit"
 
 interface EditInvoicePageProps {
   params: {

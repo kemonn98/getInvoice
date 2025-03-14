@@ -149,17 +149,24 @@ export async function updateInvoice(id: string, formData: FormData) {
       status: InvoiceStatus[status],
       invoiceNumber: formData.get('invoiceNumber') as string,
       dueDate: new Date(formData.get('dueDate') as string),
-      amount: formData.get('amount') as number,
+      amount: parseFloat(formData.get('amount') as string),
       notes: formData.get('notes') as string || '',
+      ourName: formData.get('ourName') as string,
+      ourBusinessName: formData.get('ourBusinessName') as string,
+      ourAddress: formData.get('ourAddress') as string,
+      clientName: formData.get('clientName') as string,
+      clientBusinessName: formData.get('clientBusinessName') as string || null,
+      clientAddress: formData.get('clientAddress') as string,
       items: {
         deleteMany: {},
         create: JSON.parse(formData.get('items') as string).map((item: any) => ({
           description: item.description,
-          quantity: item.quantity,
-          unitPrice: item.unitPrice
+          quantity: Number(item.quantity),
+          unitPrice: Number(item.unitPrice)
         }))
       }
     }
+    
     const invoice = await prisma.invoice.update({
       where: { id },
       data
@@ -169,7 +176,7 @@ export async function updateInvoice(id: string, formData: FormData) {
     return { success: true, data: invoice }
   } catch (error) {
     console.error('Failed to update invoice:', error)
-    return { success: false, error: 'Failed to update invoice' }
+    return { success: false, error: String(error) }
   }
 }
 
@@ -203,7 +210,7 @@ export async function updateInvoiceStatus(invoiceId: string, status: string) {
         userId: MOCK_USER_ID
       },
       data: {
-        status: status
+        status: status as InvoiceStatus
       }
     })
 

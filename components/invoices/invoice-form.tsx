@@ -20,8 +20,9 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { invoiceSchema } from "@/lib/schema"
-import { Invoice, InvoiceItem, InvoiceStatus } from '@/types/invoice'
+import { Invoice, InvoiceItem } from '@/types/invoice'
 import { useState } from "react"
+import { InvoiceStatus } from '@prisma/client'
 
 // Define status options as a constant
 const STATUS_OPTIONS = [
@@ -40,7 +41,7 @@ export function InvoiceForm({ invoice, onSubmit }: InvoiceFormProps) {
   const form = useForm<z.infer<typeof invoiceSchema>>({
     resolver: zodResolver(invoiceSchema),
     defaultValues: invoice || {
-      status: "PENDING",
+      status: InvoiceStatus.PENDING,
       // ... other default values
     }
   })

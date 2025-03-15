@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import { ArrowUpDown, Download, Eye, MoreHorizontal, Pencil, Trash2 } from "lucide-react"
+import { Download, Eye, MoreHorizontal, Pencil, Trash2 } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useSession } from "next-auth/react"
 
@@ -20,14 +20,29 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge"
 import { getInvoices } from "@/app/actions/invoice"
 
+// Add interfaces for type safety
+interface InvoiceItem {
+  quantity: number;
+  price: number;
+}
+
+interface Invoice {
+  id: string;
+  invoiceNo: string;
+  clientName: string;
+  date: string | Date;
+  dueDate: string | Date;
+  status: string;
+  amount?: number;
+  items?: InvoiceItem[];
+}
+
 export function InvoiceList() {
   const router = useRouter()
   const { data: session, status } = useSession()
-  const [invoices, setInvoices] = useState<any[]>([])
+  const [invoices, setInvoices] = useState<Invoice[]>([])
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
-  const [sortColumn, setSortColumn] = useState<string | null>(null)
-  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc")
 
   useEffect(() => {
     if (status === "authenticated" && session) {
@@ -57,44 +72,9 @@ export function InvoiceList() {
     } else if (status === "unauthenticated") {
       router.replace('/login')
     }
-  }, [status, session])
+  }, [status, session, router])
 
-  const handleSort = (column: string) => {
-    if (sortColumn === column) {
-      setSortDirection(sortDirection === "asc" ? "desc" : "asc")
-    } else {
-      setSortColumn(column)
-      setSortDirection("asc")
-    }
-  }
-
-  const sortedInvoices = [...invoices].sort((a, b) => {
-    if (!sortColumn) return 0
-
-    let aValue = a[sortColumn as keyof typeof a]
-    let bValue = b[sortColumn as keyof typeof b]
-
-    // Handle nested properties like client.name
-    if (sortColumn === "client") {
-      aValue = a.client.name
-      bValue = b.client.name
-    }
-
-    if (typeof aValue === "string" && typeof bValue === "string") {
-      return sortDirection === "asc" ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue)
-    }
-
-    if (typeof aValue === "number" && typeof bValue === "number") {
-      return sortDirection === "asc" ? aValue - bValue : bValue - aValue
-    }
-
-    // Handle dates
-    if (aValue instanceof Date && bValue instanceof Date) {
-      return sortDirection === "asc" ? aValue.getTime() - bValue.getTime() : bValue.getTime() - aValue.getTime()
-    }
-
-    return 0
-  })
+  const sortedInvoices = invoices
 
   const getStatusColor = (status: string) => {
     switch (status.toUpperCase()) {
@@ -111,11 +91,11 @@ export function InvoiceList() {
     }
   }
 
-  const calculateTotal = (invoice: any) => {
+  const calculateTotal = (invoice: Invoice) => {
     if (!invoice.items || !Array.isArray(invoice.items)) {
-      return invoice.amount || 0 // Fallback to invoice.amount if no items
+      return invoice.amount || 0
     }
-    const subtotal = invoice.items.reduce((sum: number, item: any) => 
+    const subtotal = invoice.items.reduce((sum: number, item: InvoiceItem) => 
       sum + (item.quantity * item.price), 0)
     const tax = subtotal * 0.1
     return subtotal + tax

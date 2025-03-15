@@ -1,5 +1,6 @@
 import Link from "next/link"
 import { ArrowRight } from "lucide-react"
+import Image from 'next/image'
 
 import { Button } from "@/components/ui/button"
 
@@ -52,10 +53,13 @@ export default function Home() {
             </Link>
           </div>
           <div className="mt-8 w-full overflow-hidden rounded-lg border bg-background shadow-xl">
-            <img
-              src="/placeholder.svg?height=600&width=1200"
+            <Image
+              src="/placeholder.svg"
               alt="Invoice Generator Dashboard Preview"
+              width={1200}
+              height={600}
               className="w-full object-cover"
+              priority
             />
           </div>
         </section>

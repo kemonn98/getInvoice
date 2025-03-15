@@ -16,27 +16,24 @@ import {
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { updateInvoiceStatus } from "@/app/actions/invoice"
+import { updateInvoiceStatus, deleteInvoice } from "@/app/actions/invoice"
 import { InvoiceView } from "@/components/dashboard/invoice-view"
-import { deleteInvoice } from "@/app/actions/invoice"
+
+interface Invoice {
+  id: string;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+  // Add other invoice properties you're using
+}
 
 interface InvoiceDetailViewProps {
-  invoice: any
+  invoice: Invoice
 }
 
 export function InvoiceDetailView({ invoice }: InvoiceDetailViewProps) {
   const router = useRouter()
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false)
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false)
   const [showDeleteAlert, setShowDeleteAlert] = useState(false)

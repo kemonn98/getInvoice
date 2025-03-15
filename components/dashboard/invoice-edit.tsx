@@ -18,8 +18,29 @@ interface InvoiceItem {
   price: number
 }
 
+interface Invoice {
+  id: string;
+  status: string;
+  invoiceNo: string;
+  date: string | Date;
+  dueDate: string | Date;
+  notes?: string;
+  ourName: string;
+  ourBusinessName: string;
+  ourAddress: string;
+  clientName: string;
+  clientBusinessName?: string;
+  clientAddress: string;
+  items: {
+    id: string;
+    description: string;
+    quantity: number;
+    price: number;
+  }[];
+}
+
 interface EditInvoiceFormProps {
-  invoice: any
+  invoice: Invoice
 }
 
 // Helper function to format date safely
@@ -27,7 +48,7 @@ const formatDate = (date: string | Date | null) => {
   if (!date) return '';
   try {
     return new Date(date).toISOString().split('T')[0];
-  } catch (e) {
+  } catch {
     return '';
   }
 };
@@ -37,7 +58,7 @@ export function EditInvoiceForm({ invoice }: EditInvoiceFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [status, setStatus] = useState(invoice.status)
   const [items, setItems] = useState<InvoiceItem[]>(
-    invoice.items?.map((item: any) => ({
+    invoice.items?.map((item: InvoiceItem) => ({
       id: item.id,
       description: item.description,
       quantity: item.quantity,

@@ -19,7 +19,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Input } from "@/components/ui/input"
 import { invoiceSchema } from "@/lib/schema"
 
 // Define status options as a constant
@@ -39,7 +38,7 @@ export function InvoiceForm({ invoice, onSubmit }: InvoiceFormProps) {
   const form = useForm<z.infer<typeof invoiceSchema>>({
     resolver: zodResolver(invoiceSchema),
     defaultValues: invoice || {
-      status: "pending",
+      status: "PENDING",
       // ... other default values
     }
   })

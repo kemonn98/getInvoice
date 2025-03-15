@@ -1,8 +1,35 @@
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 
+interface InvoiceItem {
+  id: string;
+  description: string;
+  quantity: number;
+  price: number;
+}
+
+interface Client {
+  name: string;
+  email?: string;
+  address?: string;
+  phone?: string;
+}
+
+interface Invoice {
+  invoiceNumber: string;
+  issueDate: string | Date;
+  dueDate: string | Date;
+  status: string;
+  client: Client;
+  items: InvoiceItem[];
+  subtotal: number;
+  tax: number;
+  total: number;
+  notes?: string;
+}
+
 interface InvoicePDFProps {
-  invoice: any
+  invoice: Invoice
 }
 
 export function InvoicePDF({ invoice }: InvoicePDFProps) {
@@ -63,7 +90,7 @@ export function InvoicePDF({ invoice }: InvoicePDFProps) {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {invoice.items.map((item: any) => (
+              {invoice.items.map((item: InvoiceItem) => (
                 <TableRow key={item.id}>
                   <TableCell>{item.description}</TableCell>
                   <TableCell className="text-right">{item.quantity}</TableCell>

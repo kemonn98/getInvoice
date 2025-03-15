@@ -150,7 +150,7 @@ export function CreateInvoiceForm() {
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-6" aria-disabled={isLoading}>
+      <form onSubmit={handleSubmit} className={`space-y-6 ${isLoading ? 'opacity-50 pointer-events-none' : ''}`}>
         {error && (
           <div className="bg-red-50 text-red-600 p-3 rounded-md mb-4">
             {error}

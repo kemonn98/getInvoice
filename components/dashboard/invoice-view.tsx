@@ -8,8 +8,23 @@ interface InvoiceItem {
   total: number;
 }
 
+interface Invoice {
+  ourBusinessName: string;
+  ourName: string;
+  ourAddress: string;
+  invoiceNumber: string;
+  date: string | Date;
+  dueDate: string | Date;
+  status: string;
+  clientName: string;
+  clientBusinessName?: string;
+  clientAddress: string;
+  items: InvoiceItem[];
+  notes?: string;
+}
+
 interface InvoiceViewProps {
-  invoice: any
+  invoice: Invoice
 }
 
 export function InvoiceView({ invoice }: InvoiceViewProps) {

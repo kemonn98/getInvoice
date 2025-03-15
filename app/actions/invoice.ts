@@ -54,7 +54,7 @@ export async function createInvoice(formData: FormData) {
     const invoiceNo = `INV-${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}-${Math.random().toString(36).slice(-4).toUpperCase()}`
 
     // Calculate total from items
-    const total = items.reduce((sum: number, item: any) => {
+    const total = items.reduce((sum: number, item: InvoiceItem) => {
       return sum + (Number(item.price) * Number(item.quantity))
     }, 0)
 
@@ -93,11 +93,11 @@ export async function createInvoice(formData: FormData) {
         clientBusinessName: formData.get("clientBusinessName") as string || null,
         clientAddress: formData.get("clientAddress") as string,
         items: {
-          create: items.map((item: any) => ({
+          create: items.map((item: InvoiceItem) => ({
             description: item.description,
-            quantity: parseInt(item.quantity),
-            price: parseFloat(item.price),
-            total: parseInt(item.quantity) * parseFloat(item.price) // Add total for each item
+            quantity: parseInt(item.quantity.toString()),
+            price: parseFloat(item.price.toString()),
+            total: parseInt(item.quantity.toString()) * parseFloat(item.price.toString())
           }))
         }
       },
@@ -183,7 +183,7 @@ export async function updateInvoice(id: string | number, formData: FormData) {
     })
 
     // Create new items
-    const itemsData = items.map((item: any) => ({
+    const itemsData = items.map((item: InvoiceItem) => ({
       invoiceId: invoiceId,
       description: item.description,
       quantity: Number(item.quantity),
@@ -192,7 +192,7 @@ export async function updateInvoice(id: string | number, formData: FormData) {
     }))
 
     // Update invoice and create new items in a transaction
-    const result = await prisma.$transaction([
+    const [updatedInvoice, createdItems] = await prisma.$transaction([
       prisma.invoice.update({
         where: { id: invoiceId },
         data: {
@@ -307,5 +307,13 @@ export async function getInvoiceById(id: string) {
     console.error('Failed to fetch invoice:', error)
     return { invoice: null, error: 'Failed to fetch invoice' }
   }
+}
+
+// Add this interface above your functions
+interface InvoiceItem {
+  description: string
+  quantity: number | string
+  price: number | string
+  total?: number
 }
 

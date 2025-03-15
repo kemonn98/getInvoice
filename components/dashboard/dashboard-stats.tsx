@@ -7,9 +7,21 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { FileText, PieChart, TrendingUp } from "lucide-react"
 import { DollarSign } from "lucide-react"
 
+interface DashboardStats {
+  totalRevenue: number;
+  currentMonthInvoices: number;
+  lastMonthInvoices: number;
+  statusCounts: {
+    PENDING: number;
+    PAID: number;
+    OVERDUE: number;
+    CANCELLED: number;
+  };
+}
+
 export function DashboardStats() {
   const { data: session, status } = useSession()
-  const [stats, setStats] = useState<any>(null)
+  const [stats, setStats] = useState<DashboardStats | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 

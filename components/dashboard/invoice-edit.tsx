@@ -173,7 +173,7 @@ export function EditInvoiceForm({ invoice }: EditInvoiceFormProps) {
                 <Input
                   id="clientBusinessName"
                   name="clientBusinessName"
-                  defaultValue={invoice.clientBusinessName}
+                  defaultValue={invoice.clientBusinessName || ""}
                 />
               </div>
             </div>
@@ -201,7 +201,7 @@ export function EditInvoiceForm({ invoice }: EditInvoiceFormProps) {
             </div>
             <div className="space-y-2">
               <Label htmlFor="status">Status</Label>
-              <Select value={status} onValueChange={setStatus}>
+              <Select value={status} onValueChange={(value) => setStatus(value as InvoiceStatus)}>
                 <SelectTrigger id="status">
                   <SelectValue placeholder="Select status" />
                 </SelectTrigger>
@@ -258,7 +258,7 @@ export function EditInvoiceForm({ invoice }: EditInvoiceFormProps) {
                       id={`item-${index}-description`}
                       placeholder="Item description"
                       value={item.description}
-                      onChange={(e) => updateItem(item.id, "description", e.target.value)}
+                      onChange={(e) => updateItem(item.id || 0, "description", e.target.value)}
                       required
                     />
                   </div>
@@ -272,7 +272,7 @@ export function EditInvoiceForm({ invoice }: EditInvoiceFormProps) {
                       min="1"
                       placeholder="Qty"
                       value={item.quantity}
-                      onChange={(e) => updateItem(item.id, "quantity", parseInt(e.target.value) || 0)}
+                      onChange={(e) => updateItem(item.id || 0, "quantity", parseInt(e.target.value) || 0)}
                       required
                     />
                   </div>
@@ -287,7 +287,7 @@ export function EditInvoiceForm({ invoice }: EditInvoiceFormProps) {
                       step="0.01"
                       placeholder="Price"
                       value={item.price}
-                      onChange={(e) => updateItem(item.id, "price", parseFloat(e.target.value) || 0)}
+                      onChange={(e) => updateItem(item.id || 0, "price", parseFloat(e.target.value) || 0)}
                       required
                     />
                   </div>
@@ -297,7 +297,7 @@ export function EditInvoiceForm({ invoice }: EditInvoiceFormProps) {
                       variant="ghost"
                       size="icon"
                       disabled={items.length === 1}
-                      onClick={() => removeItem(item.id)}
+                      onClick={() => removeItem(item.id || 0)}
                     >
                       <Trash2 className="h-4 w-4" />
                       <span className="sr-only">Remove item</span>

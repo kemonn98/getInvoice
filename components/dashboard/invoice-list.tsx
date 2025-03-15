@@ -160,7 +160,7 @@ export function InvoiceList() {
                   <TableCell>
                     ${invoice.items ? 
                       calculateTotal(invoice).toFixed(2) : 
-                      invoice.amount.toFixed(2)
+                      (invoice.amount || 0).toFixed(2)
                     }
                   </TableCell>
                   <TableCell>

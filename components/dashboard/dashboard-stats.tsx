@@ -55,9 +55,9 @@ export function DashboardStats() {
   }, [session, status])
 
   const calculateTrend = () => {
-    if (!stats.lastMonthInvoices) return 0
-    return ((stats.currentMonthInvoices - stats.lastMonthInvoices) / 
-      (stats.lastMonthInvoices || 1) * 100)
+    if (stats?.lastMonthInvoices === 0) return 0
+    return ((stats?.currentMonthInvoices - stats?.lastMonthInvoices) / 
+      (stats?.lastMonthInvoices || 1) * 100)
   }
 
   if (status === "loading" || loading) {

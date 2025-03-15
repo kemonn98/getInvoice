@@ -19,7 +19,7 @@ import { Badge } from "@/components/ui/badge"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { updateInvoiceStatus, deleteInvoice } from "@/app/actions/invoice"
 import { InvoiceView } from "@/components/dashboard/invoice-view"
-import { Invoice } from '@/types/invoice'
+import { Invoice, InvoiceStatus } from '@/types/invoice'
 
 interface InvoiceItem {
   id: number;
@@ -44,7 +44,7 @@ export function InvoiceDetailView({ invoice }: InvoiceDetailViewProps) {
   const handleStatusChange = async (status: string) => {
     setIsUpdatingStatus(true)
     try {
-      const result = await updateInvoiceStatus(invoice.id, status)
+      const result = await updateInvoiceStatus(invoice.id.toString(), status)
       if (result.success) {
         // Refresh the page to show updated status
         router.refresh()
@@ -62,7 +62,7 @@ export function InvoiceDetailView({ invoice }: InvoiceDetailViewProps) {
   async function handleDelete() {
     setIsDeleting(true)
     try {
-      const result = await deleteInvoice(invoice.id)
+      const result = await deleteInvoice(invoice.id.toString())
       if (result.success) {
         router.push('/dashboard')
         router.refresh()
@@ -119,7 +119,7 @@ export function InvoiceDetailView({ invoice }: InvoiceDetailViewProps) {
           >
             {invoice.status.charAt(0).toUpperCase() + invoice.status.slice(1).toLowerCase()}
           </Badge>
-          {invoice.status !== "paid" && (
+          {invoice.status !== InvoiceStatus.PAID && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="sm" disabled={isUpdatingStatus}>
@@ -127,16 +127,16 @@ export function InvoiceDetailView({ invoice }: InvoiceDetailViewProps) {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                {invoice.status !== "pending" && (
+                {invoice.status !== InvoiceStatus.PENDING && (
                   <DropdownMenuItem onClick={() => handleStatusChange("PENDING")}>Mark as Pending</DropdownMenuItem>
                 )}
-                {invoice.status !== "paid" && (
+                {invoice.status !== InvoiceStatus.PAID && (
                   <DropdownMenuItem onClick={() => handleStatusChange("PAID")}>Mark as Paid</DropdownMenuItem>
                 )}
-                {invoice.status !== "overdue" && (
+                {invoice.status !== InvoiceStatus.OVERDUE && (
                   <DropdownMenuItem onClick={() => handleStatusChange("OVERDUE")}>Mark as Overdue</DropdownMenuItem>
                 )}
-                {invoice.status !== "cancelled" && (
+                {invoice.status !== InvoiceStatus.CANCELLED && (
                   <DropdownMenuItem onClick={() => handleStatusChange("CANCELLED")}>Mark as Cancelled</DropdownMenuItem>
                 )}
               </DropdownMenuContent>
@@ -191,7 +191,7 @@ export function InvoiceDetailView({ invoice }: InvoiceDetailViewProps) {
                 <p className="text-sm text-muted-foreground">{new Date(invoice.createdAt).toLocaleString()}</p>
               </div>
             </div>
-            {invoice.status !== "draft" && (
+            {invoice.status !== InvoiceStatus.PENDING && (
               <div className="flex items-start gap-3">
                 <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100">
                   <Share2 className="h-4 w-4 text-blue-600" />
@@ -202,7 +202,7 @@ export function InvoiceDetailView({ invoice }: InvoiceDetailViewProps) {
                 </div>
               </div>
             )}
-            {invoice.status === "paid" && (
+            {invoice.status === InvoiceStatus.PAID && (
               <div className="flex items-start gap-3">
                 <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-100">
                   <Download className="h-4 w-4 text-green-600" />

@@ -119,30 +119,20 @@ export function InvoiceDetailView({ invoice }: InvoiceDetailViewProps) {
           >
             {invoice.status.charAt(0).toUpperCase() + invoice.status.slice(1).toLowerCase()}
           </Badge>
-          {invoice.status !== InvoiceStatus.PAID && (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" disabled={isUpdatingStatus}>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm" disabled={isUpdatingStatus}>
                   {isUpdatingStatus ? "Updating..." : "Update Status"}
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                {invoice.status !== InvoiceStatus.PENDING && (
-                  <DropdownMenuItem onClick={() => handleStatusChange("PENDING")}>Mark as Pending</DropdownMenuItem>
-                )}
-                {invoice.status !== InvoiceStatus.PAID && (
-                  <DropdownMenuItem onClick={() => handleStatusChange("PAID")}>Mark as Paid</DropdownMenuItem>
-                )}
-                {invoice.status !== InvoiceStatus.OVERDUE && (
-                  <DropdownMenuItem onClick={() => handleStatusChange("OVERDUE")}>Mark as Overdue</DropdownMenuItem>
-                )}
-                {invoice.status !== InvoiceStatus.CANCELLED && (
-                  <DropdownMenuItem onClick={() => handleStatusChange("CANCELLED")}>Mark as Cancelled</DropdownMenuItem>
-                )}
+                <DropdownMenuItem onClick={() => handleStatusChange("PENDING")}>Mark as Pending</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleStatusChange("PAID")}>Mark as Paid</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleStatusChange("OVERDUE")}>Mark as Overdue</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleStatusChange("CANCELLED")}>Mark as Cancelled</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-          )}
-        </div>
+          </div>
         <div className="flex flex-wrap gap-2">
           <Button variant="outline" size="sm" onClick={handlePrint}>
             <Printer className="mr-2 h-4 w-4" />

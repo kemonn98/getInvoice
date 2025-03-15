@@ -12,7 +12,7 @@ interface Invoice {
   ourBusinessName: string;
   ourName: string;
   ourAddress: string;
-  invoiceNumber: string;
+  invoiceNo: string;
   date: string | Date;
   dueDate: string | Date;
   status: string;
@@ -59,7 +59,7 @@ export function InvoiceView({ invoice }: InvoiceViewProps) {
         {/* Invoice Details */}
         <div className="text-right">
           <h2 className="text-3xl font-bold tracking-tight text-primary">INVOICE</h2>
-          <p className="text-xl font-medium mt-2">#{invoice.invoiceNumber}</p>
+          <p className="text-xl font-medium mt-2">#{invoice.invoiceNo}</p>
           <div className="mt-2 text-sm text-muted-foreground">
             <p>Issue Date: {new Date(invoice.date).toLocaleDateString()}</p>
             <p>Due Date: {new Date(invoice.dueDate).toLocaleDateString()}</p>

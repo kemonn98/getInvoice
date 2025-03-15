@@ -1,13 +1,5 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Invoice } from '@/types/invoice'  // Import the shared type
-
-interface InvoiceItem {
-  id: number;
-  description: string;
-  quantity: number;
-  price: number;
-  total: number;
-}
+import { Invoice, InvoiceItem } from '@/types/invoice'  // Import both types
 
 interface InvoiceViewProps {
   invoice: Invoice
@@ -21,7 +13,7 @@ export function InvoiceView({ invoice }: InvoiceViewProps) {
   const calculateSubtotal = () => {
     if (!invoice.items || !Array.isArray(invoice.items)) return 0
     return invoice.items.reduce((sum: number, item: InvoiceItem) => 
-      sum + (item.quantity * item.price), 0)
+      sum + (Number(item.quantity) * Number(item.price)), 0)
   }
 
   const calculateTax = () => {

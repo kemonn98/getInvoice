@@ -176,20 +176,15 @@ export async function getClients() {
 
 export async function updateInvoice(id: string | number, formData: FormData) {
   try {
-    // Convert id to number
     const invoiceId = Number(id)
-
-    // Parse items from form data
     const items = JSON.parse(formData.get("items") as string)
 
-    // First delete existing items
     await prisma.invoiceItem.deleteMany({
       where: {
         invoiceId: invoiceId
       }
     })
 
-    // Create new items
     const itemsData = items.map((item: InvoiceItem) => ({
       invoiceId: invoiceId,
       description: item.description,
@@ -198,13 +193,12 @@ export async function updateInvoice(id: string | number, formData: FormData) {
       total: Number(item.quantity) * Number(item.price)
     }))
 
-    // Update invoice and create new items in a transaction
     const [updatedInvoice, createdItems] = await prisma.$transaction([
       prisma.invoice.update({
         where: { id: invoiceId },
         data: {
           invoiceNo: formData.get("invoiceNo") as string,
-          status: formData.get("status") as string,
+          status: formData.get("status") as InvoiceStatus,
           date: new Date(formData.get("date") as string),
           dueDate: new Date(formData.get("dueDate") as string),
           notes: formData.get("notes") as string,

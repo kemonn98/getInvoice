@@ -5,7 +5,7 @@ import Link from "next/link"
 import { Download, Eye, MoreHorizontal, Pencil, Trash2 } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useSession } from "next-auth/react"
-import { Invoice as PrismaInvoice } from '@prisma/client'
+import { Invoice as PrismaInvoice, InvoiceStatus } from '@prisma/client'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import {
@@ -36,7 +36,7 @@ interface Invoice extends Omit<PrismaInvoice, 'items' | 'client'> {
   clientName: string;
   date: Date;  // Changed from string | Date to Date
   dueDate: Date | null;  // Changed to match Prisma's type
-  status: string;
+  status: InvoiceStatus;
   total: number;  // Added to match Prisma
   items: InvoiceItem[];
   client: {
@@ -90,15 +90,15 @@ export function InvoiceList() {
 
   const sortedInvoices = invoices
 
-  const getStatusColor = (status: string) => {
-    switch (status.toUpperCase()) {
-      case "PENDING":
+  const getStatusColor = (status: InvoiceStatus) => {
+    switch (status) {
+      case InvoiceStatus.PENDING:
         return "bg-yellow-100 text-yellow-800 hover:bg-yellow-100/80"
-      case "PAID":
+      case InvoiceStatus.PAID:
         return "bg-green-100 text-green-800 hover:bg-green-100/80"
-      case "OVERDUE":
+      case InvoiceStatus.OVERDUE:
         return "bg-red-100 text-red-800 hover:bg-red-100/80"
-      case "CANCELLED":
+      case InvoiceStatus.CANCELLED:
         return "bg-slate-100 text-slate-800 hover:bg-slate-100/80"
       default:
         return "bg-gray-100 text-gray-800 hover:bg-gray-100/80"

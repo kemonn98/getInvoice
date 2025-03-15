@@ -5,7 +5,7 @@ import Link from "next/link"
 import { Download, Eye, MoreHorizontal, Pencil, Trash2 } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useSession } from "next-auth/react"
-
+import { Invoice as PrismaInvoice } from '@prisma/client'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import {
@@ -20,21 +20,35 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge"
 import { getInvoices } from "@/app/actions/invoice"
 
-// Add interfaces for type safety
+// Update the interfaces to match Prisma's types
 interface InvoiceItem {
+  id: number;
+  description: string;
   quantity: number;
   price: number;
+  total: number;
+  invoiceId: number;
 }
 
-interface Invoice {
-  id: string;
+interface Invoice extends Omit<PrismaInvoice, 'items' | 'client'> {
+  id: number;  // Changed from string to number
   invoiceNo: string;
   clientName: string;
-  date: string | Date;
-  dueDate: string | Date;
+  date: Date;  // Changed from string | Date to Date
+  dueDate: Date | null;  // Changed to match Prisma's type
   status: string;
-  amount?: number;
-  items?: InvoiceItem[];
+  total: number;  // Added to match Prisma
+  items: InvoiceItem[];
+  client: {
+    id: number;
+    name: string;
+    email: string | null;
+    phone: string | null;
+    address: string | null;
+    userId: string;
+    createdAt: Date;
+    updatedAt: Date;
+  };
 }
 
 export function InvoiceList() {
@@ -93,12 +107,10 @@ export function InvoiceList() {
 
   const calculateTotal = (invoice: Invoice) => {
     if (!invoice.items || !Array.isArray(invoice.items)) {
-      return invoice.amount || 0
+      return invoice.total || 0;
     }
-    const subtotal = invoice.items.reduce((sum: number, item: InvoiceItem) => 
-      sum + (item.quantity * item.price), 0)
-    const tax = subtotal * 0.1
-    return subtotal + tax
+    return invoice.items.reduce((sum, item) => 
+      sum + item.total, 0);
   }
 
   if (error) return <div>Error: {error}</div>
@@ -149,19 +161,16 @@ export function InvoiceList() {
             <TableBody>
               {sortedInvoices.map((invoice) => (
                 <TableRow 
-                  key={invoice.id}
+                  key={invoice.id.toString()}
                   onClick={() => router.push(`/dashboard/invoices/${invoice.id}`)}
                   className="cursor-pointer hover:bg-muted/50"
                 >
                   <TableCell className="font-medium">{invoice.invoiceNo}</TableCell>
                   <TableCell>{invoice.clientName}</TableCell>
                   <TableCell>{new Date(invoice.date).toLocaleDateString()}</TableCell>
-                  <TableCell>{new Date(invoice.dueDate).toLocaleDateString()}</TableCell>
+                  <TableCell>{invoice.dueDate ? new Date(invoice.dueDate).toLocaleDateString() : 'N/A'}</TableCell>
                   <TableCell>
-                    ${invoice.items ? 
-                      calculateTotal(invoice).toFixed(2) : 
-                      (invoice.amount || 0).toFixed(2)
-                    }
+                    ${calculateTotal(invoice).toFixed(2)}
                   </TableCell>
                   <TableCell>
                     <Badge variant="outline" className={getStatusColor(invoice.status)}>

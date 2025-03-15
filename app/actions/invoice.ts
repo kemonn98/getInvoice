@@ -185,7 +185,7 @@ export async function updateInvoice(id: string | number, formData: FormData) {
     // First delete existing items
     await prisma.invoiceItem.deleteMany({
       where: {
-        invoiceId: invoiceId.toString()
+        invoiceId: invoiceId
       }
     })
 

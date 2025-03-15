@@ -10,47 +10,10 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { updateInvoice } from "@/app/actions/invoice"
-
-interface InvoiceItem {
-  id: number;
-  description: string;
-  quantity: number;
-  price: number;
-  total: number;
-  invoiceId: number;
-}
-
-interface Invoice {
-  id: number;
-  invoiceNo: string;
-  status: string;
-  date: Date | null;
-  dueDate: Date | null;
-  notes: string | null | undefined;
-  total: number;
-  ourName: string;
-  ourBusinessName: string;
-  ourAddress: string;
-  clientName: string;
-  clientBusinessName: string | null;
-  clientAddress: string;
-  items: InvoiceItem[];
-  client: {
-    id: number;
-    name: string;
-    email: string | null;
-    phone: string | null;
-    address: string | null;
-    userId: string;
-    createdAt: Date;
-    updatedAt: Date;
-  };
-  createdAt?: Date;
-  updatedAt?: Date;
-}
+import { Invoice, InvoiceItem, InvoiceStatus } from '@/types/invoice'
 
 interface EditInvoiceFormProps {
-  invoice: Invoice
+  invoice: Invoice;
 }
 
 // Helper function to format date safely

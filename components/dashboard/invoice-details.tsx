@@ -19,6 +19,7 @@ import { Badge } from "@/components/ui/badge"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { updateInvoiceStatus, deleteInvoice } from "@/app/actions/invoice"
 import { InvoiceView } from "@/components/dashboard/invoice-view"
+import { Invoice } from '@/types/invoice'
 
 interface InvoiceItem {
   id: number;
@@ -27,35 +28,6 @@ interface InvoiceItem {
   price: number;
   total: number;
   invoiceId: number;
-}
-
-interface Invoice {
-  id: number;
-  invoiceNo: string;
-  status: string;
-  date: Date | null;
-  dueDate: Date | null;
-  notes: string | null | undefined;
-  total: number;
-  ourName: string;
-  ourBusinessName: string;
-  ourAddress: string;
-  clientName: string;
-  clientBusinessName: string | null;
-  clientAddress: string;
-  items: InvoiceItem[];
-  client: {
-    id: number;
-    name: string;
-    email: string | null;
-    phone: string | null;
-    address: string | null;
-    userId: string;
-    createdAt: Date;
-    updatedAt: Date;
-  };
-  createdAt?: Date;
-  updatedAt?: Date;
 }
 
 interface InvoiceDetailViewProps {

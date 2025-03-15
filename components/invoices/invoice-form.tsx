@@ -20,6 +20,8 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { invoiceSchema } from "@/lib/schema"
+import { Invoice, InvoiceItem, InvoiceStatus } from '@/types/invoice'
+import { useState } from "react"
 
 // Define status options as a constant
 const STATUS_OPTIONS = [
@@ -43,6 +45,16 @@ export function InvoiceForm({ invoice, onSubmit }: InvoiceFormProps) {
     }
   })
 
+  // For form state
+  const [items, setItems] = useState<InvoiceItem[]>([])
+  const [status, setStatus] = useState<InvoiceStatus>(InvoiceStatus.PENDING)
+
+  // For select/dropdown options
+  const statusOptions = Object.values(InvoiceStatus).map(status => ({
+    label: status.toLowerCase(),
+    value: status
+  }))
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
@@ -61,7 +73,7 @@ export function InvoiceForm({ invoice, onSubmit }: InvoiceFormProps) {
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  {STATUS_OPTIONS.map((option) => (
+                  {statusOptions.map((option) => (
                     <SelectItem key={option.value} value={option.value}>
                       {option.label}
                     </SelectItem>

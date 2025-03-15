@@ -260,9 +260,12 @@ export async function updateInvoiceStatus(invoiceId: string, status: string) {
       }
     }
 
+    // Convert invoiceId to number
+    const numericInvoiceId = Number(invoiceId)
+
     const invoice = await prisma.invoice.update({
       where: {
-        id: invoiceId,
+        id: numericInvoiceId,  // Use the converted number
         userId: session.user.id
       },
       data: {

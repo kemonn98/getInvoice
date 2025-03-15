@@ -19,16 +19,7 @@ import { Badge } from "@/components/ui/badge"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { updateInvoiceStatus, deleteInvoice } from "@/app/actions/invoice"
 import { InvoiceView } from "@/components/dashboard/invoice-view"
-import { Invoice, InvoiceStatus } from '@/types/invoice'
-
-interface InvoiceItem {
-  id: number;
-  description: string;
-  quantity: number;
-  price: number;
-  total: number;
-  invoiceId: number;
-}
+import { Invoice } from '@/types/invoice'
 
 interface InvoiceDetailViewProps {
   invoice: Invoice;
@@ -132,7 +123,7 @@ export function InvoiceDetailView({ invoice }: InvoiceDetailViewProps) {
                 <DropdownMenuItem onClick={() => handleStatusChange("CANCELLED")}>Mark as Cancelled</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-          </div>
+        </div>
         <div className="flex flex-wrap gap-2">
           <Button variant="outline" size="sm" onClick={handlePrint}>
             <Printer className="mr-2 h-4 w-4" />
@@ -181,7 +172,7 @@ export function InvoiceDetailView({ invoice }: InvoiceDetailViewProps) {
                 <p className="text-sm text-muted-foreground">{new Date(invoice.createdAt).toLocaleString()}</p>
               </div>
             </div>
-            {invoice.status !== InvoiceStatus.PENDING && (
+            {invoice.status !== 'PAID' && (
               <div className="flex items-start gap-3">
                 <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100">
                   <Share2 className="h-4 w-4 text-blue-600" />
@@ -192,7 +183,7 @@ export function InvoiceDetailView({ invoice }: InvoiceDetailViewProps) {
                 </div>
               </div>
             )}
-            {invoice.status === InvoiceStatus.PAID && (
+            {invoice.status === 'PAID' && (
               <div className="flex items-start gap-3">
                 <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-100">
                   <Download className="h-4 w-4 text-green-600" />

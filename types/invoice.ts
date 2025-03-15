@@ -1,9 +1,6 @@
-export enum InvoiceStatus {
-  PENDING = "PENDING",
-  PAID = "PAID",
-  OVERDUE = "OVERDUE",
-  CANCELLED = "CANCELLED"
-}
+import { Invoice as PrismaInvoice, InvoiceStatus as PrismaInvoiceStatus } from '@prisma/client'
+
+export type InvoiceStatus = PrismaInvoiceStatus;
 
 export interface InvoiceItem {
   id?: number;
@@ -13,6 +10,12 @@ export interface InvoiceItem {
   total: number;
   invoiceId?: number;
 }
+
+export interface Invoice extends Omit<PrismaInvoice, 'items' | 'client'> {
+  items: InvoiceItem[];
+  client: Client;
+} 
+
 
 export interface Client {
   id: number;
@@ -25,23 +28,7 @@ export interface Client {
   updatedAt: Date;
 }
 
-export interface Invoice {
-  id: number;
-  invoiceNo: string;
-  status: InvoiceStatus;
-  date: Date | null;
-  dueDate: Date | null;
-  notes: string | null;
-  total: number;
-  ourName: string;
-  ourBusinessName: string;
-  ourAddress: string;
-  clientName: string;
-  clientBusinessName: string | null;
-  clientAddress: string;
+export interface Invoice extends Omit<PrismaInvoice, 'items' | 'client'> {
   items: InvoiceItem[];
   client: Client;
-  userId: string;
-  createdAt: Date;
-  updatedAt: Date;
 } 

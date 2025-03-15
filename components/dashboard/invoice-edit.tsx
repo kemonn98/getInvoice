@@ -19,24 +19,37 @@ interface InvoiceItem {
 }
 
 interface Invoice {
-  id: string;
-  status: string;
+  id: number;
   invoiceNo: string;
-  date: string | Date;
-  dueDate: string | Date;
+  status: string;
+  date: Date;
+  dueDate: Date;
   notes?: string;
+  total: number;
   ourName: string;
   ourBusinessName: string;
   ourAddress: string;
   clientName: string;
-  clientBusinessName?: string;
+  clientBusinessName?: string | null;
   clientAddress: string;
   items: {
-    id: string;
+    id: number;
     description: string;
     quantity: number;
     price: number;
+    total: number;
+    invoiceId: number;
   }[];
+  client: {
+    id: number;
+    name: string;
+    email: string | null;
+    phone: string | null;
+    address: string | null;
+    userId: string;
+    createdAt: Date;
+    updatedAt: Date;
+  };
 }
 
 interface EditInvoiceFormProps {
@@ -59,7 +72,7 @@ export function EditInvoiceForm({ invoice }: EditInvoiceFormProps) {
   const [status, setStatus] = useState(invoice.status)
   const [items, setItems] = useState<InvoiceItem[]>(
     invoice.items?.map((item: InvoiceItem) => ({
-      id: item.id,
+      id: item.id.toString(),
       description: item.description,
       quantity: item.quantity,
       price: item.price
@@ -133,7 +146,7 @@ export function EditInvoiceForm({ invoice }: EditInvoiceFormProps) {
       completeFormData.set("clientAddress", formData.get("clientAddress") as string)
       completeFormData.set("items", JSON.stringify(formattedItems))
 
-      const result = await updateInvoice(invoice.id, completeFormData)
+      const result = await updateInvoice(invoice.id.toString(), completeFormData)
 
       if (result.success) {
         router.push(`/dashboard/invoices/${invoice.id}`)

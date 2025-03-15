@@ -294,9 +294,12 @@ export async function updateInvoiceStatus(invoiceId: string, status: string) {
 // Add getInvoiceById function
 export async function getInvoiceById(id: string) {
   try {
+    // Convert id to number
+    const numericId = Number(id)
+
     const invoice = await prisma.invoice.findUnique({
       where: {
-        id: id,
+        id: numericId,  // Use the converted number
         userId: MOCK_USER_ID
       },
       include: {

@@ -227,14 +227,17 @@ export async function updateInvoice(id: string | number, formData: FormData) {
 // Add deleteInvoice function
 export async function deleteInvoice(id: string) {
   try {
+    // Convert id to number
+    const invoiceId = Number(id)
+    
     // Delete all invoice items first
     await prisma.invoiceItem.deleteMany({
-      where: { invoiceId: id }
+      where: { invoiceId: invoiceId }  // Pass as number
     })
 
     // Then delete the invoice
     await prisma.invoice.delete({
-      where: { id }
+      where: { id: invoiceId }  // Also update this to use number
     })
 
     revalidatePath('/dashboard')

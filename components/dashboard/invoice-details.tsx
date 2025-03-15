@@ -20,16 +20,46 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { updateInvoiceStatus, deleteInvoice } from "@/app/actions/invoice"
 import { InvoiceView } from "@/components/dashboard/invoice-view"
 
+interface InvoiceItem {
+  id: number;
+  description: string;
+  quantity: number;
+  price: number;
+  total: number;
+  invoiceId: number;
+}
+
 interface Invoice {
-  id: string;
+  id: number;
+  invoiceNo: string;
   status: string;
-  createdAt: string;
-  updatedAt: string;
-  // Add other invoice properties you're using
+  date: Date | null;
+  dueDate: Date | null;
+  notes: string | null | undefined;
+  total: number;
+  ourName: string;
+  ourBusinessName: string;
+  ourAddress: string;
+  clientName: string;
+  clientBusinessName: string | null;
+  clientAddress: string;
+  items: InvoiceItem[];
+  client: {
+    id: number;
+    name: string;
+    email: string | null;
+    phone: string | null;
+    address: string | null;
+    userId: string;
+    createdAt: Date;
+    updatedAt: Date;
+  };
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 interface InvoiceDetailViewProps {
-  invoice: Invoice
+  invoice: Invoice;
 }
 
 export function InvoiceDetailView({ invoice }: InvoiceDetailViewProps) {

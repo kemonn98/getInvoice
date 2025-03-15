@@ -5,14 +5,7 @@ import { prisma } from "@/lib/prisma"
 import { MOCK_USER_ID } from "../lib/constants"
 import { getServerSession } from "next-auth/next"
 import { authOptions } from "@/app/auth"
-
-// Add this enum instead
-enum InvoiceStatus {
-  PENDING = "PENDING",
-  PAID = "PAID",
-  OVERDUE = "OVERDUE",
-  CANCELLED = "CANCELLED"
-}
+import { Invoice, InvoiceItem, InvoiceStatus } from '@/types/invoice'
 
 export async function getInvoices() {
   try {
@@ -317,13 +310,5 @@ export async function getInvoiceById(id: string) {
     console.error('Failed to fetch invoice:', error)
     return { invoice: null, error: 'Failed to fetch invoice' }
   }
-}
-
-// Add this interface above your functions
-interface InvoiceItem {
-  description: string
-  quantity: number | string
-  price: number | string
-  total?: number
 }
 

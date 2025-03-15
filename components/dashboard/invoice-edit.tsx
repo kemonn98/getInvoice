@@ -26,13 +26,13 @@ interface Invoice {
   status: string;
   date: Date | null;
   dueDate: Date | null;
-  notes?: string;
+  notes: string | null | undefined;
   total: number;
   ourName: string;
   ourBusinessName: string;
   ourAddress: string;
   clientName: string;
-  clientBusinessName?: string | null;
+  clientBusinessName: string | null;
   clientAddress: string;
   items: InvoiceItem[];
   client: {

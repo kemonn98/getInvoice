@@ -1,4 +1,5 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Invoice } from '@/types/invoice'  // Import the shared type
 
 interface InvoiceItem {
   id: number;
@@ -8,26 +9,14 @@ interface InvoiceItem {
   total: number;
 }
 
-interface Invoice {
-  ourBusinessName: string;
-  ourName: string;
-  ourAddress: string;
-  invoiceNo: string;
-  date: string | Date;
-  dueDate: string | Date;
-  status: string;
-  clientName: string;
-  clientBusinessName?: string;
-  clientAddress: string;
-  items: InvoiceItem[];
-  notes?: string;
-}
-
 interface InvoiceViewProps {
   invoice: Invoice
 }
 
 export function InvoiceView({ invoice }: InvoiceViewProps) {
+  // When using the dueDate, handle the null case
+  const formattedDueDate = invoice.dueDate ? new Date(invoice.dueDate).toLocaleDateString() : 'No due date';
+
   // Calculate totals from items
   const calculateSubtotal = () => {
     if (!invoice.items || !Array.isArray(invoice.items)) return 0
@@ -62,7 +51,7 @@ export function InvoiceView({ invoice }: InvoiceViewProps) {
           <p className="text-xl font-medium mt-2">#{invoice.invoiceNo}</p>
           <div className="mt-2 text-sm text-muted-foreground">
             <p>Issue Date: {new Date(invoice.date).toLocaleDateString()}</p>
-            <p>Due Date: {new Date(invoice.dueDate).toLocaleDateString()}</p>
+            <p>Due Date: {formattedDueDate}</p>
             <p className="mt-2 font-medium uppercase">Status: {invoice.status}</p>
           </div>
         </div>

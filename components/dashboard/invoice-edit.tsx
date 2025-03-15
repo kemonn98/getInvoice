@@ -12,10 +12,12 @@ import { Textarea } from "@/components/ui/textarea"
 import { updateInvoice } from "@/app/actions/invoice"
 
 interface InvoiceItem {
-  id: string
-  description: string
-  quantity: number
-  price: number
+  id: number;
+  description: string;
+  quantity: number;
+  price: number;
+  total: number;
+  invoiceId: number;
 }
 
 interface Invoice {
@@ -32,14 +34,7 @@ interface Invoice {
   clientName: string;
   clientBusinessName?: string | null;
   clientAddress: string;
-  items: {
-    id: number;
-    description: string;
-    quantity: number;
-    price: number;
-    total: number;
-    invoiceId: number;
-  }[];
+  items: InvoiceItem[];
   client: {
     id: number;
     name: string;
@@ -70,32 +65,27 @@ export function EditInvoiceForm({ invoice }: EditInvoiceFormProps) {
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [status, setStatus] = useState(invoice.status)
-  const [items, setItems] = useState<InvoiceItem[]>(
-    invoice.items?.map((item: InvoiceItem) => ({
-      id: item.id.toString(),
-      description: item.description,
-      quantity: item.quantity,
-      price: item.price
-    })) || []
-  )
+  const [items, setItems] = useState<InvoiceItem[]>(invoice.items)
 
   const addItem = () => {
     setItems([
       ...items,
       {
-        id: Math.random().toString(36).substring(2, 9),
+        id: Math.random(),
         description: "",
         quantity: 1,
         price: 0,
+        total: 0,
+        invoiceId: 0,
       },
     ])
   }
 
-  const removeItem = (id: string) => {
+  const removeItem = (id: number) => {
     setItems(items.filter((item) => item.id !== id))
   }
 
-  const updateItem = (id: string, field: keyof InvoiceItem, value: string | number) => {
+  const updateItem = (id: number, field: keyof InvoiceItem, value: string | number) => {
     setItems(items.map((item) => (item.id === id ? { ...item, [field]: value } : item)))
   }
 

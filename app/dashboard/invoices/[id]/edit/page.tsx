@@ -31,16 +31,6 @@ export default async function EditInvoicePage({ params }: { params: { id: string
     notFound()
   }
 
-  // Convert the invoice data to match the expected types
-  const formattedInvoice = {
-    ...invoice,
-    id: invoice.id.toString(), // Convert number to string
-    items: invoice.items.map(item => ({
-      ...item,
-      id: item.id.toString() // Convert item ids to strings if needed
-    }))
-  }
-
   return (
     <DashboardShell>
       <DashboardHeader
@@ -48,7 +38,7 @@ export default async function EditInvoicePage({ params }: { params: { id: string
         text="Update invoice information and items"
       />
       <div className="grid gap-8">
-        <EditInvoiceForm invoice={formattedInvoice} />
+        <EditInvoiceForm invoice={invoice} />
       </div>
     </DashboardShell>
   )

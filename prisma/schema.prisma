@@ -57,7 +57,7 @@ model Invoice {
   user              User          @relation(fields: [userId], references: [id])
   clientId          Int
   client            Client        @relation(fields: [clientId], references: [id])
-  status            String        @default("PENDING")
+  status            InvoiceStatus @default(PENDING)
   total             Float         @default(0)
   date              DateTime
   dueDate           DateTime?
@@ -96,4 +96,12 @@ model InvoiceItem {
   total       Float
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+// Add this enum definition
+enum InvoiceStatus {
+  PENDING
+  PAID
+  OVERDUE
+  CANCELLED
 }

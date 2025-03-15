@@ -3,9 +3,16 @@
 import { revalidatePath } from "next/cache"
 import { prisma } from "@/lib/prisma"
 import { MOCK_USER_ID } from "../lib/constants"
-import { InvoiceStatus } from "@prisma/client"
 import { getServerSession } from "next-auth/next"
 import { authOptions } from "@/app/auth"
+
+// Add this enum instead
+enum InvoiceStatus {
+  PENDING = "PENDING",
+  PAID = "PAID",
+  OVERDUE = "OVERDUE",
+  CANCELLED = "CANCELLED"
+}
 
 export async function getInvoices() {
   try {

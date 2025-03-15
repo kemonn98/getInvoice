@@ -24,8 +24,8 @@ interface Invoice {
   id: number;
   invoiceNo: string;
   status: string;
-  date: Date;
-  dueDate: Date;
+  date: Date | null;
+  dueDate: Date | null;
   notes?: string;
   total: number;
   ourName: string;
@@ -45,6 +45,8 @@ interface Invoice {
     createdAt: Date;
     updatedAt: Date;
   };
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 interface EditInvoiceFormProps {

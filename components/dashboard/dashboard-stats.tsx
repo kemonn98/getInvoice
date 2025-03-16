@@ -57,8 +57,8 @@ export function DashboardStats() {
   const calculateTrend = () => {
     if (!stats) return 0;
     
-    const current = stats.currentMonthInvoices;
-    const last = stats.lastMonthInvoices;
+    const current = stats.currentMonthInvoices ?? 0;
+    const last = stats.lastMonthInvoices ?? 0;
     
     if (last === 0) return 0;
     
@@ -87,7 +87,7 @@ export function DashboardStats() {
         <CardContent>
           <div className="flex flex-col gap-1">
             <div className="text-2xl font-bold">
-              ${stats.totalRevenue.toFixed(2)}
+              ${(stats.totalRevenue ?? 0).toFixed(2)}
             </div>
             <p className="text-xs text-muted-foreground">
               +20.1% from last month
@@ -125,28 +125,28 @@ export function DashboardStats() {
                 <div className="h-2 w-2 rounded-full bg-yellow-400"></div>
                 <span className="text-sm">Pending</span>
               </div>
-              <span className="text-sm font-bold">{stats.statusCounts.PENDING}</span>
+              <span className="text-sm font-bold">{stats.statusCounts?.PENDING ?? 0}</span>
             </div>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="h-2 w-2 rounded-full bg-green-400"></div>
                 <span className="text-sm">Paid</span>
               </div>
-              <span className="text-sm font-bold">{stats.statusCounts.PAID}</span>
+              <span className="text-sm font-bold">{stats.statusCounts?.PAID ?? 0}</span>
             </div>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="h-2 w-2 rounded-full bg-red-400"></div>
                 <span className="text-sm">Overdue</span>
               </div>
-              <span className="text-sm font-bold">{stats.statusCounts.OVERDUE}</span>
+              <span className="text-sm font-bold">{stats.statusCounts?.OVERDUE ?? 0}</span>
             </div>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="h-2 w-2 rounded-full bg-gray-400"></div>
                 <span className="text-sm">Cancelled</span>
               </div>
-              <span className="text-sm font-bold">{stats.statusCounts.CANCELLED}</span>
+              <span className="text-sm font-bold">{stats.statusCounts?.CANCELLED ?? 0}</span>
             </div>
           </div>
         </CardContent>

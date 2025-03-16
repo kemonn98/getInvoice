@@ -39,6 +39,7 @@ export function DashboardStats() {
         }
 
         const data = await response.json()
+        
         setStats(data)
         setError(null)
       } catch (err) {

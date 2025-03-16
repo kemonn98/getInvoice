@@ -33,30 +33,61 @@ async function executeWithRetry<T>(operation: () => Promise<T>): Promise<T> {
 export async function GET() {
   try {
     const stats = await executeWithRetry(async () => {
-      const [totalInvoices, totalPending, totalPaid, recentInvoices] = await Promise.all([
-        prisma.invoice.count(),
-        prisma.invoice.count({
-          where: { status: 'PENDING' }
-        }),
-        prisma.invoice.count({
-          where: { status: 'PAID' }
-        }),
-        prisma.invoice.findMany({
-          take: 5,
-          orderBy: { createdAt: 'desc' },
-          include: { client: true }
-        })
-      ])
+      // Get all invoices for calculations
+      const invoices = await prisma.invoice.findMany({
+        select: {
+          total: true,
+          status: true,
+          createdAt: true,
+        }
+      });
+
+      // Calculate total revenue (sum of all paid invoices)
+      const totalRevenue = invoices
+        .filter((inv: { status: string }) => inv.status === 'PAID')
+        .reduce((sum: number, inv: { total: number }) => sum + (inv.total || 0), 0);
+
+      // Get current date info
+      const now = new Date();
+      const currentMonth = now.getMonth();
+      const currentYear = now.getFullYear();
+
+      // Count current and last month invoices
+      const currentMonthInvoices = invoices.filter((inv: { createdAt: string }) => {
+        const invDate = new Date(inv.createdAt);
+        return invDate.getMonth() === currentMonth && 
+               invDate.getFullYear() === currentYear;
+      }).length;
+
+      const lastMonthInvoices = invoices.filter((inv: { createdAt: string }) => {
+        const invDate = new Date(inv.createdAt);
+        return invDate.getMonth() === (currentMonth - 1) && 
+               invDate.getFullYear() === currentYear;
+      }).length;
+
+      // Count statuses
+      const statusCounts = {
+        PENDING: 0,
+        PAID: 0,
+        OVERDUE: 0,
+        CANCELLED: 0
+      };
+
+      invoices.forEach((inv: { status: string }) => {
+        if (statusCounts.hasOwnProperty(inv.status)) {
+          statusCounts[inv.status as keyof typeof statusCounts]++;
+        }
+      });
 
       return {
-        totalInvoices,
-        totalPending,
-        totalPaid,
-        recentInvoices
-      }
-    })
+        totalRevenue,
+        currentMonthInvoices,
+        lastMonthInvoices,
+        statusCounts
+      };
+    });
 
-    return NextResponse.json(stats)
+    return NextResponse.json(stats);
   } catch (error) {
     console.error('Error in dashboard stats:', error)
     return NextResponse.json(

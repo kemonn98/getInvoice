@@ -41,29 +41,28 @@ export async function GET() {
           createdAt: true,
         }
       });
-
-      // Calculate total revenue (sum of all paid invoices)
-      const totalRevenue = invoices
-        .filter((inv: { status: string }) => inv.status === 'PAID')
-        .reduce((sum: number, inv: { total: number }) => sum + (inv.total || 0), 0);
-
+      
       // Get current date info
       const now = new Date();
       const currentMonth = now.getMonth();
       const currentYear = now.getFullYear();
 
       // Count current and last month invoices
-      const currentMonthInvoices = invoices.filter((inv: { createdAt: string }) => {
-        const invDate = new Date(inv.createdAt);
-        return invDate.getMonth() === currentMonth && 
-               invDate.getFullYear() === currentYear;
+      const currentMonthInvoices = invoices.filter((inv: { createdAt: Date }) => {
+        // createdAt is already a Date object from Prisma
+        return inv.createdAt.getMonth() === currentMonth && 
+               inv.createdAt.getFullYear() === currentYear;
       }).length;
 
-      const lastMonthInvoices = invoices.filter((inv: { createdAt: string }) => {
-        const invDate = new Date(inv.createdAt);
-        return invDate.getMonth() === (currentMonth - 1) && 
-               invDate.getFullYear() === currentYear;
+      const lastMonthInvoices = invoices.filter((inv: { createdAt: Date }) => {
+        return inv.createdAt.getMonth() === (currentMonth - 1) && 
+               inv.createdAt.getFullYear() === currentYear;
       }).length;
+
+      // Calculate total revenue (sum of all paid invoices)
+      const totalRevenue = invoices
+        .filter((inv: { status: string }) => inv.status === 'PAID')
+        .reduce((sum: number, inv: { total: number }) => sum + (inv.total || 0), 0);
 
       // Count statuses
       const statusCounts = {

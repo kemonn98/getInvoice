@@ -1,37 +1,60 @@
 'use server'
 
 import { revalidatePath } from "next/cache"
-import { prisma } from "@/lib/prisma"
+import prisma from '@/lib/prisma'
 import { MOCK_USER_ID } from "../lib/constants"
 import { getServerSession } from "next-auth/next"
 import { authOptions } from "@/app/auth"
 import { Invoice, InvoiceItem, InvoiceStatus } from '@/types/invoice'
 
-export async function getInvoices() {
-  try {
-    const session = await getServerSession(authOptions)
-    
-    if (!session?.user?.id) {
-      return [] // Return empty array instead of throwing error
-    }
+async function executeWithRetry<T>(operation: () => Promise<T>): Promise<T> {
+  const MAX_RETRIES = 3
+  const RETRY_DELAY = 1000
+  let lastError
 
-    const invoices = await prisma.invoice.findMany({
-      where: {
-        userId: session.user.id
-      },
-      include: {
-        client: true,
-        items: true,
-      },
-      orderBy: {
-        createdAt: 'desc'
+  for (let i = 0; i < MAX_RETRIES; i++) {
+    try {
+      return await operation()
+    } catch (error: any) {
+      lastError = error
+      if (error.code !== 'P1001' && error.code !== 'P1002') {
+        throw error
       }
-    })
+      if (i < MAX_RETRIES - 1) {
+        await new Promise(resolve => setTimeout(resolve, RETRY_DELAY * (i + 1)))
+      }
+    }
+  }
+  throw lastError
+}
 
-    return invoices
+export async function getInvoices(query: string = '', currentPage: number = 1) {
+  try {
+    return await executeWithRetry(async () => {
+      const session = await getServerSession(authOptions)
+      
+      if (!session?.user?.id) {
+        return [] // Return empty array instead of throwing error
+      }
+
+      const invoices = await prisma.invoice.findMany({
+        where: {
+          userId: session.user.id
+        },
+        include: {
+          client: true,
+          items: true,
+        },
+        orderBy: {
+          createdAt: 'desc'
+        }
+      })
+
+      return invoices
+    })
   } catch (error) {
-    console.error("Error in getInvoices:", error)
-    return [] // Return empty array on error
+    console.error('Error in getInvoices:', error)
+    throw error
   }
 }
 

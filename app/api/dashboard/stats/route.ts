@@ -1,94 +1,67 @@
-import { prisma } from "@/lib/prisma"
+import { NextResponse } from 'next/server'
+import prisma from '@/lib/prisma'
 import { getServerSession } from "next-auth/next"
 import { authOptions } from "@/app/auth"
 
+const MAX_RETRIES = 3
+const RETRY_DELAY = 1000 // 1 second
+
+async function executeWithRetry<T>(operation: () => Promise<T>): Promise<T> {
+  let lastError
+  
+  for (let i = 0; i < MAX_RETRIES; i++) {
+    try {
+      return await operation()
+    } catch (error: any) {
+      lastError = error
+      
+      // Only retry on connection errors
+      if (error.code !== 'P1001' && error.code !== 'P1002') {
+        throw error
+      }
+      
+      // Wait before retrying
+      if (i < MAX_RETRIES - 1) {
+        await new Promise(resolve => setTimeout(resolve, RETRY_DELAY * (i + 1)))
+      }
+    }
+  }
+  
+  throw lastError
+}
+
 export async function GET() {
   try {
-    // Get the user session
-    const session = await getServerSession(authOptions)
-    
-    if (!session?.user?.email) {
-      return Response.json({ error: 'Unauthorized' }, { status: 401 })
-    }
+    const stats = await executeWithRetry(async () => {
+      const [totalInvoices, totalPending, totalPaid, recentInvoices] = await Promise.all([
+        prisma.invoice.count(),
+        prisma.invoice.count({
+          where: { status: 'PENDING' }
+        }),
+        prisma.invoice.count({
+          where: { status: 'PAID' }
+        }),
+        prisma.invoice.findMany({
+          take: 5,
+          orderBy: { createdAt: 'desc' },
+          include: { client: true }
+        })
+      ])
 
-    // Get the user ID from the database
-    const user = await prisma.user.findUnique({
-      where: { email: session.user.email }
-    })
-
-    if (!user) {
-      return Response.json({ error: 'User not found' }, { status: 404 })
-    }
-
-    const userId = user.id
-
-    // Get all status counts first
-    const allStatuses = await prisma.invoice.groupBy({
-      by: ['status'],
-      _count: true,
-      where: {
-        userId
+      return {
+        totalInvoices,
+        totalPending,
+        totalPaid,
+        recentInvoices
       }
     })
 
-    // Convert status counts to the expected format
-    const statusCounts = {
-      PAID: 0,
-      PENDING: 0,
-      OVERDUE: 0,
-      CANCELLED: 0,
-      ...Object.fromEntries(
-        allStatuses.map(({ status, _count }) => [status, _count])
-      )
-    }
-
-    const [totalRevenue, currentMonthInvoices, lastMonthInvoices] = await Promise.all([
-      // Calculate total revenue from paid invoices
-      prisma.invoice.aggregate({
-        _sum: {
-          total: true  // Changed from 'amount' to 'total'
-        },
-        where: {
-          userId,
-          status: 'PAID'
-        }
-      }),
-
-      // Current month invoices
-      prisma.invoice.count({
-        where: {
-          userId,
-          date: {
-            gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
-            lt: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1)
-          }
-        }
-      }),
-
-      // Last month invoices
-      prisma.invoice.count({
-        where: {
-          userId,
-          date: {
-            gte: new Date(new Date().getFullYear(), new Date().getMonth() - 1, 1),
-            lt: new Date(new Date().getFullYear(), new Date().getMonth(), 1)
-          }
-        }
-      })
-    ]);
-
-    return Response.json({
-      totalRevenue: totalRevenue._sum.total || 0,
-      currentMonthInvoices,
-      lastMonthInvoices,
-      statusCounts
-    });
-
+    return NextResponse.json(stats)
   } catch (error) {
-    console.error('Error in dashboard stats:', error);
-    return Response.json(
+    console.error('Error in dashboard stats:', error)
+    return NextResponse.json(
       { error: 'Failed to fetch dashboard stats' },
       { status: 500 }
-    );
+    )
   }
 } 

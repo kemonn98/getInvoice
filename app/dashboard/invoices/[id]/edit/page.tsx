@@ -1,6 +1,6 @@
 import { getServerSession } from "next-auth/next"
 import { authOptions } from "@/app/auth"
-import { prisma } from "@/lib/prisma"
+import prisma from "@/lib/prisma"
 import { notFound } from "next/navigation"
 import { EditInvoiceForm } from "@/components/dashboard/invoice-edit"
 import { DashboardHeader } from "@/components/dashboard/dashboard-header"

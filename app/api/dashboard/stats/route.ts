@@ -30,13 +30,21 @@ async function executeWithRetry<T>(operation: () => Promise<T>): Promise<T> {
   throw lastError
 }
 
+// Add interface for invoice type
+interface Invoice {
+  id: number;
+  total: number;
+  status: string;
+  createdAt: Date;
+}
+
 export async function GET() {
   try {
     const stats = await executeWithRetry(async () => {
       // Get all invoices for calculations
       const invoices = await prisma.invoice.findMany({
         select: {
-          id: true,  // Added id for better logging
+          id: true,
           total: true,
           status: true,
           createdAt: true,
@@ -45,7 +53,6 @@ export async function GET() {
       
       console.log('Raw invoices fetched:', JSON.stringify(invoices, null, 2));
       
-      // Get current date info
       const now = new Date();
       const currentMonth = now.getMonth();
       const currentYear = now.getFullYear();
@@ -56,8 +63,8 @@ export async function GET() {
         fullDate: now.toISOString()
       });
 
-      // Count current and last month invoices with logging
-      const currentMonthInvoices = invoices.filter((inv: { createdAt: Date }) => {
+      // Update type annotations in filter functions
+      const currentMonthInvoices = invoices.filter((inv: Invoice) => {
         const isCurrentMonth = inv.createdAt.getMonth() === currentMonth && 
                              inv.createdAt.getFullYear() === currentYear;
         console.log('Invoice date check (current month):', {
@@ -70,7 +77,7 @@ export async function GET() {
         return isCurrentMonth;
       }).length;
 
-      const lastMonthInvoices = invoices.filter((inv: { createdAt: Date }) => {
+      const lastMonthInvoices = invoices.filter((inv: Invoice) => {
         const isLastMonth = inv.createdAt.getMonth() === (currentMonth - 1) && 
                           inv.createdAt.getFullYear() === currentYear;
         console.log('Invoice date check (last month):', {
@@ -83,12 +90,11 @@ export async function GET() {
         return isLastMonth;
       }).length;
 
-      // Log revenue calculation
-      const paidInvoices = invoices.filter((inv: { status: string }) => inv.status === 'PAID');
+      const paidInvoices = invoices.filter((inv: Invoice) => inv.status === 'PAID');
       console.log('Paid invoices:', paidInvoices);
       
       const totalRevenue = paidInvoices
-        .reduce((sum: number, inv: { total: number }) => {
+        .reduce((sum: number, inv: Invoice) => {
           console.log('Adding to revenue:', {
             invoiceId: inv.id,
             invoiceTotal: inv.total,
@@ -97,7 +103,6 @@ export async function GET() {
           return sum + (inv.total || 0);
         }, 0);
 
-      // Count statuses with logging
       const statusCounts = {
         PENDING: 0,
         PAID: 0,
@@ -105,7 +110,7 @@ export async function GET() {
         CANCELLED: 0
       };
 
-      invoices.forEach((inv: { status: string, id: string }) => {
+      invoices.forEach((inv: Invoice) => {
         if (statusCounts.hasOwnProperty(inv.status)) {
           statusCounts[inv.status as keyof typeof statusCounts]++;
           console.log('Status count update:', {

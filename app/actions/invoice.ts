@@ -115,11 +115,11 @@ export async function createInvoice(formData: FormData) {
         ourName: formData.get("ourName") as string,
         ourBusinessName: formData.get("ourBusinessName") as string,
         ourAddress: formData.get("ourAddress") as string,
-        ourEmail: userEmail, // Add user email
+        ourEmail: userEmail,
         clientName: formData.get("clientName") as string,
         clientBusinessName: formData.get("clientBusinessName") as string || null,
         clientAddress: formData.get("clientAddress") as string,
-        clientEmail: formData.get("clientEmail") as string || null, // Add client email
+        clientEmail: formData.get("clientEmail") as string || null,
         items: {
           create: items.map((item: InvoiceItem) => ({
             description: item.description,

@@ -36,35 +36,68 @@ export async function GET() {
       // Get all invoices for calculations
       const invoices = await prisma.invoice.findMany({
         select: {
+          id: true,  // Added id for better logging
           total: true,
           status: true,
           createdAt: true,
         }
       });
       
+      console.log('Raw invoices fetched:', JSON.stringify(invoices, null, 2));
+      
       // Get current date info
       const now = new Date();
       const currentMonth = now.getMonth();
       const currentYear = now.getFullYear();
+      
+      console.log('Current date info:', {
+        currentMonth,
+        currentYear,
+        fullDate: now.toISOString()
+      });
 
-      // Count current and last month invoices
+      // Count current and last month invoices with logging
       const currentMonthInvoices = invoices.filter((inv: { createdAt: Date }) => {
-        // createdAt is already a Date object from Prisma
-        return inv.createdAt.getMonth() === currentMonth && 
-               inv.createdAt.getFullYear() === currentYear;
+        const isCurrentMonth = inv.createdAt.getMonth() === currentMonth && 
+                             inv.createdAt.getFullYear() === currentYear;
+        console.log('Invoice date check (current month):', {
+          invoiceId: inv.id,
+          invoiceDate: inv.createdAt,
+          invoiceMonth: inv.createdAt.getMonth(),
+          invoiceYear: inv.createdAt.getFullYear(),
+          isCurrentMonth
+        });
+        return isCurrentMonth;
       }).length;
 
       const lastMonthInvoices = invoices.filter((inv: { createdAt: Date }) => {
-        return inv.createdAt.getMonth() === (currentMonth - 1) && 
-               inv.createdAt.getFullYear() === currentYear;
+        const isLastMonth = inv.createdAt.getMonth() === (currentMonth - 1) && 
+                          inv.createdAt.getFullYear() === currentYear;
+        console.log('Invoice date check (last month):', {
+          invoiceId: inv.id,
+          invoiceDate: inv.createdAt,
+          invoiceMonth: inv.createdAt.getMonth(),
+          invoiceYear: inv.createdAt.getFullYear(),
+          isLastMonth
+        });
+        return isLastMonth;
       }).length;
 
-      // Calculate total revenue (sum of all paid invoices)
-      const totalRevenue = invoices
-        .filter((inv: { status: string }) => inv.status === 'PAID')
-        .reduce((sum: number, inv: { total: number }) => sum + (inv.total || 0), 0);
+      // Log revenue calculation
+      const paidInvoices = invoices.filter((inv: { status: string }) => inv.status === 'PAID');
+      console.log('Paid invoices:', paidInvoices);
+      
+      const totalRevenue = paidInvoices
+        .reduce((sum: number, inv: { total: number }) => {
+          console.log('Adding to revenue:', {
+            invoiceId: inv.id,
+            invoiceTotal: inv.total,
+            runningSum: sum + (inv.total || 0)
+          });
+          return sum + (inv.total || 0);
+        }, 0);
 
-      // Count statuses
+      // Count statuses with logging
       const statusCounts = {
         PENDING: 0,
         PAID: 0,
@@ -72,18 +105,27 @@ export async function GET() {
         CANCELLED: 0
       };
 
-      invoices.forEach((inv: { status: string }) => {
+      invoices.forEach((inv: { status: string, id: string }) => {
         if (statusCounts.hasOwnProperty(inv.status)) {
           statusCounts[inv.status as keyof typeof statusCounts]++;
+          console.log('Status count update:', {
+            invoiceId: inv.id,
+            status: inv.status,
+            newCount: statusCounts[inv.status as keyof typeof statusCounts]
+          });
         }
       });
 
-      return {
+      const finalStats = {
         totalRevenue,
         currentMonthInvoices,
         lastMonthInvoices,
         statusCounts
       };
+      
+      console.log('Final stats:', finalStats);
+      
+      return finalStats;
     });
 
     return NextResponse.json(stats);

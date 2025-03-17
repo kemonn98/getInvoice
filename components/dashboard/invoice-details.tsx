@@ -20,6 +20,9 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { updateInvoiceStatus, deleteInvoice } from "@/app/actions/invoice"
 import { InvoiceView } from "@/components/dashboard/invoice-view"
 import { Invoice } from '@/types/invoice'
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
+import { format } from 'date-fns';
 
 interface InvoiceDetailViewProps {
   invoice: Invoice;
@@ -71,13 +74,51 @@ export function InvoiceDetailView({ invoice }: InvoiceDetailViewProps) {
   }
 
   const handleDownloadPDF = async () => {
-    setIsGeneratingPDF(true)
-    // In a real app, this would generate and download a PDF
-    // For demo purposes, we'll just simulate a delay
-    setTimeout(() => {
-      setIsGeneratingPDF(false)
-    }, 1500)
-  }
+    try {
+      setIsGeneratingPDF(true);
+      
+      const invoiceElement = document.getElementById('invoice-container');
+      if (!invoiceElement) return;
+
+      const canvas = await html2canvas(invoiceElement, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+      });
+
+      // Define margins in mm
+      const margin = 15; // 15mm margins
+      
+      // A4 measurements
+      const imgWidth = 210 - (margin * 2); // A4 width minus margins
+      const pageHeight = 297 - (margin * 2); // A4 height minus margins
+      
+      // Calculate dimensions with margins
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+      // Create PDF
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      
+      // Add the image with margin offset
+      pdf.addImage(
+        canvas.toDataURL('image/png'),
+        'PNG',
+        margin, // X position (left margin)
+        margin, // Y position (top margin)
+        imgWidth,
+        imgHeight
+      );
+
+      // Format the filename with the invoice number
+      const fileName = `${invoice.invoiceNo}-${format(new Date(), 'yyyy-MM-dd')}.pdf`;
+
+      pdf.save(fileName);
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+    } finally {
+      setIsGeneratingPDF(false);
+    }
+  };
 
   const handleShare = () => {
     // In a real app, this would open a share dialog or copy a link
@@ -100,6 +141,7 @@ export function InvoiceDetailView({ invoice }: InvoiceDetailViewProps) {
   }
 
   return (
+    
     <div className="space-y-6">
       {/* Action Bar */}
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between print:hidden">
@@ -151,7 +193,9 @@ export function InvoiceDetailView({ invoice }: InvoiceDetailViewProps) {
       {/* Invoice View */}
       <Card className="overflow-hidden print:shadow-none print:border-none">
         <div className="p-8 print:p-0">
-          <InvoiceView invoice={invoice} />
+          <div id="invoice-container">
+            <InvoiceView invoice={invoice} />
+          </div>
         </div>
       </Card>
 

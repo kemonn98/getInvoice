@@ -332,10 +332,13 @@ export function CreateInvoiceForm() {
                     id={`item-${index}-price`}
                     type="number"
                     min="0"
-                    step="0.01"
-                    placeholder="Price"
-                    value={item.price}
-                    onChange={(e) => updateItem(item.id, "price", parseFloat(e.target.value) || 0)}
+                    step="1"
+                    placeholder="0"
+                    value={item.price || ''}
+                    onChange={(e) => {
+                      const value = e.target.value === '' ? 0 : parseFloat(e.target.value);
+                      updateItem(item.id, "price", value);
+                    }}
                     required
                     disabled={isLoading}
                   />

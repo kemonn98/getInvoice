@@ -40,17 +40,32 @@ interface Invoice {
 
 export async function GET() {
   try {
+    // Get the current user session
+    const session = await getServerSession(authOptions);
+    
+    if (!session?.user?.email) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+
     const stats = await executeWithRetry(async () => {
-      // Get all invoices for calculations
+      // Get invoices only for the current user
       const invoices = await prisma.invoice.findMany({
+        where: {
+          userEmail: session.user.email  // Filter by user email
+        },
         select: {
           id: true,
           total: true,
           status: true,
           createdAt: true,
+          userEmail: true, // Add this to verify filtering
         }
       });
       
+      console.log('Current user:', session.user.email);
       console.log('Raw invoices fetched:', JSON.stringify(invoices, null, 2));
       
       const now = new Date();

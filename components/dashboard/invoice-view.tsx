@@ -35,6 +35,11 @@ export function InvoiceView({ invoice }: InvoiceViewProps) {
             <p>{invoice.ourName}</p>
             <p className="whitespace-pre-line">{invoice.ourAddress}</p>
           </div>
+          {invoice.ourEmail && (
+            <div>
+              <span className="font-semibold">Our Email:</span> {invoice.ourEmail}
+            </div>
+          )}
         </div>
 
         {/* Invoice Details */}
@@ -58,6 +63,11 @@ export function InvoiceView({ invoice }: InvoiceViewProps) {
             <p>{invoice.clientBusinessName}</p>
           )}
           <p className="whitespace-pre-line">{invoice.clientAddress}</p>
+          {invoice.clientEmail && (
+            <div>
+              <span className="font-semibold">Client Email:</span> {invoice.clientEmail}
+            </div>
+          )}
         </div>
       </div>
 

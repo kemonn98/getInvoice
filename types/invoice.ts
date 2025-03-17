@@ -11,14 +11,6 @@ export interface InvoiceItem {
   invoiceId?: number;
 }
 
-export interface Invoice extends Omit<PrismaInvoice, 'items' | 'client'> {
-  items: InvoiceItem[];
-  client: Client;
-  ourEmail?: string | null;
-  clientEmail?: string | null;
-} 
-
-
 export interface Client {
   id: number;
   name: string;
@@ -30,7 +22,10 @@ export interface Client {
   updatedAt: Date;
 }
 
+// Single Invoice interface definition
 export interface Invoice extends Omit<PrismaInvoice, 'items' | 'client'> {
   items: InvoiceItem[];
   client: Client;
+  ourEmail: string | null;
+  clientEmail: string | null;
 } 

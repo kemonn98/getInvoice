@@ -115,7 +115,7 @@ export async function createInvoice(formData: FormData) {
         ourName: formData.get("ourName") as string,
         ourBusinessName: formData.get("ourBusinessName") as string,
         ourAddress: formData.get("ourAddress") as string,
-        ourEmail: userEmail,
+        ourEmail: session.user.email || null,
         clientName: formData.get("clientName") as string,
         clientBusinessName: formData.get("clientBusinessName") as string || null,
         clientAddress: formData.get("clientAddress") as string,
@@ -228,7 +228,9 @@ export async function updateInvoice(id: string | number, formData: FormData) {
           clientName: formData.get("clientName") as string,
           clientBusinessName: formData.get("clientBusinessName") as string,
           clientAddress: formData.get("clientAddress") as string,
-          total: Number(formData.get("total"))
+          total: Number(formData.get("total")),
+          ourEmail: formData.get("ourEmail") as string || null,
+          clientEmail: formData.get("clientEmail") as string || null
         }
       }),
       prisma.invoiceItem.createMany({

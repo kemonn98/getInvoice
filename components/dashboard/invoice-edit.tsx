@@ -97,9 +97,10 @@ export function EditInvoiceForm({ invoice }: EditInvoiceFormProps) {
       completeFormData.set("ourBusinessName", formData.get("ourBusinessName") as string)
       completeFormData.set("ourAddress", formData.get("ourAddress") as string)
       completeFormData.set("clientName", formData.get("clientName") as string)
-      completeFormData.set("clientEmail", formData.get("clientEmail") as string)
+      completeFormData.set("clientEmail", formData.get("clientEmail") as string || "")
       completeFormData.set("clientBusinessName", formData.get("clientBusinessName") as string)
       completeFormData.set("clientAddress", formData.get("clientAddress") as string)
+      completeFormData.set("ourEmail", formData.get("ourEmail") as string || "")
       completeFormData.set("items", JSON.stringify(formattedItems))
 
       const result = await updateInvoice(invoice.id.toString(), completeFormData)

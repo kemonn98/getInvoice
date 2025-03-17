@@ -54,18 +54,18 @@ export async function GET() {
       // Get invoices only for the current user
       const invoices = await prisma.invoice.findMany({
         where: {
-          userEmail: session.user.email  // Filter by user email
+          userId: session?.user?.id  // If the field is named 'userId' in your schema
         },
         select: {
           id: true,
           total: true,
           status: true,
           createdAt: true,
-          userEmail: true, // Add this to verify filtering
+          userId: true, // Match the field name here too
         }
       });
       
-      console.log('Current user:', session.user.email);
+      console.log('Current user:', session?.user?.email);
       console.log('Raw invoices fetched:', JSON.stringify(invoices, null, 2));
       
       const now = new Date();

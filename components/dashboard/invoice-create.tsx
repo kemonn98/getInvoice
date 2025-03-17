@@ -207,12 +207,21 @@ export function CreateInvoiceForm() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="clientBusinessName">Business Name (Optional)</Label>
+                  <Label htmlFor="clientEmail">Client Email</Label>
                   <Input
-                    id="clientBusinessName"
-                    name="clientBusinessName"
+                    id="clientEmail"
+                    name="clientEmail"
+                    type="email"
+                    placeholder="client@example.com"
                   />
                 </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="clientBusinessName">Business Name (Optional)</Label>
+                <Input
+                  id="clientBusinessName"
+                  name="clientBusinessName"
+                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="clientAddress">Client Address*</Label>

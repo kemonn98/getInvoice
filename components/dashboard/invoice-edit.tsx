@@ -97,6 +97,7 @@ export function EditInvoiceForm({ invoice }: EditInvoiceFormProps) {
       completeFormData.set("ourBusinessName", formData.get("ourBusinessName") as string)
       completeFormData.set("ourAddress", formData.get("ourAddress") as string)
       completeFormData.set("clientName", formData.get("clientName") as string)
+      completeFormData.set("clientEmail", formData.get("clientEmail") as string)
       completeFormData.set("clientBusinessName", formData.get("clientBusinessName") as string)
       completeFormData.set("clientAddress", formData.get("clientAddress") as string)
       completeFormData.set("items", JSON.stringify(formattedItems))
@@ -169,13 +170,23 @@ export function EditInvoiceForm({ invoice }: EditInvoiceFormProps) {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="clientBusinessName">Business Name</Label>
+                <Label htmlFor="clientEmail">Client Email</Label>
                 <Input
-                  id="clientBusinessName"
-                  name="clientBusinessName"
-                  defaultValue={invoice.clientBusinessName || ""}
+                  id="clientEmail"
+                  name="clientEmail"
+                  type="email"
+                  placeholder="client@example.com"
+                  defaultValue={invoice.clientEmail || ""}
                 />
               </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="clientBusinessName">Business Name</Label>
+              <Input
+                id="clientBusinessName"
+                name="clientBusinessName"
+                defaultValue={invoice.clientBusinessName || ""}
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="clientAddress">Client Address*</Label>

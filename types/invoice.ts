@@ -14,6 +14,8 @@ export interface InvoiceItem {
 export interface Invoice extends Omit<PrismaInvoice, 'items' | 'client'> {
   items: InvoiceItem[];
   client: Client;
+  ourEmail?: string | null;
+  clientEmail?: string | null;
 } 
 
 

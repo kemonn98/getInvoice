@@ -81,11 +81,11 @@ export async function createInvoice(formData: FormData) {
       return sum + (Number(item.price) * Number(item.quantity))
     }, 0)
 
-    // First, create the client with proper relation
+    // First, create the client with proper relation and email
     const client = await prisma.client.create({
       data: {
         name: formData.get("clientName") as string,
-        email: null,
+        email: formData.get("clientEmail") as string || null, // Add client email
         phone: null,
         address: formData.get("clientAddress") as string,
         user: {
@@ -94,7 +94,10 @@ export async function createInvoice(formData: FormData) {
       }
     })
 
-    // Then create the invoice
+    // Get user email from session
+    const userEmail = session.user.email || null;
+
+    // Then create the invoice with email addresses
     const invoice = await prisma.invoice.create({
       data: {
         user: {
@@ -103,18 +106,20 @@ export async function createInvoice(formData: FormData) {
         client: {
           connect: { id: client.id }
         },
-        invoiceNo,  // Use generated invoice number
+        invoiceNo,
         status: formData.get("status") as InvoiceStatus || "PENDING",
-        total,      // Use calculated total
-        date: new Date(formData.get("date") as string || now), // Use current date if not provided
+        total,
+        date: new Date(formData.get("date") as string || now),
         dueDate: new Date(formData.get("dueDate") as string),
         notes: formData.get("notes") as string || "",
         ourName: formData.get("ourName") as string,
         ourBusinessName: formData.get("ourBusinessName") as string,
         ourAddress: formData.get("ourAddress") as string,
+        ourEmail: userEmail, // Add user email
         clientName: formData.get("clientName") as string,
         clientBusinessName: formData.get("clientBusinessName") as string || null,
         clientAddress: formData.get("clientAddress") as string,
+        clientEmail: formData.get("clientEmail") as string || null, // Add client email
         items: {
           create: items.map((item: InvoiceItem) => ({
             description: item.description,
@@ -138,7 +143,6 @@ export async function createInvoice(formData: FormData) {
   } catch (error) {
     console.error("Error in createInvoice:", error)
     return {
-      
       success: false,
       error: error instanceof Error ? error.message : "Failed to create invoice"
     }

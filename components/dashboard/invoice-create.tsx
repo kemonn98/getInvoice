@@ -68,7 +68,7 @@ export function CreateInvoiceForm() {
   }
 
   const calculateTax = () => {
-    return calculateSubtotal() * 0.1 // 10% tax rate
+    return calculateSubtotal() * 0.05 // 5% tax rate
   }
 
   const calculateTotal = () => {
@@ -172,7 +172,7 @@ export function CreateInvoiceForm() {
                   <Input
                     id="ourName"
                     name="ourName"
-                    defaultValue="Nadia Tateanna"
+                    defaultValue={session?.user?.name || ""}
                   />
                 </div>
                 <div className="space-y-2">
@@ -180,7 +180,6 @@ export function CreateInvoiceForm() {
                   <Input
                     id="ourBusinessName"
                     name="ourBusinessName"
-                    defaultValue="PT. SlabPixel Creative Group"
                   />
                 </div>
               </div>
@@ -189,7 +188,6 @@ export function CreateInvoiceForm() {
                 <Textarea
                   id="ourAddress"
                   name="ourAddress"
-                  defaultValue="Jl. Raya Tajem No.A09, RT.05/RW.27, Kenayan, Wedomartani, Kec. Ngemplak, Kabupaten Sleman, Daerah Istimewa Yogyakarta 55584"
                 />
               </div>
             </div>
@@ -372,7 +370,7 @@ export function CreateInvoiceForm() {
                 <span>${calculateSubtotal().toFixed(2)}</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span>Tax (10%):</span>
+                <span>Tax (5%):</span>
                 <span>${calculateTax().toFixed(2)}</span>
               </div>
               <div className="flex justify-between font-medium">

@@ -1,3 +1,5 @@
+import type { Employee as PrismaEmployee, SalarySlip as PrismaSalarySlip } from "@prisma/client"
+
 export enum InvoiceStatus {
   PENDING = "PENDING",
   PAID = "PAID",
@@ -49,14 +51,7 @@ export interface Invoice {
   items: InvoiceItem[]
 }
 
-
-export enum EmployeeStatus {
-  FULL_TIME = "FULL_TIME",
-  PROBATION = "PROBATION",
-  CONTRACT = "CONTRACT"
-}
-
-export type Employee = {
+export interface Employee extends PrismaEmployee {
   id: number
   userId: string
   name: string
@@ -67,6 +62,38 @@ export type Employee = {
   phone: string
   createdAt: Date
   updatedAt: Date
+}
+
+export interface SalarySlip extends PrismaSalarySlip {
+  id: number
+  userId: string
+  employeeId: number
+  month: string
+  year: number
+  companyName: string
+  companyAddress: string
+  companyLogo?: string | null
+  basicSalary: number
+  positionAllowance: number
+  familyAllowance: number
+  childAllowance: number
+  foodAllowance: number
+  bonus: number
+  thr: number
+  others: number
+  totalSalary: number
+  approvedBy: string
+  approvedPosition: string
+  notes?: string | null
+  createdAt: Date | null
+  updatedAt: Date | null
+  employee: Employee
+}
+
+export enum EmployeeStatus {
+  FULL_TIME = "FULL_TIME",
+  PROBATION = "PROBATION",
+  CONTRACT = "CONTRACT"
 }
 
 const statusCounts: Record<InvoiceStatus, number> = {

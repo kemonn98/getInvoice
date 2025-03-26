@@ -199,6 +199,11 @@ export async function updateInvoice(id: string | number, formData: FormData) {
     const invoiceId = Number(id)
     const items = JSON.parse(formData.get("items") as string)
 
+    // Calculate total from items (same as createInvoice)
+    const total = items.reduce((sum: number, item: InvoiceItem) => {
+      return sum + (Number(item.price) * Number(item.quantity))
+    }, 0)
+
     await prisma.invoiceItem.deleteMany({
       where: {
         invoiceId: invoiceId
@@ -228,7 +233,7 @@ export async function updateInvoice(id: string | number, formData: FormData) {
           clientName: formData.get("clientName") as string,
           clientBusinessName: formData.get("clientBusinessName") as string,
           clientAddress: formData.get("clientAddress") as string,
-          total: Number(formData.get("total")),
+          total: total,
           ourEmail: formData.get("ourEmail") as string || null,
           clientEmail: formData.get("clientEmail") as string || null
         }

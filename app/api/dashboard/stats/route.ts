@@ -2,10 +2,17 @@ import { NextResponse } from "next/server"
 import prisma from "@/lib/prisma"
 import { getServerSession } from "next-auth/next"
 import { authOptions } from "@/app/auth"
-import { InvoiceStatus } from "@/types"
 
 const MAX_RETRIES = 3
 const RETRY_DELAY = 1000 // 1 second
+
+// Remove the type definition and just use string literals for the status
+const statusCounts = {
+  PENDING: 0,
+  PAID: 0,
+  OVERDUE: 0,
+  CANCELLED: 0,
+} as const
 
 async function executeWithRetry<T>(operation: () => Promise<T>): Promise<T> {
   let lastError
@@ -29,15 +36,6 @@ async function executeWithRetry<T>(operation: () => Promise<T>): Promise<T> {
   }
 
   throw lastError
-}
-
-// Update the interface to match Prisma's type
-interface Invoice {
-  id: number
-  userId: string
-  total: number
-  status: InvoiceStatus
-  createdAt: Date | null  // Allow null since Prisma might return null
 }
 
 export async function GET() {
@@ -108,10 +106,11 @@ export async function GET() {
         return isLastMonth;
       }).length
 
-      const paidInvoices = invoices.filter((inv) => inv.status === InvoiceStatus.PAID)
+      // Use Prisma's enum values
+      const paidInvoices = invoices.filter((inv) => inv.status === 'PAID')
       console.log("Paid invoices:", paidInvoices)
 
-      const totalRevenue = paidInvoices.reduce((sum: number, inv: Invoice) => {
+      const totalRevenue = paidInvoices.reduce((sum, inv) => {
         console.log("Adding to revenue:", {
           invoiceId: inv.id,
           invoiceTotal: inv.total,
@@ -120,21 +119,11 @@ export async function GET() {
         return sum + (inv.total || 0)
       }, 0)
 
-      const statusCounts = {
-        PENDING: 0,
-        PAID: 0,
-        OVERDUE: 0,
-        CANCELLED: 0,
-      }
-
-      invoices.forEach((inv: Invoice) => {
-        if (statusCounts.hasOwnProperty(inv.status)) {
-          statusCounts[inv.status as keyof typeof statusCounts]++
-          console.log("Status count update:", {
-            invoiceId: inv.id,
-            status: inv.status,
-            newCount: statusCounts[inv.status as keyof typeof statusCounts],
-          })
+      const counts = { ...statusCounts }
+      
+      invoices.forEach((inv) => {
+        if (inv.status in counts) {
+          counts[inv.status as keyof typeof statusCounts]++
         }
       })
 
@@ -142,7 +131,7 @@ export async function GET() {
         totalRevenue,
         currentMonthInvoices,
         lastMonthInvoices,
-        statusCounts,
+        statusCounts: counts,
       }
 
       console.log("Final stats:", finalStats)

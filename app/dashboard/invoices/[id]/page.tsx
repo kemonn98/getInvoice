@@ -5,6 +5,7 @@ import { notFound } from "next/navigation"
 import { InvoiceDetailView } from "@/components/dashboard/invoice-details"
 import { DashboardHeader } from "@/components/dashboard/dashboard-header"
 import { DashboardShell } from "@/components/dashboard/dashboard-shell"
+import { Invoice } from "@prisma/client"
 
 async function getInvoice(id: number) {
   const session = await getServerSession(authOptions)

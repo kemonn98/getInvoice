@@ -5,11 +5,50 @@ export enum InvoiceStatus {
   CANCELLED = "CANCELLED"
 }
 
-export interface Invoice {
-  // ... other fields ...
-  status: InvoiceStatus
-  // ... other fields ...
+export interface Client {
+  id: number
+  userId: string
+  name: string
+  email: string | null
+  phone: string | null
+  address: string | null
+  createdAt: Date | null
+  updatedAt: Date | null
 }
+
+export interface InvoiceItem {
+  id: number
+  invoiceId: number
+  description: string
+  quantity: number
+  price: number
+  total: number
+}
+
+export interface Invoice {
+  id: number
+  userId: string
+  clientId: number
+  invoiceNo: string
+  status: InvoiceStatus
+  total: number
+  date: Date
+  dueDate: Date | null
+  notes: string | null
+  ourName: string
+  ourBusinessName: string
+  ourAddress: string
+  ourEmail: string | null
+  clientName: string
+  clientBusinessName: string | null
+  clientAddress: string
+  clientEmail: string | null
+  createdAt: Date | null
+  updatedAt: Date | null
+  client: Client
+  items: InvoiceItem[]
+}
+
 
 export enum EmployeeStatus {
   FULL_TIME = "FULL_TIME",

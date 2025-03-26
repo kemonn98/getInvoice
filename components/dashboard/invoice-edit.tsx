@@ -12,7 +12,7 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { updateInvoice } from "@/app/actions/invoice"
-import type { Invoice, InvoiceItem, InvoiceStatus } from "@/types/invoice"
+import type { Invoice, InvoiceItem, InvoiceStatus } from "@/types"
 
 interface EditInvoiceFormProps {
   invoice: Invoice
@@ -32,7 +32,7 @@ export function EditInvoiceForm({ invoice }: EditInvoiceFormProps) {
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [status, setStatus] = useState(invoice.status)
-  const [items, setItems] = useState<InvoiceItem[]>(invoice.items)
+  const [items, setItems] = useState(invoice.items)
 
   const addItem = () => {
     setItems([

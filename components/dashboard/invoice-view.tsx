@@ -1,5 +1,4 @@
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Invoice, InvoiceItem } from '@/types/invoice'  // Import both types
+import type { Invoice, InvoiceItem } from "@/types/invoice" // Import both types
 
 interface InvoiceViewProps {
   invoice: Invoice
@@ -7,13 +6,12 @@ interface InvoiceViewProps {
 
 export function InvoiceView({ invoice }: InvoiceViewProps) {
   // When using the dueDate, handle the null case
-  const formattedDueDate = invoice.dueDate ? new Date(invoice.dueDate).toLocaleDateString() : 'No due date';
+  const formattedDueDate = invoice.dueDate ? new Date(invoice.dueDate).toLocaleDateString() : "No due date"
 
   // Calculate totals from items
   const calculateSubtotal = () => {
     if (!invoice.items || !Array.isArray(invoice.items)) return 0
-    return invoice.items.reduce((sum: number, item: InvoiceItem) => 
-      sum + (Number(item.quantity) * Number(item.price)), 0)
+    return invoice.items.reduce((sum: number, item: InvoiceItem) => sum + Number(item.quantity) * Number(item.price), 0)
   }
 
   const calculateTax = () => {
@@ -35,11 +33,7 @@ export function InvoiceView({ invoice }: InvoiceViewProps) {
             <p>{invoice.ourName}</p>
             <p className="whitespace-pre-line">{invoice.ourAddress}</p>
           </div>
-          {invoice.ourEmail && (
-            <div className="text-sm text-muted-foreground">
-              {invoice.ourEmail}
-            </div>
-          )}
+          {invoice.ourEmail && <div className="text-sm text-muted-foreground">{invoice.ourEmail}</div>}
         </div>
 
         {/* Invoice Details */}
@@ -59,15 +53,9 @@ export function InvoiceView({ invoice }: InvoiceViewProps) {
         <h3 className="font-semibold mb-2">Bill To:</h3>
         <div className="text-sm text-muted-foreground">
           <p className="font-medium">{invoice.clientName}</p>
-          {invoice.clientBusinessName && (
-            <p>{invoice.clientBusinessName}</p>
-          )}
+          {invoice.clientBusinessName && <p>{invoice.clientBusinessName}</p>}
           <p className="whitespace-pre-line">{invoice.clientAddress}</p>
-          {invoice.clientEmail && (
-            <div>
-              {invoice.clientEmail}
-            </div>
-          )}
+          {invoice.clientEmail && <div>{invoice.clientEmail}</div>}
         </div>
       </div>
 
@@ -88,9 +76,7 @@ export function InvoiceView({ invoice }: InvoiceViewProps) {
                 <td className="py-2">{item.description}</td>
                 <td className="py-2 text-right">{item.quantity}</td>
                 <td className="py-2 text-right">${item.price.toFixed(2)}</td>
-                <td className="py-2 text-right">
-                  ${(item.quantity * item.price).toFixed(2)}
-                </td>
+                <td className="py-2 text-right">${(item.quantity * item.price).toFixed(2)}</td>
               </tr>
             ))}
           </tbody>

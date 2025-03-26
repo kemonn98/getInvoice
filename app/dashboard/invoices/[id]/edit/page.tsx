@@ -12,13 +12,13 @@ async function getInvoice(id: string) {
 
   const invoice = await prisma.invoice.findUnique({
     where: {
-      id: parseInt(id),
-      userId: session.user.id
+      id: Number.parseInt(id),
+      userId: session.user.id,
     },
     include: {
       items: true,
-      client: true
-    }
+      client: true,
+    },
   })
 
   return invoice
@@ -33,10 +33,7 @@ export default async function EditInvoicePage({ params }: { params: { id: string
 
   return (
     <DashboardShell>
-      <DashboardHeader
-        heading={`Edit Invoice ${invoice.invoiceNo}`}
-        text="Update invoice information and items"
-      />
+      <DashboardHeader heading={`Edit Invoice ${invoice.invoiceNo}`} text="Update invoice information and items" />
       <div className="grid gap-8">
         <EditInvoiceForm invoice={invoice} />
       </div>

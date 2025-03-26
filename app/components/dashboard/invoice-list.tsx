@@ -10,10 +10,10 @@ interface Invoice {
 }
 
 const formatDate = (date: string) => {
-  return new Date(date).toLocaleDateString('en-US', {
-    month: 'long',
-    day: 'numeric',
-    year: 'numeric'
+  return new Date(date).toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
   })
 }
 
@@ -34,11 +34,7 @@ export function InvoiceList({ invoices }: { invoices: Invoice[] }) {
           </thead>
           <tbody className="[&_tr:last-child]:border-0">
             {invoices?.map((invoice) => (
-              <Link 
-                key={invoice.id} 
-                href={`/invoice/${invoice.id}`}
-                className="block"
-              >
+              <Link key={invoice.id} href={`/invoice/${invoice.id}`} className="block">
                 <tr className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted cursor-pointer">
                   <td className="p-4 align-middle">{invoice.id}</td>
                   <td className="p-4 align-middle">{invoice.customer}</td>
@@ -46,14 +42,13 @@ export function InvoiceList({ invoices }: { invoices: Invoice[] }) {
                   <td className="p-4 align-middle">{formatDate(invoice.date)}</td>
                   <td className="p-4 align-middle">${invoice.amount}</td>
                   <td className="p-4 align-middle">
-                    <span className={cn(
-                      "inline-flex items-center rounded-full px-2 py-1 text-xs font-semibold",
-                      {
+                    <span
+                      className={cn("inline-flex items-center rounded-full px-2 py-1 text-xs font-semibold", {
                         "bg-green-100 text-green-700": invoice.status === "paid",
                         "bg-yellow-100 text-yellow-700": invoice.status === "pending",
                         "bg-red-100 text-red-700": invoice.status === "unpaid",
-                      }
-                    )}>
+                      })}
+                    >
                       {invoice.status}
                     </span>
                   </td>
@@ -65,4 +60,5 @@ export function InvoiceList({ invoices }: { invoices: Invoice[] }) {
       </div>
     </div>
   )
-} 
+}
+

@@ -5,7 +5,7 @@ import Link from "next/link"
 import { Download, Eye, MoreHorizontal, Pencil, Trash2 } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useSession } from "next-auth/react"
-import { Invoice as PrismaInvoice, InvoiceStatus } from '@prisma/client'
+import { type Invoice as PrismaInvoice, InvoiceStatus } from "@prisma/client"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import {
@@ -22,33 +22,33 @@ import { getInvoices } from "@/app/actions/invoice"
 
 // Update the interfaces to match Prisma's types
 interface InvoiceItem {
-  id: number;
-  description: string;
-  quantity: number;
-  price: number;
-  total: number;
-  invoiceId: number;
+  id: number
+  description: string
+  quantity: number
+  price: number
+  total: number
+  invoiceId: number
 }
 
-interface Invoice extends Omit<PrismaInvoice, 'items' | 'client'> {
-  id: number;  // Changed from string to number
-  invoiceNo: string;
-  clientName: string;
-  date: Date;  // Changed from string | Date to Date
-  dueDate: Date | null;  // Changed to match Prisma's type
-  status: InvoiceStatus;
-  total: number;  // Added to match Prisma
-  items: InvoiceItem[];
+interface Invoice extends Omit<PrismaInvoice, "items" | "client"> {
+  id: number // Changed from string to number
+  invoiceNo: string
+  clientName: string
+  date: Date // Changed from string | Date to Date
+  dueDate: Date | null // Changed to match Prisma's type
+  status: InvoiceStatus
+  total: number // Added to match Prisma
+  items: InvoiceItem[]
   client: {
-    id: number;
-    name: string;
-    email: string | null;
-    phone: string | null;
-    address: string | null;
-    userId: string;
-    createdAt: Date;
-    updatedAt: Date;
-  };
+    id: number
+    name: string
+    email: string | null
+    phone: string | null
+    address: string | null
+    userId: string
+    createdAt: Date
+    updatedAt: Date
+  }
 }
 
 export function InvoiceList() {
@@ -62,29 +62,29 @@ export function InvoiceList() {
     if (status === "authenticated" && session) {
       const fetchInvoices = async () => {
         try {
-          setIsLoading(true);
-          setError(null);
+          setIsLoading(true)
+          setError(null)
           const data = await getInvoices()
           setInvoices(data || [])
         } catch (err) {
-          console.error('Error fetching invoices:', err);
+          console.error("Error fetching invoices:", err)
           if (err instanceof Error) {
             if (err.message.includes("Unauthorized")) {
-              router.replace('/login');
+              router.replace("/login")
             } else {
-              setError(err.message);
+              setError(err.message)
             }
           } else {
-            setError('Failed to load invoices');
+            setError("Failed to load invoices")
           }
         } finally {
-          setIsLoading(false);
+          setIsLoading(false)
         }
       }
 
       fetchInvoices()
     } else if (status === "unauthenticated") {
-      router.replace('/login')
+      router.replace("/login")
     }
   }, [status, session, router])
 
@@ -107,10 +107,9 @@ export function InvoiceList() {
 
   const calculateTotal = (invoice: Invoice) => {
     if (!invoice.items || !Array.isArray(invoice.items)) {
-      return invoice.total || 0;
+      return invoice.total || 0
     }
-    return invoice.items.reduce((sum, item) => 
-      sum + item.total, 0);
+    return invoice.items.reduce((sum, item) => sum + item.total, 0)
   }
 
   if (error) return <div>Error: {error}</div>
@@ -160,7 +159,7 @@ export function InvoiceList() {
             </TableHeader>
             <TableBody>
               {sortedInvoices.map((invoice) => (
-                <TableRow 
+                <TableRow
                   key={invoice.id.toString()}
                   onClick={() => router.push(`/dashboard/invoices/${invoice.id}`)}
                   className="cursor-pointer hover:bg-muted/50"
@@ -168,10 +167,8 @@ export function InvoiceList() {
                   <TableCell className="font-medium">{invoice.invoiceNo}</TableCell>
                   <TableCell>{invoice.clientName}</TableCell>
                   <TableCell>{new Date(invoice.date).toLocaleDateString()}</TableCell>
-                  <TableCell>{invoice.dueDate ? new Date(invoice.dueDate).toLocaleDateString() : 'N/A'}</TableCell>
-                  <TableCell>
-                    ${calculateTotal(invoice).toFixed(2)}
-                  </TableCell>
+                  <TableCell>{invoice.dueDate ? new Date(invoice.dueDate).toLocaleDateString() : "N/A"}</TableCell>
+                  <TableCell>${calculateTotal(invoice).toFixed(2)}</TableCell>
                   <TableCell>
                     <Badge variant="outline" className={getStatusColor(invoice.status)}>
                       {invoice.status.charAt(0).toUpperCase() + invoice.status.slice(1).toLowerCase()}

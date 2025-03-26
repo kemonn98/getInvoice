@@ -1,5 +1,7 @@
 "use client"
 
+import type React from "react"
+
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Plus, Trash2 } from "lucide-react"
@@ -10,21 +12,21 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { updateInvoice } from "@/app/actions/invoice"
-import { Invoice, InvoiceItem, InvoiceStatus } from '@/types/invoice'
+import type { Invoice, InvoiceItem, InvoiceStatus } from "@/types/invoice"
 
 interface EditInvoiceFormProps {
-  invoice: Invoice;
+  invoice: Invoice
 }
 
 // Helper function to format date safely
 const formatDate = (date: string | Date | null) => {
-  if (!date) return '';
+  if (!date) return ""
   try {
-    return new Date(date).toISOString().split('T')[0];
+    return new Date(date).toISOString().split("T")[0]
   } catch {
-    return '';
+    return ""
   }
-};
+}
 
 export function EditInvoiceForm({ invoice }: EditInvoiceFormProps) {
   const router = useRouter()
@@ -73,7 +75,7 @@ export function EditInvoiceForm({ invoice }: EditInvoiceFormProps) {
     try {
       const form = e.target as HTMLFormElement
       const formData = new FormData(form)
-      
+
       // Calculate total first
       const total = calculateTotal()
 
@@ -82,7 +84,7 @@ export function EditInvoiceForm({ invoice }: EditInvoiceFormProps) {
         description: item.description,
         quantity: Number(item.quantity),
         price: Number(item.price),
-        total: Number(item.quantity) * Number(item.price)
+        total: Number(item.quantity) * Number(item.price),
       }))
 
       // Create the complete form data object
@@ -92,15 +94,15 @@ export function EditInvoiceForm({ invoice }: EditInvoiceFormProps) {
       completeFormData.set("total", total.toString())
       completeFormData.set("date", new Date(formData.get("date") as string).toISOString())
       completeFormData.set("dueDate", new Date(formData.get("dueDate") as string).toISOString())
-      completeFormData.set("notes", formData.get("notes") as string || "")
+      completeFormData.set("notes", (formData.get("notes") as string) || "")
       completeFormData.set("ourName", formData.get("ourName") as string)
       completeFormData.set("ourBusinessName", formData.get("ourBusinessName") as string)
       completeFormData.set("ourAddress", formData.get("ourAddress") as string)
       completeFormData.set("clientName", formData.get("clientName") as string)
-      completeFormData.set("clientEmail", formData.get("clientEmail") as string || "")
+      completeFormData.set("clientEmail", (formData.get("clientEmail") as string) || "")
       completeFormData.set("clientBusinessName", formData.get("clientBusinessName") as string)
       completeFormData.set("clientAddress", formData.get("clientAddress") as string)
-      completeFormData.set("ourEmail", formData.get("ourEmail") as string || "")
+      completeFormData.set("ourEmail", (formData.get("ourEmail") as string) || "")
       completeFormData.set("items", JSON.stringify(formattedItems))
 
       const result = await updateInvoice(invoice.id.toString(), completeFormData)
@@ -109,10 +111,10 @@ export function EditInvoiceForm({ invoice }: EditInvoiceFormProps) {
         router.push(`/dashboard/invoices/${invoice.id}`)
         router.refresh()
       } else {
-        console.error('Update failed:', result.error)
+        console.error("Update failed:", result.error)
       }
     } catch (error) {
-      console.error('Failed to update invoice:', error)
+      console.error("Failed to update invoice:", error)
     } finally {
       setIsSubmitting(false)
     }
@@ -132,28 +134,16 @@ export function EditInvoiceForm({ invoice }: EditInvoiceFormProps) {
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="ourName">Name</Label>
-                <Input
-                  id="ourName"
-                  name="ourName"
-                  defaultValue={invoice.ourName}
-                />
+                <Input id="ourName" name="ourName" defaultValue={invoice.ourName} />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="ourBusinessName">Business Name</Label>
-                <Input
-                  id="ourBusinessName"
-                  name="ourBusinessName"
-                  defaultValue={invoice.ourBusinessName}
-                />
+                <Input id="ourBusinessName" name="ourBusinessName" defaultValue={invoice.ourBusinessName} />
               </div>
             </div>
             <div className="space-y-2">
               <Label htmlFor="ourAddress">Address</Label>
-              <Textarea
-                id="ourAddress"
-                name="ourAddress"
-                defaultValue={invoice.ourAddress}
-              />
+              <Textarea id="ourAddress" name="ourAddress" defaultValue={invoice.ourAddress} />
             </div>
           </div>
 
@@ -163,12 +153,7 @@ export function EditInvoiceForm({ invoice }: EditInvoiceFormProps) {
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="clientName">Client Name*</Label>
-                <Input
-                  id="clientName"
-                  name="clientName"
-                  defaultValue={invoice.clientName}
-                  required
-                />
+                <Input id="clientName" name="clientName" defaultValue={invoice.clientName} required />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="clientEmail">Client Email</Label>
@@ -191,12 +176,7 @@ export function EditInvoiceForm({ invoice }: EditInvoiceFormProps) {
             </div>
             <div className="space-y-2">
               <Label htmlFor="clientAddress">Client Address*</Label>
-              <Textarea
-                id="clientAddress"
-                name="clientAddress"
-                defaultValue={invoice.clientAddress}
-                required
-              />
+              <Textarea id="clientAddress" name="clientAddress" defaultValue={invoice.clientAddress} required />
             </div>
           </div>
 
@@ -204,12 +184,7 @@ export function EditInvoiceForm({ invoice }: EditInvoiceFormProps) {
           <div className="grid gap-6 md:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="invoiceNo">Invoice Number</Label>
-              <Input 
-                id="invoiceNo" 
-                name="invoiceNo" 
-                defaultValue={invoice.invoiceNo} 
-                required 
-              />
+              <Input id="invoiceNo" name="invoiceNo" defaultValue={invoice.invoiceNo} required />
             </div>
             <div className="space-y-2">
               <Label htmlFor="status">Status</Label>
@@ -227,23 +202,11 @@ export function EditInvoiceForm({ invoice }: EditInvoiceFormProps) {
             </div>
             <div className="space-y-2">
               <Label htmlFor="dueDate">Due Date</Label>
-              <Input
-                id="dueDate"
-                name="dueDate"
-                type="date"
-                defaultValue={formatDate(invoice.dueDate)}
-                required
-              />
+              <Input id="dueDate" name="dueDate" type="date" defaultValue={formatDate(invoice.dueDate)} required />
             </div>
             <div className="space-y-2">
               <Label htmlFor="date">Issue Date</Label>
-              <Input
-                id="date"
-                name="date"
-                type="date"
-                defaultValue={formatDate(invoice.date)}
-                required
-              />
+              <Input id="date" name="date" type="date" defaultValue={formatDate(invoice.date)} required />
             </div>
           </div>
         </CardContent>
@@ -284,7 +247,7 @@ export function EditInvoiceForm({ invoice }: EditInvoiceFormProps) {
                       min="1"
                       placeholder="Qty"
                       value={item.quantity}
-                      onChange={(e) => updateItem(item.id || 0, "quantity", parseInt(e.target.value) || 0)}
+                      onChange={(e) => updateItem(item.id || 0, "quantity", Number.parseInt(e.target.value) || 0)}
                       required
                     />
                   </div>
@@ -299,7 +262,7 @@ export function EditInvoiceForm({ invoice }: EditInvoiceFormProps) {
                       step="0.01"
                       placeholder="Price"
                       value={item.price}
-                      onChange={(e) => updateItem(item.id || 0, "price", parseFloat(e.target.value) || 0)}
+                      onChange={(e) => updateItem(item.id || 0, "price", Number.parseFloat(e.target.value) || 0)}
                       required
                     />
                   </div>

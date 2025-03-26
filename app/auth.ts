@@ -1,21 +1,21 @@
-import { AuthOptions } from "next-auth";
-import { PrismaAdapter } from "@auth/prisma-adapter";
-import GoogleProvider from "next-auth/providers/google";
-import prisma from "@/lib/prisma";
+import type { AuthOptions } from "next-auth"
+import { PrismaAdapter } from "@auth/prisma-adapter"
+import GoogleProvider from "next-auth/providers/google"
+import prisma from "@/lib/prisma"
 
 // Add these type declarations
-import { DefaultSession, DefaultUser } from "next-auth";
+import type { DefaultSession, DefaultUser } from "next-auth"
 
 // Extend the Session interface
 declare module "next-auth" {
   interface Session extends DefaultSession {
     user?: {
-      id: string;
+      id: string
     } & DefaultSession["user"]
   }
 
   interface User extends DefaultUser {
-    id: string;
+    id: string
   }
 }
 
@@ -30,23 +30,24 @@ export const authOptions: AuthOptions = {
   callbacks: {
     session: async ({ session, token }) => {
       if (session?.user) {
-        session.user.id = token.id as string;
+        session.user.id = token.id as string
       }
-      return session;
+      return session
     },
     jwt: async ({ token, user }) => {
       if (user) {
-        token.id = user.id;
+        token.id = user.id
       }
-      return token;
-    }
+      return token
+    },
   },
   pages: {
-    signIn: '/login',
+    signIn: "/login",
   },
   session: {
-    strategy: "jwt"
+    strategy: "jwt",
   },
   secret: process.env.NEXTAUTH_SECRET,
-  debug: process.env.NODE_ENV === 'development',
-};
+  debug: process.env.NODE_ENV === "development",
+}
+

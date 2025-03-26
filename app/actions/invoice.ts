@@ -1,11 +1,11 @@
-'use server'
+"use server"
 
 import { revalidatePath } from "next/cache"
-import prisma from '@/lib/prisma'
+import prisma from "@/lib/prisma"
 import { MOCK_USER_ID } from "../lib/constants"
 import { getServerSession } from "next-auth/next"
 import { authOptions } from "@/app/auth"
-import { Invoice, InvoiceItem, InvoiceStatus } from '@/types/invoice'
+import type { InvoiceItem, InvoiceStatus } from "@/types/invoice"
 
 async function executeWithRetry<T>(operation: () => Promise<T>): Promise<T> {
   const MAX_RETRIES = 3
@@ -17,43 +17,43 @@ async function executeWithRetry<T>(operation: () => Promise<T>): Promise<T> {
       return await operation()
     } catch (error: any) {
       lastError = error
-      if (error.code !== 'P1001' && error.code !== 'P1002') {
+      if (error.code !== "P1001" && error.code !== "P1002") {
         throw error
       }
       if (i < MAX_RETRIES - 1) {
-        await new Promise(resolve => setTimeout(resolve, RETRY_DELAY * (i + 1)))
+        await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY * (i + 1)))
       }
     }
   }
   throw lastError
 }
 
-export async function getInvoices(query: string = '', currentPage: number = 1) {
+export async function getInvoices(query = "", currentPage = 1) {
   try {
     return await executeWithRetry(async () => {
       const session = await getServerSession(authOptions)
-      
+
       if (!session?.user?.id) {
         return [] // Return empty array instead of throwing error
       }
 
       const invoices = await prisma.invoice.findMany({
         where: {
-          userId: session.user.id
+          userId: session.user.id,
         },
         include: {
           client: true,
           items: true,
         },
         orderBy: {
-          createdAt: 'desc'
-        }
+          createdAt: "desc",
+        },
       })
 
       return invoices
     })
   } catch (error) {
-    console.error('Error in getInvoices:', error)
+    console.error("Error in getInvoices:", error)
     throw error
   }
 }
@@ -61,11 +61,11 @@ export async function getInvoices(query: string = '', currentPage: number = 1) {
 export async function createInvoice(formData: FormData) {
   try {
     const session = await getServerSession(authOptions)
-    
+
     if (!session?.user?.id) {
       return {
         success: false,
-        error: "Unauthorized: Please sign in"
+        error: "Unauthorized: Please sign in",
       }
     }
 
@@ -74,77 +74,77 @@ export async function createInvoice(formData: FormData) {
 
     // Generate invoice number
     const now = new Date()
-    const invoiceNo = `INV-${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}-${Math.random().toString(36).slice(-4).toUpperCase()}`
+    const invoiceNo = `INV-${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, "0")}${String(now.getDate()).padStart(2, "0")}-${Math.random().toString(36).slice(-4).toUpperCase()}`
 
     // Calculate total from items
     const total = items.reduce((sum: number, item: InvoiceItem) => {
-      return sum + (Number(item.price) * Number(item.quantity))
+      return sum + Number(item.price) * Number(item.quantity)
     }, 0)
 
     // First, create the client with proper relation and email
     const client = await prisma.client.create({
       data: {
         name: formData.get("clientName") as string,
-        email: formData.get("clientEmail") as string || null, // Add client email
+        email: (formData.get("clientEmail") as string) || null, // Add client email
         phone: null,
         address: formData.get("clientAddress") as string,
         user: {
-          connect: { id: userId }
-        }
-      }
+          connect: { id: userId },
+        },
+      },
     })
 
     // Get user email from session
-    const userEmail = session.user.email || null;
+    const userEmail = session.user.email || null
 
     // Then create the invoice with email addresses
     const invoice = await prisma.invoice.create({
       data: {
         user: {
-          connect: { id: userId }
+          connect: { id: userId },
         },
         client: {
-          connect: { id: client.id }
+          connect: { id: client.id },
         },
         invoiceNo,
-        status: formData.get("status") as InvoiceStatus || "PENDING",
+        status: (formData.get("status") as InvoiceStatus) || "PENDING",
         total,
-        date: new Date(formData.get("date") as string || now),
+        date: new Date((formData.get("date") as string) || now),
         dueDate: new Date(formData.get("dueDate") as string),
-        notes: formData.get("notes") as string || "",
+        notes: (formData.get("notes") as string) || "",
         ourName: formData.get("ourName") as string,
         ourBusinessName: formData.get("ourBusinessName") as string,
         ourAddress: formData.get("ourAddress") as string,
         ourEmail: session.user.email || null,
         clientName: formData.get("clientName") as string,
-        clientBusinessName: formData.get("clientBusinessName") as string || null,
+        clientBusinessName: (formData.get("clientBusinessName") as string) || null,
         clientAddress: formData.get("clientAddress") as string,
-        clientEmail: formData.get("clientEmail") as string || null,
+        clientEmail: (formData.get("clientEmail") as string) || null,
         items: {
           create: items.map((item: InvoiceItem) => ({
             description: item.description,
-            quantity: parseInt(item.quantity.toString()),
-            price: parseFloat(item.price.toString()),
-            total: parseInt(item.quantity.toString()) * parseFloat(item.price.toString())
-          }))
-        }
+            quantity: Number.parseInt(item.quantity.toString()),
+            price: Number.parseFloat(item.price.toString()),
+            total: Number.parseInt(item.quantity.toString()) * Number.parseFloat(item.price.toString()),
+          })),
+        },
       },
       include: {
         items: true,
         user: true,
-        client: true
-      }
+        client: true,
+      },
     })
 
     return {
       success: true,
-      data: invoice
+      data: invoice,
     }
   } catch (error) {
     console.error("Error in createInvoice:", error)
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Failed to create invoice"
+      error: error instanceof Error ? error.message : "Failed to create invoice",
     }
   }
 }
@@ -152,21 +152,18 @@ export async function createInvoice(formData: FormData) {
 // Add this function to create a test client
 async function ensureTestClient() {
   const testClient = await prisma.client.findFirst({
-    where: { userId: MOCK_USER_ID }
-
+    where: { userId: MOCK_USER_ID },
   })
 
   if (!testClient) {
     return await prisma.client.create({
       data: {
-
-
         userId: MOCK_USER_ID,
         name: "Test Client",
         email: "client@example.com",
         phone: "123-456-7890",
-        address: "123 Test St"
-      }
+        address: "123 Test St",
+      },
     })
   }
 
@@ -181,15 +178,15 @@ export async function getClients() {
 
     const clients = await prisma.client.findMany({
       where: {
-        userId: MOCK_USER_ID
+        userId: MOCK_USER_ID,
       },
       orderBy: {
-        name: 'asc'
-      }
+        name: "asc",
+      },
     })
     return clients
   } catch (error) {
-    console.error('Failed to fetch clients:', error)
+    console.error("Failed to fetch clients:", error)
     return []
   }
 }
@@ -201,13 +198,13 @@ export async function updateInvoice(id: string | number, formData: FormData) {
 
     // Calculate total from items (same as createInvoice)
     const total = items.reduce((sum: number, item: InvoiceItem) => {
-      return sum + (Number(item.price) * Number(item.quantity))
+      return sum + Number(item.price) * Number(item.quantity)
     }, 0)
 
     await prisma.invoiceItem.deleteMany({
       where: {
-        invoiceId: invoiceId
-      }
+        invoiceId: invoiceId,
+      },
     })
 
     const itemsData = items.map((item: InvoiceItem) => ({
@@ -215,7 +212,7 @@ export async function updateInvoice(id: string | number, formData: FormData) {
       description: item.description,
       quantity: Number(item.quantity),
       price: Number(item.price),
-      total: Number(item.quantity) * Number(item.price)
+      total: Number(item.quantity) * Number(item.price),
     }))
 
     const [updatedInvoice, createdItems] = await prisma.$transaction([
@@ -234,13 +231,13 @@ export async function updateInvoice(id: string | number, formData: FormData) {
           clientBusinessName: formData.get("clientBusinessName") as string,
           clientAddress: formData.get("clientAddress") as string,
           total: total,
-          ourEmail: formData.get("ourEmail") as string || null,
-          clientEmail: formData.get("clientEmail") as string || null
-        }
+          ourEmail: (formData.get("ourEmail") as string) || null,
+          clientEmail: (formData.get("clientEmail") as string) || null,
+        },
       }),
       prisma.invoiceItem.createMany({
-        data: itemsData
-      })
+        data: itemsData,
+      }),
     ])
 
     revalidatePath("/dashboard/invoices")
@@ -256,22 +253,22 @@ export async function deleteInvoice(id: string) {
   try {
     // Convert id to number
     const invoiceId = Number(id)
-    
+
     // Delete all invoice items first
     await prisma.invoiceItem.deleteMany({
-      where: { invoiceId: invoiceId }  // Pass as number
+      where: { invoiceId: invoiceId }, // Pass as number
     })
 
     // Then delete the invoice
     await prisma.invoice.delete({
-      where: { id: invoiceId }  // Also update this to use number
+      where: { id: invoiceId }, // Also update this to use number
     })
 
-    revalidatePath('/dashboard')
+    revalidatePath("/dashboard")
     return { success: true }
   } catch (error) {
-    console.error('Failed to delete invoice:', error)
-    return { success: false, error: 'Failed to delete invoice' }
+    console.error("Failed to delete invoice:", error)
+    return { success: false, error: "Failed to delete invoice" }
   }
 }
 
@@ -279,11 +276,11 @@ export async function deleteInvoice(id: string) {
 export async function updateInvoiceStatus(invoiceId: string, status: string) {
   try {
     const session = await getServerSession(authOptions)
-    
+
     if (!session?.user?.id) {
       return {
         success: false,
-        error: "Unauthorized: Please sign in"
+        error: "Unauthorized: Please sign in",
       }
     }
 
@@ -292,28 +289,28 @@ export async function updateInvoiceStatus(invoiceId: string, status: string) {
 
     const invoice = await prisma.invoice.update({
       where: {
-        id: numericInvoiceId,  // Use the converted number
-        userId: session.user.id
+        id: numericInvoiceId, // Use the converted number
+        userId: session.user.id,
       },
       data: {
-        status: status as InvoiceStatus
+        status: status as InvoiceStatus,
       },
       include: {
         items: true,
         client: true,
-        user: true
-      }
+        user: true,
+      },
     })
 
     return {
       success: true,
-      data: invoice
+      data: invoice,
     }
   } catch (error) {
     console.error("Error updating invoice status:", error)
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Failed to update invoice status"
+      error: error instanceof Error ? error.message : "Failed to update invoice status",
     }
   }
 }
@@ -326,23 +323,23 @@ export async function getInvoiceById(id: string) {
 
     const invoice = await prisma.invoice.findUnique({
       where: {
-        id: numericId,  // Use the converted number
-        userId: MOCK_USER_ID
+        id: numericId, // Use the converted number
+        userId: MOCK_USER_ID,
       },
       include: {
         client: true,
-        items: true
-      }
+        items: true,
+      },
     })
 
     if (!invoice) {
-      return { invoice: null, error: 'Invoice not found' }
+      return { invoice: null, error: "Invoice not found" }
     }
 
     return { invoice, error: null }
   } catch (error) {
-    console.error('Failed to fetch invoice:', error)
-    return { invoice: null, error: 'Failed to fetch invoice' }
+    console.error("Failed to fetch invoice:", error)
+    return { invoice: null, error: "Failed to fetch invoice" }
   }
 }
 

@@ -13,12 +13,12 @@ async function getInvoice(id: number) {
   const invoice = await prisma.invoice.findUnique({
     where: {
       id: id,
-      userId: session.user.id
+      userId: session.user.id,
     },
     include: {
       items: true,
-      client: true
-    }
+      client: true,
+    },
   })
 
   return invoice
@@ -31,7 +31,7 @@ type PageParams = {
 }
 
 export default async function InvoicePage({ params }: PageParams) {
-  const invoice = await getInvoice(parseInt(params.id))
+  const invoice = await getInvoice(Number.parseInt(params.id))
 
   if (!invoice) {
     notFound()
@@ -39,10 +39,7 @@ export default async function InvoicePage({ params }: PageParams) {
 
   return (
     <DashboardShell>
-      <DashboardHeader
-        heading={`Invoice ${invoice.invoiceNo}`}
-        text="View and manage invoice details"
-      />
+      <DashboardHeader heading={`Invoice ${invoice.invoiceNo}`} text="View and manage invoice details" />
       <div className="grid gap-8">
         <InvoiceDetailView invoice={invoice} />
       </div>

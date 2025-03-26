@@ -19,13 +19,13 @@ import { Badge } from "@/components/ui/badge"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { updateInvoiceStatus, deleteInvoice } from "@/app/actions/invoice"
 import { InvoiceView } from "@/components/dashboard/invoice-view"
-import { Invoice } from '@/types/invoice'
-import html2canvas from 'html2canvas';
-import jsPDF from 'jspdf';
-import { format } from 'date-fns';
+import type { Invoice } from "@/types/invoice"
+import html2canvas from "html2canvas"
+import jsPDF from "jspdf"
+import { format } from "date-fns"
 
 interface InvoiceDetailViewProps {
-  invoice: Invoice;
+  invoice: Invoice
 }
 
 export function InvoiceDetailView({ invoice }: InvoiceDetailViewProps) {
@@ -58,11 +58,11 @@ export function InvoiceDetailView({ invoice }: InvoiceDetailViewProps) {
     try {
       const result = await deleteInvoice(invoice.id.toString())
       if (result.success) {
-        router.push('/dashboard')
+        router.push("/dashboard")
         router.refresh()
       }
     } catch (error) {
-      console.error('Failed to delete invoice:', error)
+      console.error("Failed to delete invoice:", error)
     } finally {
       setIsDeleting(false)
       setShowDeleteAlert(false)
@@ -75,50 +75,50 @@ export function InvoiceDetailView({ invoice }: InvoiceDetailViewProps) {
 
   const handleDownloadPDF = async () => {
     try {
-      setIsGeneratingPDF(true);
-      
-      const invoiceElement = document.getElementById('invoice-container');
-      if (!invoiceElement) return;
+      setIsGeneratingPDF(true)
+
+      const invoiceElement = document.getElementById("invoice-container")
+      if (!invoiceElement) return
 
       const canvas = await html2canvas(invoiceElement, {
         scale: 2,
         useCORS: true,
         logging: false,
-      });
+      })
 
       // Define margins in mm
-      const margin = 15; // 15mm margins
-      
+      const margin = 15 // 15mm margins
+
       // A4 measurements
-      const imgWidth = 210 - (margin * 2); // A4 width minus margins
-      const pageHeight = 297 - (margin * 2); // A4 height minus margins
-      
+      const imgWidth = 210 - margin * 2 // A4 width minus margins
+      const pageHeight = 297 - margin * 2 // A4 height minus margins
+
       // Calculate dimensions with margins
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width
 
       // Create PDF
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      
+      const pdf = new jsPDF("p", "mm", "a4")
+
       // Add the image with margin offset
       pdf.addImage(
-        canvas.toDataURL('image/png'),
-        'PNG',
+        canvas.toDataURL("image/png"),
+        "PNG",
         margin, // X position (left margin)
         margin, // Y position (top margin)
         imgWidth,
-        imgHeight
-      );
+        imgHeight,
+      )
 
       // Format the filename with the invoice number
-      const fileName = `${invoice.invoiceNo}-${format(new Date(), 'yyyy-MM-dd')}.pdf`;
+      const fileName = `${invoice.invoiceNo}-${format(new Date(), "yyyy-MM-dd")}.pdf`
 
-      pdf.save(fileName);
+      pdf.save(fileName)
     } catch (error) {
-      console.error('Error generating PDF:', error);
+      console.error("Error generating PDF:", error)
     } finally {
-      setIsGeneratingPDF(false);
+      setIsGeneratingPDF(false)
     }
-  };
+  }
 
   const handleShare = () => {
     // In a real app, this would open a share dialog or copy a link
@@ -141,30 +141,26 @@ export function InvoiceDetailView({ invoice }: InvoiceDetailViewProps) {
   }
 
   return (
-    
     <div className="space-y-6">
       {/* Action Bar */}
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between print:hidden">
         <div className="flex items-center gap-2">
-          <Badge 
-            variant="secondary" 
-            className={`${getStatusColor(invoice.status)} font-medium px-3 py-1.5`}
-          >
+          <Badge variant="secondary" className={`${getStatusColor(invoice.status)} font-medium px-3 py-1.5`}>
             {invoice.status.charAt(0).toUpperCase() + invoice.status.slice(1).toLowerCase()}
           </Badge>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="sm" disabled={isUpdatingStatus}>
-                  {isUpdatingStatus ? "Updating..." : "Update Status"}
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => handleStatusChange("PENDING")}>Mark as Pending</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleStatusChange("PAID")}>Mark as Paid</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleStatusChange("OVERDUE")}>Mark as Overdue</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleStatusChange("CANCELLED")}>Mark as Cancelled</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+                {isUpdatingStatus ? "Updating..." : "Update Status"}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => handleStatusChange("PENDING")}>Mark as Pending</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleStatusChange("PAID")}>Mark as Paid</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleStatusChange("OVERDUE")}>Mark as Overdue</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleStatusChange("CANCELLED")}>Mark as Cancelled</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
         <div className="flex flex-wrap gap-2">
           <Button variant="outline" size="sm" onClick={handlePrint}>
@@ -216,7 +212,7 @@ export function InvoiceDetailView({ invoice }: InvoiceDetailViewProps) {
                 <p className="text-sm text-muted-foreground">{new Date(invoice.createdAt).toLocaleString()}</p>
               </div>
             </div>
-            {invoice.status !== 'PAID' && (
+            {invoice.status !== "PAID" && (
               <div className="flex items-start gap-3">
                 <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100">
                   <Share2 className="h-4 w-4 text-blue-600" />
@@ -227,7 +223,7 @@ export function InvoiceDetailView({ invoice }: InvoiceDetailViewProps) {
                 </div>
               </div>
             )}
-            {invoice.status === 'PAID' && (
+            {invoice.status === "PAID" && (
               <div className="flex items-start gap-3">
                 <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-100">
                   <Download className="h-4 w-4 text-green-600" />
@@ -252,11 +248,7 @@ export function InvoiceDetailView({ invoice }: InvoiceDetailViewProps) {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleDelete}
-              className="bg-red-600 hover:bg-red-700"
-              disabled={isDeleting}
-            >
+            <AlertDialogAction onClick={handleDelete} className="bg-red-600 hover:bg-red-700" disabled={isDeleting}>
               {isDeleting ? "Deleting..." : "Delete"}
             </AlertDialogAction>
           </AlertDialogFooter>

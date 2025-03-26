@@ -58,11 +58,7 @@ export default function LoginPage() {
             <CardDescription className="text-center">Sign in to access your invoices</CardDescription>
           </CardHeader>
           <CardContent className="grid gap-4">
-            {error && (
-              <div className="p-3 text-sm text-red-500 bg-red-50 rounded-md">
-                {error}
-              </div>
-            )}
+            {error && <div className="p-3 text-sm text-red-500 bg-red-50 rounded-md">{error}</div>}
             <GoogleLoginButton onClick={handleGoogleLogin} isLoading={isLoading} />
             <div className="relative">
               <div className="absolute inset-0 flex items-center">

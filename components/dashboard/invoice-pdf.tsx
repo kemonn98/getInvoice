@@ -2,30 +2,30 @@ import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 
 interface InvoiceItem {
-  id: string;
-  description: string;
-  quantity: number;
-  price: number;
+  id: string
+  description: string
+  quantity: number
+  price: number
 }
 
 interface Client {
-  name: string;
-  email?: string;
-  address?: string;
-  phone?: string;
+  name: string
+  email?: string
+  address?: string
+  phone?: string
 }
 
 interface Invoice {
-  invoiceNumber: string;
-  issueDate: string | Date;
-  dueDate: string | Date;
-  status: string;
-  client: Client;
-  items: InvoiceItem[];
-  subtotal: number;
-  tax: number;
-  total: number;
-  notes?: string;
+  invoiceNumber: string
+  issueDate: string | Date
+  dueDate: string | Date
+  status: string
+  client: Client
+  items: InvoiceItem[]
+  subtotal: number
+  tax: number
+  total: number
+  notes?: string
 }
 
 interface InvoicePDFProps {

@@ -1,5 +1,7 @@
 "use client"
 
+import type React from "react"
+
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useSession } from "next-auth/react"
@@ -25,16 +27,18 @@ export function CreateInvoiceForm() {
   const { data: session, status }: SessionContextValue = useSession()
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [items, setItems] = useState<InvoiceItem[]>([
-    { id: "1", description: "", quantity: 1, price: 0 }
-  ])
+  const [items, setItems] = useState<InvoiceItem[]>([{ id: "1", description: "", quantity: 1, price: 0 }])
 
   // Generate default invoice number
-  const defaultInvoiceNumber = `INV-${new Date().getFullYear()}${String(new Date().getMonth() + 1).padStart(2, '0')}${String(new Date().getDate()).padStart(2, '0')}-${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`
+  const defaultInvoiceNumber = `INV-${new Date().getFullYear()}${String(new Date().getMonth() + 1).padStart(2, "0")}${String(new Date().getDate()).padStart(2, "0")}-${Math.floor(
+    Math.random() * 1000,
+  )
+    .toString()
+    .padStart(3, "0")}`
 
   // Generate default dates
-  const today = new Date().toISOString().split('T')[0]
-  const thirtyDaysFromNow = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+  const today = new Date().toISOString().split("T")[0]
+  const thirtyDaysFromNow = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0]
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -78,7 +82,7 @@ export function CreateInvoiceForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
-    
+
     if (!session?.user?.id) {
       setError("You must be signed in to create an invoice")
       return
@@ -109,7 +113,7 @@ export function CreateInvoiceForm() {
       formData.append("userId", session.user.id)
 
       const result = await createInvoice(formData)
-      
+
       if (result.success && result.data) {
         router.push(`/dashboard/invoices/${result.data.id}`)
         router.refresh()
@@ -150,13 +154,9 @@ export function CreateInvoiceForm() {
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className={`space-y-6 ${isLoading ? 'opacity-50 pointer-events-none' : ''}`}>
-        {error && (
-          <div className="bg-red-50 text-red-600 p-3 rounded-md mb-4">
-            {error}
-          </div>
-        )}
-        
+      <form onSubmit={handleSubmit} className={`space-y-6 ${isLoading ? "opacity-50 pointer-events-none" : ""}`}>
+        {error && <div className="bg-red-50 text-red-600 p-3 rounded-md mb-4">{error}</div>}
+
         {/* Invoice Header Card */}
         <Card>
           <CardHeader>
@@ -169,26 +169,16 @@ export function CreateInvoiceForm() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="ourName">Name</Label>
-                  <Input
-                    id="ourName"
-                    name="ourName"
-                    defaultValue={session?.user?.name || ""}
-                  />
+                  <Input id="ourName" name="ourName" defaultValue={session?.user?.name || ""} />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="ourBusinessName">Business Name</Label>
-                  <Input
-                    id="ourBusinessName"
-                    name="ourBusinessName"
-                  />
+                  <Input id="ourBusinessName" name="ourBusinessName" />
                 </div>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="ourAddress">Address</Label>
-                <Textarea
-                  id="ourAddress"
-                  name="ourAddress"
-                />
+                <Textarea id="ourAddress" name="ourAddress" />
               </div>
             </div>
 
@@ -198,36 +188,20 @@ export function CreateInvoiceForm() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="clientName">Client Name*</Label>
-                  <Input
-                    id="clientName"
-                    name="clientName"
-                    required
-                  />
+                  <Input id="clientName" name="clientName" required />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="clientEmail">Client Email</Label>
-                  <Input
-                    id="clientEmail"
-                    name="clientEmail"
-                    type="email"
-                    placeholder="client@example.com"
-                  />
+                  <Input id="clientEmail" name="clientEmail" type="email" placeholder="client@example.com" />
                 </div>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="clientBusinessName">Business Name (Optional)</Label>
-                <Input
-                  id="clientBusinessName"
-                  name="clientBusinessName"
-                />
+                <Input id="clientBusinessName" name="clientBusinessName" />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="clientAddress">Client Address*</Label>
-                <Textarea
-                  id="clientAddress"
-                  name="clientAddress"
-                  required
-                />
+                <Textarea id="clientAddress" name="clientAddress" required />
               </div>
             </div>
 
@@ -237,12 +211,7 @@ export function CreateInvoiceForm() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="invoiceNumber">Invoice Number</Label>
-                  <Input
-                    id="invoiceNumber"
-                    name="invoiceNumber"
-                    defaultValue={defaultInvoiceNumber}
-                    required
-                  />
+                  <Input id="invoiceNumber" name="invoiceNumber" defaultValue={defaultInvoiceNumber} required />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="status">Status</Label>
@@ -262,23 +231,11 @@ export function CreateInvoiceForm() {
               <div className="grid grid-cols-3 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="issueDate">Issue Date</Label>
-                  <Input
-                    id="issueDate"
-                    name="issueDate"
-                    type="date"
-                    defaultValue={today}
-                    required
-                  />
+                  <Input id="issueDate" name="issueDate" type="date" defaultValue={today} required />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="dueDate">Due Date</Label>
-                  <Input
-                    id="dueDate"
-                    name="dueDate"
-                    type="date"
-                    defaultValue={thirtyDaysFromNow}
-                    required
-                  />
+                  <Input id="dueDate" name="dueDate" type="date" defaultValue={thirtyDaysFromNow} required />
                 </div>
               </div>
             </div>
@@ -289,13 +246,7 @@ export function CreateInvoiceForm() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
             <CardTitle>Line Items</CardTitle>
-            <Button 
-              type="button" 
-              variant="outline" 
-              size="sm" 
-              onClick={addItem}
-              disabled={isLoading}
-            >
+            <Button type="button" variant="outline" size="sm" onClick={addItem} disabled={isLoading}>
               <Plus className="mr-2 h-4 w-4" />
               Add Item
             </Button>
@@ -326,7 +277,7 @@ export function CreateInvoiceForm() {
                     min="1"
                     placeholder="Qty"
                     value={item.quantity}
-                    onChange={(e) => updateItem(item.id, "quantity", parseInt(e.target.value) || 0)}
+                    onChange={(e) => updateItem(item.id, "quantity", Number.parseInt(e.target.value) || 0)}
                     required
                     disabled={isLoading}
                   />
@@ -341,10 +292,10 @@ export function CreateInvoiceForm() {
                     min="0"
                     step="1"
                     placeholder="0"
-                    value={item.price || ''}
+                    value={item.price || ""}
                     onChange={(e) => {
-                      const value = e.target.value === '' ? 0 : parseFloat(e.target.value);
-                      updateItem(item.id, "price", value);
+                      const value = e.target.value === "" ? 0 : Number.parseFloat(e.target.value)
+                      updateItem(item.id, "price", value)
                     }}
                     required
                     disabled={isLoading}
@@ -389,21 +340,11 @@ export function CreateInvoiceForm() {
           <CardContent>
             <div className="space-y-2">
               <Label htmlFor="notes">Notes</Label>
-              <Textarea
-                id="notes"
-                name="notes"
-                placeholder="Enter any additional notes..."
-                className="min-h-[100px]"
-              />
+              <Textarea id="notes" name="notes" placeholder="Enter any additional notes..." className="min-h-[100px]" />
             </div>
           </CardContent>
           <CardFooter className="flex justify-end gap-4 border-t pt-4">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => router.push('/dashboard')}
-              disabled={isLoading}
-            >
+            <Button type="button" variant="outline" onClick={() => router.push("/dashboard")} disabled={isLoading}>
               Cancel
             </Button>
             <Button type="submit" disabled={isLoading}>
@@ -413,7 +354,7 @@ export function CreateInvoiceForm() {
                   Creating...
                 </>
               ) : (
-                'Create Invoice'
+                "Create Invoice"
               )}
             </Button>
           </CardFooter>

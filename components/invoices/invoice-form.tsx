@@ -2,34 +2,21 @@
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
-import * as z from "zod"
+import type * as z from "zod"
 import { Button } from "@/components/ui/button"
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { invoiceSchema } from "@/lib/schema"
-import { Invoice, InvoiceItem } from '@/types/invoice'
+import type { InvoiceItem } from "@/types/invoice"
 import { useState } from "react"
-import { InvoiceStatus } from '@prisma/client'
+import { InvoiceStatus } from "@prisma/client"
 
 // Define status options as a constant
 const STATUS_OPTIONS = [
   { label: "Pending", value: "pending" },
   { label: "Paid", value: "paid" },
   { label: "Overdue", value: "overdue" },
-  { label: "Cancelled", value: "cancelled" }
+  { label: "Cancelled", value: "cancelled" },
 ] as const
 
 interface InvoiceFormProps {
@@ -43,7 +30,7 @@ export function InvoiceForm({ invoice, onSubmit }: InvoiceFormProps) {
     defaultValues: invoice || {
       status: InvoiceStatus.PENDING,
       // ... other default values
-    }
+    },
   })
 
   // For form state
@@ -51,9 +38,9 @@ export function InvoiceForm({ invoice, onSubmit }: InvoiceFormProps) {
   const [status, setStatus] = useState<InvoiceStatus>(InvoiceStatus.PENDING)
 
   // For select/dropdown options
-  const statusOptions = Object.values(InvoiceStatus).map(status => ({
+  const statusOptions = Object.values(InvoiceStatus).map((status) => ({
     label: status.toLowerCase(),
-    value: status
+    value: status,
   }))
 
   return (
@@ -92,4 +79,5 @@ export function InvoiceForm({ invoice, onSubmit }: InvoiceFormProps) {
       </form>
     </Form>
   )
-} 
+}
+

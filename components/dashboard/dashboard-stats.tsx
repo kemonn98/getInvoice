@@ -8,15 +8,15 @@ import { FileText, PieChart, TrendingUp } from "lucide-react"
 import { DollarSign } from "lucide-react"
 
 interface DashboardStats {
-  totalRevenue: number;
-  currentMonthInvoices: number;
-  lastMonthInvoices: number;
+  totalRevenue: number
+  currentMonthInvoices: number
+  lastMonthInvoices: number
   statusCounts: {
-    PENDING: number;
-    PAID: number;
-    OVERDUE: number;
-    CANCELLED: number;
-  };
+    PENDING: number
+    PAID: number
+    OVERDUE: number
+    CANCELLED: number
+  }
 }
 
 export function DashboardStats() {
@@ -31,20 +31,20 @@ export function DashboardStats() {
 
       try {
         setLoading(true)
-        const response = await fetch('/api/dashboard/stats')
-        
+        const response = await fetch("/api/dashboard/stats")
+
         if (!response.ok) {
           const errorData = await response.json()
-          throw new Error(errorData.error || 'Failed to fetch stats')
+          throw new Error(errorData.error || "Failed to fetch stats")
         }
 
         const data = await response.json()
-        
+
         setStats(data)
         setError(null)
       } catch (err) {
-        console.error('Error fetching stats:', err)
-        setError(err instanceof Error ? err.message : 'Failed to fetch stats')
+        console.error("Error fetching stats:", err)
+        setError(err instanceof Error ? err.message : "Failed to fetch stats")
       } finally {
         setLoading(false)
       }
@@ -56,14 +56,14 @@ export function DashboardStats() {
   }, [session, status])
 
   const calculateTrend = () => {
-    if (!stats) return 0;
-    
-    const current = stats.currentMonthInvoices ?? 0;
-    const last = stats.lastMonthInvoices ?? 0;
-    
-    if (last === 0) return 0;
-    
-    return ((current - last) / last) * 100;
+    if (!stats) return 0
+
+    const current = stats.currentMonthInvoices ?? 0
+    const last = stats.lastMonthInvoices ?? 0
+
+    if (last === 0) return 0
+
+    return ((current - last) / last) * 100
   }
 
   if (status === "loading" || loading) {
@@ -87,12 +87,8 @@ export function DashboardStats() {
         </CardHeader>
         <CardContent>
           <div className="flex flex-col gap-1">
-            <div className="text-2xl font-bold">
-              ${(stats.totalRevenue ?? 0).toFixed(2)}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              +20.1% from last month
-            </p>
+            <div className="text-2xl font-bold">${(stats.totalRevenue ?? 0).toFixed(2)}</div>
+            <p className="text-xs text-muted-foreground">+20.1% from last month</p>
           </div>
         </CardContent>
       </Card>
@@ -104,11 +100,9 @@ export function DashboardStats() {
         </CardHeader>
         <CardContent>
           <div className="flex flex-col gap-1">
-            <div className="text-2xl font-bold">
-              {stats.currentMonthInvoices}
-            </div>
+            <div className="text-2xl font-bold">{stats.currentMonthInvoices}</div>
             <p className="text-xs text-muted-foreground">
-              {stats.currentMonthInvoices > 0 ? `${stats.currentMonthInvoices} total invoices` : 'No invoices yet'}
+              {stats.currentMonthInvoices > 0 ? `${stats.currentMonthInvoices} total invoices` : "No invoices yet"}
             </p>
           </div>
         </CardContent>
@@ -160,12 +154,8 @@ export function DashboardStats() {
         </CardHeader>
         <CardContent>
           <div className="flex flex-col gap-1">
-            <div className="text-2xl font-bold text-orange-600">
-              {calculateTrend().toFixed(1)}%
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Compared to last month
-            </p>
+            <div className="text-2xl font-bold text-orange-600">{calculateTrend().toFixed(1)}%</div>
+            <p className="text-xs text-muted-foreground">Compared to last month</p>
           </div>
         </CardContent>
       </Card>

@@ -14,7 +14,9 @@ export default function Home() {
           </div>
           <nav className="flex items-center gap-4">
             <Link href="/login">
-              <Button variant="ghost" size="sm">Log in</Button>
+              <Button variant="ghost" size="sm">
+                Log in
+              </Button>
             </Link>
             <Link href="/login">
               <Button size="sm">
@@ -30,9 +32,7 @@ export default function Home() {
       <main className="flex-1 container flex flex-col items-center justify-center gap-8">
         {/* Hero Section */}
         <div className="text-center space-y-4 max-w-3xl">
-          <h1 className="text-4xl font-bold tracking-tighter md:text-6xl">
-            Create professional invoices in seconds
-          </h1>
+          <h1 className="text-4xl font-bold tracking-tighter md:text-6xl">Create professional invoices in seconds</h1>
           <p className="text-lg text-muted-foreground">
             Generate, manage, and send invoices to your clients with our easy-to-use invoice generator.
           </p>
@@ -44,7 +44,9 @@ export default function Home() {
               </Button>
             </Link>
             <Link href="#features">
-              <Button variant="outline" size="lg">Learn More</Button>
+              <Button variant="outline" size="lg">
+                Learn More
+              </Button>
             </Link>
           </div>
         </div>
@@ -80,12 +82,14 @@ export default function Home() {
       {/* Footer */}
       <footer className="border-t bg-background py-4">
         <div className="container flex items-center justify-between">
-          <div className="text-sm text-muted-foreground">
-            © {new Date().getFullYear()} Invoice Generator
-          </div>
+          <div className="text-sm text-muted-foreground">© {new Date().getFullYear()} Invoice Generator</div>
           <nav className="flex items-center gap-4 text-sm text-muted-foreground">
-            <Link href="#" className="hover:underline">Terms</Link>
-            <Link href="#" className="hover:underline">Privacy</Link>
+            <Link href="#" className="hover:underline">
+              Terms
+            </Link>
+            <Link href="#" className="hover:underline">
+              Privacy
+            </Link>
           </nav>
         </div>
       </footer>

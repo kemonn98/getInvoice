@@ -4,7 +4,7 @@ import type React from "react"
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { BarChart3, FileText, Home, Settings, Users } from "lucide-react"
+import { BarChart3, FileText, Home, Settings, Users, CreditCard } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -27,8 +27,13 @@ const navItems: NavItem[] = [
     icon: FileText,
   },
   {
-    title: "Clients",
-    href: "/dashboard/clients",
+    title: "Salary Slips",
+    href: "/dashboard/salary-slips",
+    icon: CreditCard,
+  },
+  {
+    title: "Employees",
+    href: "/dashboard/employees",
     icon: Users,
   },
   {

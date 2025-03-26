@@ -1,6 +1,4 @@
-import type { Employee as PrismaEmployee } from "@prisma/client"
-import { InvoiceStatus as InvoiceStatusEnum } from "@/types"
-import type { SalarySlip as PrismaSalarySlip } from "@prisma/client"
+import type { Employee as PrismaEmployee, SalarySlip as PrismaSalarySlip } from "@prisma/client"
 
 export enum InvoiceStatus {
   PENDING = "PENDING",
@@ -53,43 +51,16 @@ export interface Invoice {
   items: InvoiceItem[]
 }
 
-export interface Employee extends PrismaEmployee {
-  id: number
-  userId: string
-  name: string
-  nationalId: string
-  position: string
+export interface Employee extends Omit<PrismaEmployee, 'status'> {
   status: EmployeeStatus
-  address: string
-  phone: string
-  createdAt: Date
-  updatedAt: Date
 }
 
-export interface SalarySlip extends PrismaSalarySlip {
-  id: number
-  userId: string
-  employeeId: number
-  month: string
-  year: number
-  companyName: string
-  companyAddress: string
-  companyLogo?: string | null
-  basicSalary: number
-  positionAllowance: number
-  familyAllowance: number
-  childAllowance: number
-  foodAllowance: number
-  bonus: number
-  thr: number
-  others: number
-  totalSalary: number
-  approvedBy: string
-  approvedPosition: string
-  notes?: string | null
-  createdAt: Date | null
-  updatedAt: Date | null
+export type SalarySlipWithRelations = PrismaSalarySlip & {
   employee: Employee
+}
+
+export type SalarySlip = Omit<PrismaSalarySlip, 'notes'> & {
+  notes: string | null
 }
 
 export enum EmployeeStatus {

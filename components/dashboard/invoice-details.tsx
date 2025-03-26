@@ -19,13 +19,18 @@ import { Badge } from "@/components/ui/badge"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { updateInvoiceStatus, deleteInvoice } from "@/app/actions/invoice"
 import { InvoiceView } from "@/components/dashboard/invoice-view"
-import type { Invoice } from "@/types/invoice"
+import type { Invoice, Client, InvoiceItem } from "@prisma/client"
 import html2canvas from "html2canvas"
 import jsPDF from "jspdf"
 import { format } from "date-fns"
 
+type InvoiceWithRelations = Invoice & {
+  client: Client
+  items: InvoiceItem[]
+}
+
 interface InvoiceDetailViewProps {
-  invoice: Invoice
+  invoice: InvoiceWithRelations
 }
 
 export function InvoiceDetailView({ invoice }: InvoiceDetailViewProps) {

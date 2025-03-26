@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import prisma from "@/lib/prisma"
 import { getServerSession } from "next-auth/next"
 import { authOptions } from "@/app/auth"
+import { InvoiceStatus } from "@/types"
 
 const MAX_RETRIES = 3
 const RETRY_DELAY = 1000 // 1 second
@@ -30,12 +31,13 @@ async function executeWithRetry<T>(operation: () => Promise<T>): Promise<T> {
   throw lastError
 }
 
-// Add interface for invoice type
+// Update the interface to match Prisma's type
 interface Invoice {
   id: number
+  userId: string
   total: number
-  status: string
-  createdAt: Date
+  status: InvoiceStatus
+  createdAt: Date | null  // Allow null since Prisma might return null
 }
 
 export async function GET() {
@@ -51,14 +53,14 @@ export async function GET() {
       // Get invoices only for the current user
       const invoices = await prisma.invoice.findMany({
         where: {
-          userId: session?.user?.id, // If the field is named 'userId' in your schema
+          userId: session?.user?.id,
         },
         select: {
           id: true,
           total: true,
           status: true,
           createdAt: true,
-          userId: true, // Match the field name here too
+          userId: true,
         },
       })
 
@@ -75,32 +77,38 @@ export async function GET() {
         fullDate: now.toISOString(),
       })
 
-      // Update type annotations in filter functions
-      const currentMonthInvoices = invoices.filter((inv: Invoice) => {
-        const isCurrentMonth = inv.createdAt.getMonth() === currentMonth && inv.createdAt.getFullYear() === currentYear
+      // Update the filter to handle potential null dates
+      const currentMonthInvoices = invoices.filter((inv) => {
+        if (!inv.createdAt) return false;
+        const isCurrentMonth = 
+          inv.createdAt.getMonth() === currentMonth && 
+          inv.createdAt.getFullYear() === currentYear;
         console.log("Invoice date check (current month):", {
           invoiceId: inv.id,
           invoiceDate: inv.createdAt,
-          invoiceMonth: inv.createdAt.getMonth(),
-          invoiceYear: inv.createdAt.getFullYear(),
+          invoiceMonth: inv.createdAt?.getMonth(),
+          invoiceYear: inv.createdAt?.getFullYear(),
           isCurrentMonth,
         })
-        return isCurrentMonth
+        return isCurrentMonth;
       }).length
 
-      const lastMonthInvoices = invoices.filter((inv: Invoice) => {
-        const isLastMonth = inv.createdAt.getMonth() === currentMonth - 1 && inv.createdAt.getFullYear() === currentYear
+      const lastMonthInvoices = invoices.filter((inv) => {
+        if (!inv.createdAt) return false;
+        const isLastMonth = 
+          inv.createdAt.getMonth() === currentMonth - 1 && 
+          inv.createdAt.getFullYear() === currentYear;
         console.log("Invoice date check (last month):", {
           invoiceId: inv.id,
           invoiceDate: inv.createdAt,
-          invoiceMonth: inv.createdAt.getMonth(),
-          invoiceYear: inv.createdAt.getFullYear(),
+          invoiceMonth: inv.createdAt?.getMonth(),
+          invoiceYear: inv.createdAt?.getFullYear(),
           isLastMonth,
         })
-        return isLastMonth
+        return isLastMonth;
       }).length
 
-      const paidInvoices = invoices.filter((inv: Invoice) => inv.status === "PAID")
+      const paidInvoices = invoices.filter((inv) => inv.status === InvoiceStatus.PAID)
       console.log("Paid invoices:", paidInvoices)
 
       const totalRevenue = paidInvoices.reduce((sum: number, inv: Invoice) => {

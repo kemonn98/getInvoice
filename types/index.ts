@@ -28,4 +28,11 @@ export type Employee = {
   phone: string
   createdAt: Date
   updatedAt: Date
-} 
+}
+
+const statusCounts: Record<InvoiceStatus, number> = {
+  [InvoiceStatus.PENDING]: 0,
+  [InvoiceStatus.PAID]: 0,
+  [InvoiceStatus.OVERDUE]: 0,
+  [InvoiceStatus.CANCELLED]: 0,
+}; 

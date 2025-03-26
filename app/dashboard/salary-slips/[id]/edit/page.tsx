@@ -3,11 +3,18 @@ import { EditSalarySlipForm } from "@/components/dashboard/salary-slip-edit"
 import { DashboardHeader } from "@/components/dashboard/dashboard-header"
 import { DashboardShell } from "@/components/dashboard/dashboard-shell"
 import { getSalarySlipById, getEmployees } from "@/app/actions/salary"
-import type { SalarySlip, Employee } from "@/types"
+import { Employee } from "@/types"
+import { SalarySlip } from "@/types/salary"
+import type { SalarySlip as PrismaSalarySlip, Employee as PrismaEmployee } from "@prisma/client"
 
-async function getSalarySlip(id: string): Promise<SalarySlip | null> {
+// Define the full types including relations
+type SalarySlipWithEmployee = PrismaSalarySlip & {
+  employee: PrismaEmployee
+}
+
+async function getSalarySlip(id: string): Promise<SalarySlipWithEmployee | null> {
   const { salarySlip, error } = await getSalarySlipById(id)
-  return salarySlip
+  return salarySlip as SalarySlipWithEmployee
 }
 
 export default async function EditSalarySlipPage({ params }: { params: { id: string } }) {
@@ -25,7 +32,10 @@ export default async function EditSalarySlipPage({ params }: { params: { id: str
         text={`${salarySlip.month} ${salarySlip.year}`}
       />
       <div className="grid gap-8">
-        <EditSalarySlipForm salarySlip={salarySlip} employees={employees as Employee[]} />
+        <EditSalarySlipForm 
+          salarySlip={salarySlip as SalarySlip} 
+          employees={employees as Employee[]} 
+        />
       </div>
     </DashboardShell>
   )

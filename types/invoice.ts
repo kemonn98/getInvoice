@@ -1,6 +1,7 @@
-import type { Invoice as PrismaInvoice, InvoiceStatus as PrismaInvoiceStatus } from "@prisma/client"
+import type { Invoice as PrismaInvoice } from "@prisma/client"
+import { InvoiceStatus as InvoiceStatusEnum } from "@/types"
 
-export type InvoiceStatus = PrismaInvoiceStatus
+export type InvoiceStatus = InvoiceStatusEnum
 
 export interface InvoiceItem {
   id?: number

@@ -1,4 +1,6 @@
-import type { Employee as PrismaEmployee, SalarySlip as PrismaSalarySlip } from "@prisma/client"
+import type { Employee as PrismaEmployee } from "@prisma/client"
+import { InvoiceStatus as InvoiceStatusEnum } from "@/types"
+import type { SalarySlip as PrismaSalarySlip } from "@prisma/client"
 
 export enum InvoiceStatus {
   PENDING = "PENDING",

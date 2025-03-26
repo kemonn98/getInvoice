@@ -19,14 +19,15 @@ import { Badge } from "@/components/ui/badge"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { updateInvoiceStatus, deleteInvoice } from "@/app/actions/invoice"
 import { InvoiceView } from "@/components/dashboard/invoice-view"
-import type { Invoice, Client, InvoiceItem } from "@prisma/client"
+import type { Invoice as PrismaInvoice, Client as PrismaClient, InvoiceItem as PrismaInvoiceItem, InvoiceItem, Client } from "@prisma/client"
 import html2canvas from "html2canvas"
 import jsPDF from "jspdf"
 import { format } from "date-fns"
+import { Invoice } from "@/types/invoice"
 
-type InvoiceWithRelations = Invoice & {
-  client: Client
-  items: InvoiceItem[]
+type InvoiceWithRelations = PrismaInvoice & {
+  client: PrismaClient
+  items: PrismaInvoiceItem[]
 }
 
 interface InvoiceDetailViewProps {
@@ -195,7 +196,7 @@ export function InvoiceDetailView({ invoice }: InvoiceDetailViewProps) {
       <Card className="overflow-hidden print:shadow-none print:border-none">
         <div className="p-8 print:p-0">
           <div id="invoice-container">
-            <InvoiceView invoice={invoice} />
+            <InvoiceView invoice={invoice as Invoice} />
           </div>
         </div>
       </Card>
@@ -214,7 +215,7 @@ export function InvoiceDetailView({ invoice }: InvoiceDetailViewProps) {
               </div>
               <div>
                 <p className="font-medium">Invoice created</p>
-                <p className="text-sm text-muted-foreground">{new Date(invoice.createdAt).toLocaleString()}</p>
+                <p className="text-sm text-muted-foreground">{new Date(invoice.createdAt || new Date()).toLocaleString()}</p>
               </div>
             </div>
             {invoice.status !== "PAID" && (
@@ -224,7 +225,7 @@ export function InvoiceDetailView({ invoice }: InvoiceDetailViewProps) {
                 </div>
                 <div>
                   <p className="font-medium">Invoice sent to client</p>
-                  <p className="text-sm text-muted-foreground">{new Date(invoice.updatedAt).toLocaleString()}</p>
+                  <p className="text-sm text-muted-foreground">{new Date(invoice.updatedAt || new Date()).toLocaleString()}</p>
                 </div>
               </div>
             )}
@@ -235,7 +236,7 @@ export function InvoiceDetailView({ invoice }: InvoiceDetailViewProps) {
                 </div>
                 <div>
                   <p className="font-medium">Payment received</p>
-                  <p className="text-sm text-muted-foreground">{new Date(invoice.updatedAt).toLocaleString()}</p>
+                  <p className="text-sm text-muted-foreground">{new Date(invoice.updatedAt || new Date()).toLocaleString()}</p>
                 </div>
               </div>
             )}

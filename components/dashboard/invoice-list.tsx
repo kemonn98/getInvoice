@@ -5,7 +5,7 @@ import Link from "next/link"
 import { Download, Eye, MoreHorizontal, Pencil, Trash2 } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useSession } from "next-auth/react"
-import { type Invoice as PrismaInvoice, InvoiceStatus } from "@prisma/client"
+import { type Invoice as PrismaInvoice } from "@prisma/client" 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import {
@@ -37,7 +37,7 @@ interface Invoice extends Omit<PrismaInvoice, "items" | "client"> {
   clientName: string
   date: Date // Changed from string | Date to Date
   dueDate: Date | null // Changed to match Prisma's type
-  status: InvoiceStatus
+  status: InvoiceStatusEnum
   total: number // Added to match Prisma
   items: InvoiceItem[]
   client: {
@@ -66,7 +66,7 @@ export function InvoiceList() {
           setIsLoading(true)
           setError(null)
           const data = await getInvoices()
-          setInvoices(data || [])
+          setInvoices(data as Invoice[])
         } catch (err) {
           console.error("Error fetching invoices:", err)
           if (err instanceof Error) {

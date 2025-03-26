@@ -12,12 +12,16 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { updateSalarySlip } from "@/app/actions/salary"
-import type { SalarySlip, Employee } from "@/types/salary"
+import type { SalarySlip as PrismaSalarySlip, Employee as PrismaEmployee } from "@prisma/client"
 import { formatCurrency } from "@/lib/utils"
 
+type SalarySlipWithEmployee = PrismaSalarySlip & {
+  employee: PrismaEmployee
+}
+
 interface EditSalarySlipFormProps {
-  salarySlip: SalarySlip
-  employees: Employee[]
+  salarySlip: SalarySlipWithEmployee
+  employees: PrismaEmployee[]
 }
 
 export function EditSalarySlipForm({ salarySlip, employees }: EditSalarySlipFormProps) {

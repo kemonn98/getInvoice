@@ -17,13 +17,18 @@ import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { deleteSalarySlip } from "@/app/actions/salary"
 import { SalarySlipView } from "@/components/dashboard/salary-slip-view"
-import type { SalarySlip } from "@/types/salary"
+import type { SalarySlip as PrismaSalarySlip, Employee as PrismaEmployee } from "@prisma/client"
 import html2canvas from "html2canvas"
 import jsPDF from "jspdf"
 import { format } from "date-fns"
+import { SalarySlip } from "@/types/salary"
+
+type SalarySlipWithEmployee = PrismaSalarySlip & {
+  employee: PrismaEmployee
+}
 
 interface SalarySlipDetailViewProps {
-  salarySlip: SalarySlip
+  salarySlip: SalarySlipWithEmployee
 }
 
 export function SalarySlipDetailView({ salarySlip }: SalarySlipDetailViewProps) {
@@ -105,7 +110,7 @@ export function SalarySlipDetailView({ salarySlip }: SalarySlipDetailViewProps) 
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between print:hidden">
         <div className="flex items-center gap-2">
           <span className="text-sm text-muted-foreground">
-            Created on {format(new Date(salarySlip.createdAt), "MMMM d, yyyy")}
+            Created on {format(new Date(salarySlip.createdAt || new Date()), "MMMM d, yyyy")}
           </span>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -136,7 +141,7 @@ export function SalarySlipDetailView({ salarySlip }: SalarySlipDetailViewProps) 
       <Card className="overflow-hidden print:shadow-none print:border-none">
         <div className="p-8 print:p-0">
           <div id="salary-slip-container">
-            <SalarySlipView salarySlip={salarySlip} />
+            <SalarySlipView salarySlip={salarySlip as SalarySlip} />
           </div>
         </div>
       </Card>

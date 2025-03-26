@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { invoiceSchema } from "@/lib/schema"
 import type { InvoiceItem } from "@/types/invoice"
 import { useState } from "react"
-import { InvoiceStatus } from "@prisma/client"
+import { InvoiceStatus } from "@/types"
 
 // Define status options as a constant
 const STATUS_OPTIONS = [

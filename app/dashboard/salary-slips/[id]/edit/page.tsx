@@ -3,6 +3,7 @@ import { EditSalarySlipForm } from "@/components/dashboard/salary-slip-edit"
 import { DashboardHeader } from "@/components/dashboard/dashboard-header"
 import { DashboardShell } from "@/components/dashboard/dashboard-shell"
 import { getSalarySlipById, getEmployees } from "@/app/actions/salary"
+import { SalarySlip, Employee } from "@/types"
 
 async function getSalarySlip(id: string) {
   const { salarySlip, error } = await getSalarySlipById(id)
@@ -24,7 +25,7 @@ export default async function EditSalarySlipPage({ params }: { params: { id: str
         text={`${salarySlip.month} ${salarySlip.year}`}
       />
       <div className="grid gap-8">
-        <EditSalarySlipForm salarySlip={salarySlip} employees={employees} />
+        <EditSalarySlipForm salarySlip={salarySlip as SalarySlip} employees={employees as Employee[]} />
       </div>
     </DashboardShell>
   )

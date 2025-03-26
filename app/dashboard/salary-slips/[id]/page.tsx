@@ -3,6 +3,7 @@ import { SalarySlipDetailView } from "@/components/dashboard/salary-slip-details
 import { DashboardHeader } from "@/components/dashboard/dashboard-header"
 import { DashboardShell } from "@/components/dashboard/dashboard-shell"
 import { getSalarySlipById } from "@/app/actions/salary"
+import { SalarySlip } from "@/types"
 
 type PageParams = {
   params: {
@@ -24,7 +25,7 @@ export default async function SalarySlipPage({ params }: PageParams) {
         text={`${salarySlip.month} ${salarySlip.year}`}
       />
       <div className="grid gap-8">
-        <SalarySlipDetailView salarySlip={salarySlip} />
+        <SalarySlipDetailView salarySlip={salarySlip as SalarySlip} />
       </div>
     </DashboardShell>
   )

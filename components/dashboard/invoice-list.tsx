@@ -19,6 +19,7 @@ import {
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { getInvoices } from "@/app/actions/invoice"
+import { InvoiceStatus as InvoiceStatusEnum } from "@/types"
 
 // Update the interfaces to match Prisma's types
 interface InvoiceItem {
@@ -90,16 +91,16 @@ export function InvoiceList() {
 
   const sortedInvoices = invoices
 
-  const getStatusColor = (status: InvoiceStatus) => {
+  const getStatusColor = (status: InvoiceStatusEnum) => {
     switch (status) {
-      case InvoiceStatus.PENDING:
+      case InvoiceStatusEnum.PENDING:
         return "bg-yellow-100 text-yellow-800 hover:bg-yellow-100/80"
-      case InvoiceStatus.PAID:
+      case InvoiceStatusEnum.PAID:
         return "bg-green-100 text-green-800 hover:bg-green-100/80"
-      case InvoiceStatus.OVERDUE:
+      case InvoiceStatusEnum.OVERDUE:
         return "bg-red-100 text-red-800 hover:bg-red-100/80"
-      case InvoiceStatus.CANCELLED:
-        return "bg-slate-100 text-slate-800 hover:bg-slate-100/80"
+      case InvoiceStatusEnum.CANCELLED:
+        return "bg-gray-100 text-gray-800 hover:bg-gray-100/80"
       default:
         return "bg-gray-100 text-gray-800 hover:bg-gray-100/80"
     }

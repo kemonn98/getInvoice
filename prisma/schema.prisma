@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
@@ -20,43 +20,42 @@ model Account {
   scope             String?
   id_token          String? @db.Text
   session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "Account_ibfk_1")
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([provider, providerAccountId])
-  @@index([userId])
+  @@unique([provider, providerAccountId], map: "provider_providerAccountId")
+  @@index([userId], map: "userId")
 }
 
 model Session {
   id           String   @id @default(cuid())
-  sessionToken String   @unique
+  sessionToken String   @unique(map: "sessionToken")
   userId       String
   expires      DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "Session_ibfk_1")
 
-  @@index([userId])
+  @@index([userId], map: "userId")
 }
 
 model User {
   id            String       @id @default(cuid())
   name          String?
-  email         String?      @unique
+  email         String?      @unique(map: "email")
   emailVerified DateTime?
   image         String?
   accounts      Account[]
-  sessions      Session[]
   clients       Client[]
-  invoices      Invoice[]
   employees     Employee[]
+  invoices      Invoice[]
   salarySlips   SalarySlip[]
+  sessions      Session[]
 }
 
 model VerificationToken {
   identifier String
-  token      String   @unique
+  token      String   @unique(map: "token")
   expires    DateTime
 
-  @@unique([identifier, token])
+  @@unique([identifier, token], map: "identifier_token")
 }
 
 model Client {
@@ -66,12 +65,19 @@ model Client {
   email     String?
   phone     String?
   address   String?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "Client_ibfk_1")
   invoices  Invoice[]
 
-  @@index([userId])
+  @@index([userId], map: "userId")
+}
+
+enum InvoiceStatus {
+  PENDING
+  PAID
+  OVERDUE
+  CANCELLED
 }
 
 model Invoice {
@@ -79,11 +85,11 @@ model Invoice {
   userId             String
   clientId           Int
   invoiceNo          String
-  status             String
-  total              Float
+  status             InvoiceStatus @default(PENDING)
+  total              Float         @db.Float
   date               DateTime
   dueDate            DateTime?
-  notes              String?
+  notes              String?       @db.Text
   ourName            String
   ourBusinessName    String
   ourAddress         String
@@ -92,14 +98,14 @@ model Invoice {
   clientBusinessName String?
   clientAddress      String
   clientEmail        String?
-  createdAt          DateTime      @default(now())
-  updatedAt          DateTime      @updatedAt
-  user               User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  client             Client        @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  createdAt          DateTime?     @default(now())
+  updatedAt          DateTime?     @updatedAt
+  user               User          @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "Invoice_ibfk_1")
+  client             Client        @relation(fields: [clientId], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "Invoice_ibfk_2")
   items              InvoiceItem[]
 
-  @@index([userId])
-  @@index([clientId])
+  @@index([clientId], map: "clientId")
+  @@index([userId], map: "userId")
 }
 
 model InvoiceItem {
@@ -107,11 +113,11 @@ model InvoiceItem {
   invoiceId   Int
   description String
   quantity    Int
-  price       Float
-  total       Float
-  invoice     Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  price       Float   @db.Float
+  total       Float   @db.Float
+  invoice     Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "InvoiceItem_ibfk_1")
 
-  @@index([invoiceId])
+  @@index([invoiceId], map: "invoiceId")
 }
 
 model Employee {
@@ -120,15 +126,15 @@ model Employee {
   name        String
   nationalId  String
   position    String
-  status      String       // FULL_TIME, PROBATION, CONTRACT
+  status      String
   address     String
   phone       String
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt   DateTime?    @default(now())
+  updatedAt   DateTime?    @updatedAt
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "Employee_ibfk_1")
   salarySlips SalarySlip[]
 
-  @@index([userId])
+  @@index([userId], map: "userId")
 }
 
 model SalarySlip {
@@ -140,24 +146,23 @@ model SalarySlip {
   companyName       String
   companyAddress    String
   companyLogo       String?
-  basicSalary       Float
-  positionAllowance Float
-  familyAllowance   Float
-  childAllowance    Float
-  foodAllowance     Float
-  bonus             Float
-  thr               Float
-  others            Float
-  totalSalary       Float
+  basicSalary       Float     @db.Float
+  positionAllowance Float     @db.Float
+  familyAllowance   Float     @db.Float
+  childAllowance    Float     @db.Float
+  foodAllowance     Float     @db.Float
+  bonus             Float     @db.Float
+  thr               Float     @db.Float
+  others            Float     @db.Float
+  totalSalary       Float     @db.Float
   approvedBy        String
   approvedPosition  String
-  notes             String?
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
-  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  employee          Employee  @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  notes             String?   @db.Text
+  createdAt         DateTime? @default(now())
+  updatedAt         DateTime? @updatedAt
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "SalarySlip_ibfk_1")
+  employee          Employee  @relation(fields: [employeeId], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "SalarySlip_ibfk_2")
 
-  @@index([userId])
-  @@index([employeeId])
+  @@index([employeeId], map: "employeeId")
+  @@index([userId], map: "userId")
 }
-

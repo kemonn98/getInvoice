@@ -34,7 +34,7 @@ export function EmployeeList() {
           setIsLoading(true)
           setError(null)
           const data = await getEmployees()
-          setEmployees(data || [])
+          setEmployees(data as Employee[])
         } catch (err) {
           console.error("Error fetching employees:", err)
           if (err instanceof Error) {

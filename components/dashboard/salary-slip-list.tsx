@@ -34,7 +34,7 @@ export function SalarySlipList() {
           setIsLoading(true)
           setError(null)
           const data = await getSalarySlips()
-          setSalarySlips(data || [])
+          setSalarySlips(data as SalarySlip[])
         } catch (err) {
           console.error("Error fetching salary slips:", err)
           if (err instanceof Error) {

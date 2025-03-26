@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
-import { type Employee, EmployeeStatus } from "@/types/salary"
+import { Employee, EmployeeStatus } from "@/types"
 import { updateEmployee } from "@/app/actions/employee"
 
 interface EditEmployeeFormProps {

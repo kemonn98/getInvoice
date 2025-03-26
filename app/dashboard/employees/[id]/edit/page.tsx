@@ -5,8 +5,9 @@ import { EditEmployeeForm } from "@/components/dashboard/employee-edit"
 import { DashboardHeader } from "@/components/dashboard/dashboard-header"
 import { DashboardShell } from "@/components/dashboard/dashboard-shell"
 import prisma from "@/lib/prisma"
+import { Employee, EmployeeStatus } from "@/types"
 
-async function getEmployee(id: string) {
+async function getEmployee(id: string): Promise<Employee | null> {
   const session = await getServerSession(authOptions)
   if (!session?.user?.id) return null
 
@@ -17,7 +18,7 @@ async function getEmployee(id: string) {
     },
   })
 
-  return employee
+  return employee as Employee // Type assertion here since we know the shape matches
 }
 
 export default async function EditEmployeePage({ params }: { params: { id: string } }) {

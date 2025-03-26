@@ -120,21 +120,27 @@ model InvoiceItem {
   @@index([invoiceId], map: "invoiceId")
 }
 
+enum EmployeeStatus {
+  FULL_TIME
+  PROBATION
+  CONTRACT
+}
+
 model Employee {
-  id          Int          @id @default(autoincrement())
+  id          Int            @id @default(autoincrement())
   userId      String
   name        String
   nationalId  String
   position    String
-  status      String
+  status      EmployeeStatus @default(FULL_TIME)
   address     String
   phone       String
-  createdAt   DateTime?    @default(now())
-  updatedAt   DateTime?    @updatedAt
-  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "Employee_ibfk_1")
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  user        User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   salarySlips SalarySlip[]
 
-  @@index([userId], map: "userId")
+  @@index([userId])
 }
 
 model SalarySlip {

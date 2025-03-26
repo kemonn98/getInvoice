@@ -51,7 +51,14 @@ export interface Invoice {
   items: InvoiceItem[]
 }
 
-export interface Employee extends Omit<PrismaEmployee, 'status'> {
+export enum EmployeeStatus {
+  FULL_TIME = "FULL_TIME",
+  PROBATION = "PROBATION",
+  CONTRACT = "CONTRACT"
+}
+
+// Create a type that extends Prisma's Employee type
+export type Employee = Omit<PrismaEmployee, 'status'> & {
   status: EmployeeStatus
 }
 
@@ -61,12 +68,6 @@ export type SalarySlipWithRelations = PrismaSalarySlip & {
 
 export type SalarySlip = Omit<PrismaSalarySlip, 'notes'> & {
   notes: string | null
-}
-
-export enum EmployeeStatus {
-  FULL_TIME = "FULL_TIME",
-  PROBATION = "PROBATION",
-  CONTRACT = "CONTRACT"
 }
 
 const statusCounts: Record<InvoiceStatus, number> = {

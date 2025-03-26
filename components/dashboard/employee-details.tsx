@@ -17,7 +17,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { deleteEmployee } from "@/app/actions/employee"
-import type { Employee } from "@/types/salary"
+import type { Employee } from "@/types"
 import Link from "next/link"
 
 interface EmployeeDetailViewProps {

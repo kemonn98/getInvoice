@@ -3,7 +3,7 @@ import { EmployeeDetailView } from "@/components/dashboard/employee-details"
 import { DashboardHeader } from "@/components/dashboard/dashboard-header"
 import { DashboardShell } from "@/components/dashboard/dashboard-shell"
 import { getEmployeeById } from "@/app/actions/employee"
-import { Employee, EmployeeStatus } from "@/types"
+import type { Employee } from "@/types"
 
 type PageParams = {
   params: {

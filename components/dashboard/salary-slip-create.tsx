@@ -145,7 +145,7 @@ export function CreateSalarySlipForm({ employees }: CreateSalarySlipFormProps) {
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="companyName">Company Name*</Label>
-                <Input id="companyName" name="companyName" required />
+                <Input id="companyName" name="companyName" required placeholder="PT. SLABPIXEL CRETIVE GROUP" />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="companyLogo">Company Logo URL (Optional)</Label>
@@ -154,7 +154,7 @@ export function CreateSalarySlipForm({ employees }: CreateSalarySlipFormProps) {
             </div>
             <div className="space-y-2">
               <Label htmlFor="companyAddress">Company Address*</Label>
-              <Textarea id="companyAddress" name="companyAddress" required />
+              <Textarea id="companyAddress" name="companyAddress" required placeholder="Jl. Raya Tajem No.A09, RT.05/RW.27, Kenayan, Wedomartani, Kec. Ngemplak, Kabupaten Sleman, Daerah Istimewa Yogyakarta 55584" />
             </div>
           </CardContent>
         </Card>

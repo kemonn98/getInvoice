@@ -3,7 +3,7 @@
 import type React from "react"
 
 import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { useSession } from "next-auth/react"
 import { Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -22,6 +22,7 @@ interface CreateSalarySlipFormProps {
 
 export function CreateSalarySlipForm({ employees }: CreateSalarySlipFormProps) {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const { data: session, status } = useSession()
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -53,12 +54,16 @@ export function CreateSalarySlipForm({ employees }: CreateSalarySlipFormProps) {
     "December",
   ]
 
-  // Generate years for select (current year and 5 years back)
+  // Generate years for select (5 years back and 1 year ahead)
   const currentYear = new Date().getFullYear()
-  const years = Array.from({ length: 6 }, (_, i) => currentYear - i)
+  const years = Array.from({ length: 7 }, (_, i) => currentYear + 1 - i)
 
   // Get current month and year
   const currentMonth = new Date().toLocaleString("default", { month: "long" })
+
+  // Get month and year from URL parameters
+  const monthParam = searchParams.get('month')
+  const yearParam = searchParams.get('year')
 
   // Calculate total salary
   const calculateTotal = () => {
@@ -77,7 +82,28 @@ export function CreateSalarySlipForm({ employees }: CreateSalarySlipFormProps) {
     if (status === "unauthenticated") {
       router.replace("/login")
     }
-  }, [status, router])
+    
+    // Validate month parameter
+    if (monthParam && months.includes(monthParam)) {
+      // Update the month select default value
+      const monthSelect = document.querySelector('select[name="month"]') as HTMLSelectElement
+      if (monthSelect) {
+        monthSelect.value = monthParam
+      }
+    }
+
+    // Validate year parameter
+    if (yearParam) {
+      const yearNum = parseInt(yearParam)
+      if (!isNaN(yearNum) && yearNum >= currentYear - 5 && yearNum <= currentYear + 1) {
+        // Update the year select default value
+        const yearSelect = document.querySelector('select[name="year"]') as HTMLSelectElement
+        if (yearSelect) {
+          yearSelect.value = yearParam
+        }
+      }
+    }
+  }, [status, router, monthParam, yearParam])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -194,7 +220,7 @@ export function CreateSalarySlipForm({ employees }: CreateSalarySlipFormProps) {
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="month">Month*</Label>
-                <Select name="month" defaultValue={currentMonth}>
+                <Select name="month" defaultValue={monthParam || currentMonth}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select month" />
                   </SelectTrigger>
@@ -209,7 +235,7 @@ export function CreateSalarySlipForm({ employees }: CreateSalarySlipFormProps) {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="year">Year*</Label>
-                <Select name="year" defaultValue={currentYear.toString()}>
+                <Select name="year" defaultValue={yearParam || currentYear.toString()}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select year" />
                   </SelectTrigger>

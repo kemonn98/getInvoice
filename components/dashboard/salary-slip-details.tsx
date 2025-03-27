@@ -81,7 +81,12 @@ export function SalarySlipDetailView({ salarySlip }: SalarySlipDetailViewProps) 
       const imgHeight = (canvas.height * imgWidth) / canvas.width
 
       // Create PDF
-      const pdf = new jsPDF("p", "mm", "a4")
+      const pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "mm",
+        format: "a4",
+        compress: true
+      })
 
       // Add the image with margin offset
       pdf.addImage(

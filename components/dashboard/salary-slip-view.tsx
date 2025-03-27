@@ -15,6 +15,14 @@ export function SalarySlipView({ salarySlip }: SalarySlipViewProps) {
       .replace(/\b\w/g, (l) => l.toUpperCase())
   }
 
+  const getMonthNumber = (monthName: string) => {
+    const months = [
+      'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December'
+    ];
+    return (months.indexOf(monthName) + 1).toString();
+  }
+
   return (
     <div className="space-y-8">
       {/* Header */}
@@ -45,7 +53,7 @@ export function SalarySlipView({ salarySlip }: SalarySlipViewProps) {
             {salarySlip.month} {salarySlip.year}
           </p>
           <div className="mt-2 text-sm text-muted-foreground">
-            <p>Date: {new Date(salarySlip.createdAt).toLocaleDateString()}</p>
+            <p>Date: {getMonthNumber(salarySlip.month)}/28/{salarySlip.year}</p>
           </div>
         </div>
       </div>

@@ -3,8 +3,13 @@ import { DashboardHeader } from "@/components/dashboard/dashboard-header"
 import { DashboardShell } from "@/components/dashboard/dashboard-shell"
 import { getEmployees } from "@/app/actions/salary"
 import type { Employee } from "@prisma/client"
+import { Suspense } from 'react'
+import { useSearchParams } from 'next/navigation'
 
-export default async function CreateSalarySlipPage() {
+// Explicitly mark the page as dynamic if you need to use headers
+export const dynamic = 'force-dynamic'
+
+function SalarySlipContent() {
   const employees = await getEmployees()
 
   return (
@@ -14,6 +19,14 @@ export default async function CreateSalarySlipPage() {
         <CreateSalarySlipForm employees={employees} />
       </div>
     </DashboardShell>
+  )
+}
+
+export default function SalarySlipPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <SalarySlipContent />
+    </Suspense>
   )
 }
 

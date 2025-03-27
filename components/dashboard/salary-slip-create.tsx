@@ -13,7 +13,7 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { createSalarySlip } from "@/app/actions/salary"
-import type { Employee } from "@/types/salary"
+import type { Employee } from "@prisma/client"
 import { formatCurrency } from "@/lib/utils"
 
 interface CreateSalarySlipFormProps {
@@ -28,11 +28,11 @@ export function CreateSalarySlipForm({ employees }: CreateSalarySlipFormProps) {
   const [selectedEmployee, setSelectedEmployee] = useState<string>("")
 
   // Form state
-  const [basicSalary, setBasicSalary] = useState<number>(0)
+  const [basicSalary, setBasicSalary] = useState<number>(3000000)
   const [positionAllowance, setPositionAllowance] = useState<number>(0)
   const [familyAllowance, setFamilyAllowance] = useState<number>(0)
   const [childAllowance, setChildAllowance] = useState<number>(0)
-  const [foodAllowance, setFoodAllowance] = useState<number>(0)
+  const [foodAllowance, setFoodAllowance] = useState<number>(300000)
   const [bonus, setBonus] = useState<number>(0)
   const [thr, setThr] = useState<number>(0)
   const [others, setOthers] = useState<number>(0)
@@ -145,7 +145,7 @@ export function CreateSalarySlipForm({ employees }: CreateSalarySlipFormProps) {
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="companyName">Company Name*</Label>
-                <Input id="companyName" name="companyName" required placeholder="PT. SLABPIXEL CRETIVE GROUP" />
+                <Input id="companyName" name="companyName" required value="PT. SLABPIXEL CRETIVE GROUP" />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="companyLogo">Company Logo URL (Optional)</Label>
@@ -154,7 +154,7 @@ export function CreateSalarySlipForm({ employees }: CreateSalarySlipFormProps) {
             </div>
             <div className="space-y-2">
               <Label htmlFor="companyAddress">Company Address*</Label>
-              <Textarea id="companyAddress" name="companyAddress" required placeholder="Jl. Raya Tajem No.A09, RT.05/RW.27, Kenayan, Wedomartani, Kec. Ngemplak, Kabupaten Sleman, Daerah Istimewa Yogyakarta 55584" />
+              <Textarea id="companyAddress" name="companyAddress" required value="Jl. Raya Tajem No.A09, RT.05/RW.27, Kenayan, Wedomartani, Kec. Ngemplak, Kabupaten Sleman, Daerah Istimewa Yogyakarta 55584" />
             </div>
           </CardContent>
         </Card>
@@ -224,108 +224,128 @@ export function CreateSalarySlipForm({ employees }: CreateSalarySlipFormProps) {
           <CardHeader>
             <CardTitle>Salary Components</CardTitle>
           </CardHeader>
-          <CardContent className="grid gap-6">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="basicSalary">Basic Salary (IDR)*</Label>
-                <Input
-                  id="basicSalary"
-                  name="basicSalary"
-                  type="number"
-                  min="0"
-                  value={basicSalary}
-                  onChange={(e) => setBasicSalary(Number(e.target.value))}
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="positionAllowance">Position Allowance (IDR)</Label>
-                <Input
-                  id="positionAllowance"
-                  name="positionAllowance"
-                  type="number"
-                  min="0"
-                  value={positionAllowance}
-                  onChange={(e) => setPositionAllowance(Number(e.target.value))}
-                />
-              </div>
+          <CardContent className="grid gap-4">
+            <div className="grid grid-cols-[2fr_2fr_3fr] items-center gap-4">
+              <Label htmlFor="basicSalary">Basic Salary (IDR)*</Label>
+              <span className="text-sm text-muted-foreground">-</span>
+              <Input
+                id="basicSalary"
+                name="basicSalary"
+                type="number"
+                min="0"
+                placeholder="0"
+                value={basicSalary || ''}
+                onChange={(e) => setBasicSalary(parseInt(e.target.value) || 0)}
+                required
+              />
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="familyAllowance">Family Allowance (IDR)</Label>
-                <Input
-                  id="familyAllowance"
-                  name="familyAllowance"
-                  type="number"
-                  min="0"
-                  value={familyAllowance}
-                  onChange={(e) => setFamilyAllowance(Number(e.target.value))}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="childAllowance">Child Allowance (IDR)</Label>
-                <Input
-                  id="childAllowance"
-                  name="childAllowance"
-                  type="number"
-                  min="0"
-                  value={childAllowance}
-                  onChange={(e) => setChildAllowance(Number(e.target.value))}
-                />
-              </div>
+
+            <div className="grid grid-cols-[2fr_2fr_3fr] items-center gap-4">
+              <Label htmlFor="positionAllowance">Position Allowance (IDR)</Label>
+              <span className="text-sm text-muted-foreground">-</span>
+              <Input
+                id="positionAllowance"
+                name="positionAllowance"
+                type="number"
+                min="0"
+                placeholder="0"
+                value={positionAllowance || ''}
+                onChange={(e) => setPositionAllowance(parseInt(e.target.value) || 0)}
+              />
+
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="foodAllowance">Food Allowance (IDR)</Label>
-                <Input
-                  id="foodAllowance"
-                  name="foodAllowance"
-                  type="number"
-                  min="0"
-                  value={foodAllowance}
-                  onChange={(e) => setFoodAllowance(Number(e.target.value))}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="bonus">Bonus (IDR)</Label>
-                <Input
-                  id="bonus"
-                  name="bonus"
-                  type="number"
-                  min="0"
-                  value={bonus}
-                  onChange={(e) => setBonus(Number(e.target.value))}
-                />
-              </div>
+
+            <div className="grid grid-cols-[2fr_2fr_3fr] items-center gap-4">
+              <Label htmlFor="familyAllowance">Family Allowance (IDR)</Label>
+              <span className="text-sm text-muted-foreground">10% x Basic Salary</span>
+              <Input
+                id="familyAllowance"
+                name="familyAllowance"
+                type="number"
+                min="0"
+                placeholder="0"
+                value={familyAllowance || ''}
+                onChange={(e) => setFamilyAllowance(parseInt(e.target.value) || 0)}
+              />
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="thr">THR (IDR)</Label>
-                <Input
-                  id="thr"
-                  name="thr"
-                  type="number"
-                  min="0"
-                  value={thr}
-                  onChange={(e) => setThr(Number(e.target.value))}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="others">Others (IDR)</Label>
-                <Input
-                  id="others"
-                  name="others"
-                  type="number"
-                  min="0"
-                  value={others}
-                  onChange={(e) => setOthers(Number(e.target.value))}
-                />
-              </div>
+
+            <div className="grid grid-cols-[2fr_2fr_3fr] items-center gap-4">
+              <Label htmlFor="childAllowance">Child Allowance (IDR)</Label>
+              <span className="text-sm text-muted-foreground">2% x Number of Children x Basic Salary</span>
+              <Input
+                id="childAllowance"
+                name="childAllowance"
+                type="number"
+                min="0"
+                placeholder="0"
+                value={childAllowance || ''}
+                onChange={(e) => setChildAllowance(parseInt(e.target.value) || 0)}
+              />
             </div>
+
+            <div className="grid grid-cols-[2fr_2fr_3fr] items-center gap-4">
+              <Label htmlFor="foodAllowance">Food Allowance (IDR)</Label>
+              <span className="text-sm text-muted-foreground">20 Days x IDR 15,000</span>
+              <Input
+                id="foodAllowance"
+                name="foodAllowance"
+                type="number"
+                min="0"
+                placeholder="0"
+                value={foodAllowance || ''}
+                onChange={(e) => setFoodAllowance(parseInt(e.target.value) || 0)}
+              />
+              
+            </div>
+
+            <div className="grid grid-cols-[2fr_2fr_3fr] items-center gap-4">
+              <Label htmlFor="bonus">Bonus (IDR)</Label>
+              <span className="text-sm text-muted-foreground">Performance</span>
+              <Input
+                id="bonus"
+                name="bonus"
+                type="number"
+                min="0"
+                placeholder="0"
+                value={bonus || ''}
+                onChange={(e) => setBonus(parseInt(e.target.value) || 0)}
+              />
+            </div>
+
+            <div className="grid grid-cols-[2fr_2fr_3fr] items-center gap-4">
+              <Label htmlFor="thr">THR (IDR)</Label>
+              <span className="text-sm text-muted-foreground">-</span>
+              <Input
+                id="thr"
+                name="thr"
+                type="number"
+                min="0"
+                placeholder="0"
+                value={thr || ''}
+                onChange={(e) => setThr(parseInt(e.target.value) || 0)}
+              />
+            </div>
+
+            <div className="grid grid-cols-[2fr_2fr_3fr] items-center gap-4">
+              <Label htmlFor="others">Others (IDR)</Label>
+              <span className="text-sm text-muted-foreground">-</span>
+              <Input
+                id="others"
+                name="others"
+                type="number"
+                min="0"
+                placeholder="0"
+                value={others || ''}
+                onChange={(e) => setOthers(parseInt(e.target.value) || 0)}
+              />
+            </div>
+
             <div className="border-t pt-4 mt-2">
-              <div className="flex justify-between font-medium text-lg">
+              <div className="grid grid-cols-[2fr_2fr_3fr] items-center gap-4 font-medium text-lg">
                 <span>Total Salary:</span>
+                <span/>
                 <span>{formatCurrency(calculateTotal(), "IDR")}</span>
+                <span></span>
               </div>
             </div>
           </CardContent>

@@ -7,7 +7,7 @@ import { getServerSession } from "next-auth/next"
 import { redirect } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
-import { PlusCircle } from "lucide-react"
+import { UserPlus } from "lucide-react"
 
 // Mark the page as a Server Component
 export const dynamic = "force-dynamic"
@@ -26,7 +26,7 @@ export default async function EmployeesPage() {
       <DashboardHeader heading="Employees" text="Manage your employees.">
         <Link href="/dashboard/employees/new">
           <Button size="sm">
-            <PlusCircle className="mr-2 h-4 w-4" />
+            <UserPlus className="mr-2 h-4 w-4" />
             New Employee
           </Button>
         </Link>

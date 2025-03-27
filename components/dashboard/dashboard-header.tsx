@@ -18,12 +18,6 @@ export function DashboardHeader({ heading, text, children }: DashboardHeaderProp
       </div>
       <div className="flex items-center gap-2">
         {children}
-        <Link href="/dashboard/invoices/new">
-          <Button size="sm">
-            <PlusCircle className="mr-2 h-4 w-4" />
-            New Invoice
-          </Button>
-        </Link>
       </div>
     </div>
   )

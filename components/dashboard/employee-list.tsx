@@ -105,12 +105,6 @@ export function EmployeeList() {
           <CardTitle>Employees</CardTitle>
           <CardDescription>Manage your employees and their information.</CardDescription>
         </div>
-        <Link href="/dashboard/employees/new">
-          <Button size="sm">
-            <UserPlus className="mr-2 h-4 w-4" />
-            Add Employee
-          </Button>
-        </Link>
       </CardHeader>
       <CardContent>
         {employees.length === 0 ? (

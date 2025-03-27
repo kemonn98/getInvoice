@@ -9,7 +9,7 @@ import { useSearchParams } from 'next/navigation'
 // Explicitly mark the page as dynamic if you need to use headers
 export const dynamic = 'force-dynamic'
 
-function SalarySlipContent() {
+async function SalarySlipContent() {
   const employees = await getEmployees()
 
   return (

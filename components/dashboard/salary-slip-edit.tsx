@@ -184,103 +184,167 @@ export function EditSalarySlipForm({ salarySlip, employees }: EditSalarySlipForm
           <CardTitle>Salary Components</CardTitle>
         </CardHeader>
         <CardContent className="grid gap-6">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
+          <div className="grid grid-cols-12 gap-4">
+            <div className="col-span-3 space-y-2">
               <Label htmlFor="basicSalary">Basic Salary (IDR)*</Label>
+            </div>
+            <div className="col-span-6 space-y-2">
+              <Label className="text-sm text-muted-foreground">Base monthly salary before allowances and deductions</Label>
+            </div>
+            <div className="col-span-3 space-y-2">
               <Input
                 id="basicSalary"
                 name="basicSalary"
                 type="number"
                 min="0"
-                value={basicSalary}
+                placeholder="0"
+                value={basicSalary || ''}
                 onChange={(e) => setBasicSalary(Number(e.target.value))}
                 required
               />
             </div>
-            <div className="space-y-2">
+          </div>
+
+          <div className="grid grid-cols-12 gap-4">
+            <div className="col-span-3 space-y-2">
               <Label htmlFor="positionAllowance">Position Allowance (IDR)</Label>
+            </div>
+            <div className="col-span-6 space-y-2">
+              <Label className="text-sm text-muted-foreground">Additional compensation based on employee's position</Label>
+            </div>
+            <div className="col-span-3 space-y-2">
               <Input
                 id="positionAllowance"
                 name="positionAllowance"
                 type="number"
                 min="0"
-                value={positionAllowance}
+                placeholder="0"
+                value={positionAllowance || ''}
                 onChange={(e) => setPositionAllowance(Number(e.target.value))}
               />
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
+
+          <div className="grid grid-cols-12 gap-4">
+            <div className="col-span-3 space-y-2">
               <Label htmlFor="familyAllowance">Family Allowance (IDR)</Label>
+            </div>
+            <div className="col-span-6 space-y-2">
+              <Label className="text-sm text-muted-foreground">Additional allowance for married employees</Label>
+            </div>
+            <div className="col-span-3 space-y-2">
               <Input
                 id="familyAllowance"
                 name="familyAllowance"
                 type="number"
                 min="0"
-                value={familyAllowance}
+                placeholder="0"
+                value={familyAllowance || ''}
                 onChange={(e) => setFamilyAllowance(Number(e.target.value))}
               />
             </div>
-            <div className="space-y-2">
+          </div>
+
+          <div className="grid grid-cols-12 gap-4">
+            <div className="col-span-3 space-y-2">
               <Label htmlFor="childAllowance">Child Allowance (IDR)</Label>
+            </div>
+            <div className="col-span-6 space-y-2">
+              <Label className="text-sm text-muted-foreground">Additional allowance for employees with children</Label>
+            </div>
+            <div className="col-span-3 space-y-2">
               <Input
                 id="childAllowance"
                 name="childAllowance"
                 type="number"
                 min="0"
-                value={childAllowance}
+                placeholder="0"
+                value={childAllowance || ''}
                 onChange={(e) => setChildAllowance(Number(e.target.value))}
               />
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
+
+          <div className="grid grid-cols-12 gap-4">
+            <div className="col-span-3 space-y-2">
               <Label htmlFor="foodAllowance">Food Allowance (IDR)</Label>
+            </div>
+            <div className="col-span-6 space-y-2">
+              <Label className="text-sm text-muted-foreground">Monthly allowance for meals and nutrition</Label>
+            </div>
+            <div className="col-span-3 space-y-2">
               <Input
                 id="foodAllowance"
                 name="foodAllowance"
                 type="number"
                 min="0"
-                value={foodAllowance}
+                placeholder="0"
+                value={foodAllowance || ''}
                 onChange={(e) => setFoodAllowance(Number(e.target.value))}
               />
             </div>
-            <div className="space-y-2">
+          </div>
+
+          <div className="grid grid-cols-12 gap-4">
+            <div className="col-span-3 space-y-2">
               <Label htmlFor="bonus">Bonus (IDR)</Label>
+            </div>
+            <div className="col-span-6 space-y-2">
+              <Label className="text-sm text-muted-foreground">Additional performance-based or special occasion bonus</Label>
+            </div>
+            <div className="col-span-3 space-y-2">
               <Input
                 id="bonus"
                 name="bonus"
                 type="number"
                 min="0"
-                value={bonus}
+                placeholder="0"
+                value={bonus || ''}
                 onChange={(e) => setBonus(Number(e.target.value))}
               />
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
+
+          <div className="grid grid-cols-12 gap-4">
+            <div className="col-span-3 space-y-2">
               <Label htmlFor="thr">THR (IDR)</Label>
+            </div>
+            <div className="col-span-6 space-y-2">
+              <Label className="text-sm text-muted-foreground">Tunjangan Hari Raya - Religious holiday allowance</Label>
+            </div>
+            <div className="col-span-3 space-y-2">
               <Input
                 id="thr"
                 name="thr"
                 type="number"
                 min="0"
-                value={thr}
+                placeholder="0"
+                value={thr || ''}
                 onChange={(e) => setThr(Number(e.target.value))}
               />
             </div>
-            <div className="space-y-2">
+          </div>
+
+          <div className="grid grid-cols-12 gap-4">
+            <div className="col-span-3 space-y-2">
               <Label htmlFor="others">Others (IDR)</Label>
+            </div>
+            <div className="col-span-6 space-y-2">
+              <Label className="text-sm text-muted-foreground">Additional miscellaneous payments or allowances</Label>
+            </div>
+            <div className="col-span-3 space-y-2">
               <Input
                 id="others"
                 name="others"
                 type="number"
                 min="0"
-                value={others}
+                placeholder="0"
+                value={others || ''}
                 onChange={(e) => setOthers(Number(e.target.value))}
               />
             </div>
           </div>
+
           <div className="border-t pt-4 mt-2">
             <div className="flex justify-between font-medium text-lg">
               <span>Total Salary:</span>

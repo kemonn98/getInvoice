@@ -91,59 +91,55 @@ export function SalarySlipView({ salarySlip }: SalarySlipViewProps) {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-[50%]">Description</TableHead>
+              <TableHead className="w-[20%]">Description</TableHead>
+              <TableHead className="w-[50%]">Details</TableHead>
               <TableHead className="text-right">Amount (IDR)</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             <TableRow>
               <TableCell>Basic Salary</TableCell>
+              <TableCell className="text-sm text-muted-foreground">Base monthly salary before allowances and deductions</TableCell>
               <TableCell className="text-right">{formatCurrency(salarySlip.basicSalary, "IDR")}</TableCell>
             </TableRow>
-            {salarySlip.positionAllowance > 0 && (
-              <TableRow>
-                <TableCell>Position Allowance</TableCell>
-                <TableCell className="text-right">{formatCurrency(salarySlip.positionAllowance, "IDR")}</TableCell>
-              </TableRow>
-            )}
-            {salarySlip.familyAllowance > 0 && (
-              <TableRow>
-                <TableCell>Family Allowance</TableCell>
-                <TableCell className="text-right">{formatCurrency(salarySlip.familyAllowance, "IDR")}</TableCell>
-              </TableRow>
-            )}
-            {salarySlip.childAllowance > 0 && (
-              <TableRow>
-                <TableCell>Child Allowance</TableCell>
-                <TableCell className="text-right">{formatCurrency(salarySlip.childAllowance, "IDR")}</TableCell>
-              </TableRow>
-            )}
-            {salarySlip.foodAllowance > 0 && (
-              <TableRow>
-                <TableCell>Food Allowance</TableCell>
-                <TableCell className="text-right">{formatCurrency(salarySlip.foodAllowance, "IDR")}</TableCell>
-              </TableRow>
-            )}
-            {salarySlip.bonus > 0 && (
-              <TableRow>
-                <TableCell>Bonus</TableCell>
-                <TableCell className="text-right">{formatCurrency(salarySlip.bonus, "IDR")}</TableCell>
-              </TableRow>
-            )}
-            {salarySlip.thr > 0 && (
-              <TableRow>
-                <TableCell>THR</TableCell>
-                <TableCell className="text-right">{formatCurrency(salarySlip.thr, "IDR")}</TableCell>
-              </TableRow>
-            )}
-            {salarySlip.others > 0 && (
-              <TableRow>
-                <TableCell>Others</TableCell>
-                <TableCell className="text-right">{formatCurrency(salarySlip.others, "IDR")}</TableCell>
-              </TableRow>
-            )}
+            <TableRow>
+              <TableCell>Position Allowance</TableCell>
+              <TableCell className="text-sm text-muted-foreground">Additional compensation based on employee's position or role</TableCell>
+              <TableCell className="text-right">{formatCurrency(salarySlip.positionAllowance || 0, "IDR")}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>Family Allowance</TableCell>
+              <TableCell className="text-sm text-muted-foreground">Additional allowance for married employees</TableCell>
+              <TableCell className="text-right">{formatCurrency(salarySlip.familyAllowance || 0, "IDR")}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>Child Allowance</TableCell>
+              <TableCell className="text-sm text-muted-foreground">Additional allowance for employees with children</TableCell>
+              <TableCell className="text-right">{formatCurrency(salarySlip.childAllowance || 0, "IDR")}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>Food Allowance</TableCell>
+              <TableCell className="text-sm text-muted-foreground">Monthly allowance for meals and nutrition</TableCell>
+              <TableCell className="text-right">{formatCurrency(salarySlip.foodAllowance || 0, "IDR")}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>Bonus</TableCell>
+              <TableCell className="text-sm text-muted-foreground">Additional performance-based or special occasion bonus</TableCell>
+              <TableCell className="text-right">{formatCurrency(salarySlip.bonus || 0, "IDR")}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>THR</TableCell>
+              <TableCell className="text-sm text-muted-foreground">Tunjangan Hari Raya - Religious holiday allowance</TableCell>
+              <TableCell className="text-right">{formatCurrency(salarySlip.thr || 0, "IDR")}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>Others</TableCell>
+              <TableCell className="text-sm text-muted-foreground">Additional miscellaneous payments or allowances</TableCell>
+              <TableCell className="text-right">{formatCurrency(salarySlip.others || 0, "IDR")}</TableCell>
+            </TableRow>
             <TableRow className="font-bold">
               <TableCell>Total Salary</TableCell>
+              <TableCell className="text-sm text-muted-foreground">Total compensation including all allowances</TableCell>
               <TableCell className="text-right">{formatCurrency(salarySlip.totalSalary, "IDR")}</TableCell>
             </TableRow>
           </TableBody>

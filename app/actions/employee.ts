@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache"
 import prisma from "@/lib/prisma"
 import { getServerSession } from "next-auth/next"
 import { authOptions } from "@/app/auth"
-import type { EmployeeStatus } from "@/types/salary"
+import type { EmployeeStatus } from "@/types/employee"
 
 // Helper function for database retries
 async function executeWithRetry<T>(operation: () => Promise<T>): Promise<T> {

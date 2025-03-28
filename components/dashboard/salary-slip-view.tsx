@@ -1,5 +1,5 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import type { SalarySlip } from "@/types/salary"
+import type { SalarySlip } from "@/types/employee"
 import { formatCurrency } from "@/lib/utils"
 import Image from "next/image"
 

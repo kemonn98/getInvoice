@@ -21,7 +21,7 @@ import type { SalarySlip as PrismaSalarySlip, Employee as PrismaEmployee } from 
 import html2canvas from "html2canvas"
 import jsPDF from "jspdf"
 import { format } from "date-fns"
-import { SalarySlip } from "@/types/salary"
+import { SalarySlip } from "@/types/employee"
 
 type SalarySlipWithEmployee = PrismaSalarySlip & {
   employee: PrismaEmployee

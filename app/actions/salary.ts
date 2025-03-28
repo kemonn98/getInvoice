@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache"
 import prisma from "@/lib/prisma"
 import { getServerSession } from "next-auth/next"
 import { authOptions } from "@/app/auth"
-import type { EmployeeStatus } from "@/types/salary"
+import type { EmployeeStatus } from "@/types/employee"
 
 // Helper function for database retries
 async function executeWithRetry<T>(operation: () => Promise<T>): Promise<T> {
@@ -314,6 +314,30 @@ export async function deleteSalarySlip(id: string) {
   } catch (error) {
     console.error("Failed to delete salary slip:", error)
     return { success: false, error: "Failed to delete salary slip" }
+  }
+}
+
+export async function deleteEmployee(id: string) {
+  try {
+    const session = await getServerSession(authOptions)
+    if (!session) {
+      return { success: false, error: "Unauthorized" }
+    }
+
+    // Delete the employee from your database
+    await prisma.employee.delete({
+      where: {
+        id: parseInt(id),
+      },
+    })
+
+    return { success: true }
+  } catch (error) {
+    console.error("Error deleting employee:", error)
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Failed to delete employee",
+    }
   }
 }
 

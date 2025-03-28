@@ -15,6 +15,8 @@ export interface Employee {
   phone: string
   createdAt: Date
   updatedAt: Date
+  gender: string
+  email: string
 }
 
 export interface SalarySlip {

@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { getSalarySlips, deleteSalarySlip } from "@/app/actions/salary"
-import type { SalarySlip } from "@/types/salary"
+import type { SalarySlip } from "@/types/employee"
 import { formatCurrency } from "@/lib/utils"
 import { toast } from "sonner"
 import { EmployeeStatusBadge } from "@/components/ui/employee-status-badge"

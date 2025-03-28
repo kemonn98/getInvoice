@@ -4,7 +4,7 @@ import { DashboardHeader } from "@/components/dashboard/dashboard-header"
 import { DashboardShell } from "@/components/dashboard/dashboard-shell"
 import { getSalarySlipById, getEmployees } from "@/app/actions/salary"
 import { Employee } from "@/types"
-import { SalarySlip } from "@/types/salary"
+import { SalarySlip } from "@/types/employee"
 import type { SalarySlip as PrismaSalarySlip, Employee as PrismaEmployee } from "@prisma/client"
 
 // Define the full types including relations
@@ -33,7 +33,7 @@ export default async function EditSalarySlipPage({ params }: { params: { id: str
       />
       <div className="grid gap-8">
         <EditSalarySlipForm 
-          salarySlip={salarySlip as SalarySlip} 
+          salarySlip={salarySlip as SalarySlipWithEmployee} 
           employees={employees as Employee[]} 
         />
       </div>

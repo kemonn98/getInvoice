@@ -126,19 +126,33 @@ enum EmployeeStatus {
   CONTRACT
 }
 
+enum Gender {
+  MALE
+  FEMALE
+}
+
 model Employee {
-  id          Int            @id @default(autoincrement())
-  userId      String
-  name        String
-  nationalId  String
-  position    String
-  status      EmployeeStatus @default(FULL_TIME)
-  address     String
-  phone       String
-  createdAt   DateTime       @default(now())
-  updatedAt   DateTime       @updatedAt
-  user        User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  salarySlips SalarySlip[]
+  id             Int            @id @default(autoincrement())
+  userId         String
+  name           String
+  nationalId     String
+  position       String
+  status         EmployeeStatus @default(FULL_TIME)
+  address        String
+  phone          String
+  email          String?
+  gender         Gender?
+  dateOfBirth    DateTime?
+  birthLocation  String?
+  joinedDate     DateTime?
+  lastEducation  String?
+  religion       String?
+  bank           String?
+  bankNumber     BigInt?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  salarySlips    SalarySlip[]
 
   @@index([userId])
 }

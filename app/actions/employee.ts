@@ -96,6 +96,10 @@ export async function createEmployee(formData: FormData) {
       }
     }
 
+    const bankNumber = formData.get("bankNumber")
+    const dateOfBirth = formData.get("dateOfBirth")
+    const joinedDate = formData.get("joinedDate")
+
     const employee = await prisma.employee.create({
       data: {
         userId: session.user.id,
@@ -105,6 +109,15 @@ export async function createEmployee(formData: FormData) {
         status: formData.get("status") as EmployeeStatus,
         address: formData.get("address") as string,
         phone: formData.get("phone") as string,
+        email: formData.get("email") as string || null,
+        gender: formData.get("gender") as "MALE" | "FEMALE" || null,
+        dateOfBirth: dateOfBirth ? new Date(dateOfBirth as string) : null,
+        birthLocation: formData.get("birthLocation") as string || null,
+        joinedDate: joinedDate ? new Date(joinedDate as string) : null,
+        lastEducation: formData.get("lastEducation") as string || null,
+        religion: formData.get("religion") as string || null,
+        bank: formData.get("bank") as string || null,
+        bankNumber: bankNumber ? parseInt(bankNumber as string, 10) : null,
       },
     })
 
@@ -136,6 +149,10 @@ export async function updateEmployee(id: string, formData: FormData) {
 
     const employeeId = Number(id)
 
+    const bankNumber = formData.get("bankNumber")
+    const dateOfBirth = formData.get("dateOfBirth")
+    const joinedDate = formData.get("joinedDate")
+
     const employee = await prisma.employee.update({
       where: {
         id: employeeId,
@@ -148,6 +165,15 @@ export async function updateEmployee(id: string, formData: FormData) {
         status: formData.get("status") as EmployeeStatus,
         address: formData.get("address") as string,
         phone: formData.get("phone") as string,
+        email: formData.get("email") as string || null,
+        gender: formData.get("gender") as "MALE" | "FEMALE" || null,
+        dateOfBirth: dateOfBirth ? new Date(dateOfBirth as string) : null,
+        birthLocation: formData.get("birthLocation") as string || null,
+        joinedDate: joinedDate ? new Date(joinedDate as string) : null,
+        lastEducation: formData.get("lastEducation") as string || null,
+        religion: formData.get("religion") as string || null,
+        bank: formData.get("bank") as string || null,
+        bankNumber: bankNumber ? parseInt(bankNumber as string, 10) : null,
       },
     })
 

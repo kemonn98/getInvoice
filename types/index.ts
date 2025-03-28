@@ -60,6 +60,15 @@ export enum EmployeeStatus {
 // Create a type that extends Prisma's Employee type
 export type Employee = Omit<PrismaEmployee, 'status'> & {
   status: EmployeeStatus
+  email?: string
+  gender?: 'MALE' | 'FEMALE'
+  dateOfBirth?: Date
+  birthLocation?: string
+  joinedDate?: Date
+  lastEducation?: string
+  religion?: string
+  bank?: string
+  bankNumber?: number
 }
 
 export type SalarySlipWithRelations = PrismaSalarySlip & {

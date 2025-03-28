@@ -12,8 +12,13 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
-import { createEmployee } from "@/app/actions/salary"
+import { createEmployee } from "@/app/actions/employee"
 import { EmployeeStatus } from "@/types/salary"
+import { Calendar } from "@/components/ui/calendar"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { format } from "date-fns"
+import { Calendar as CalendarIcon } from "lucide-react"
+import { DatePicker } from "@/components/ui/date-picker"
 
 export function CreateEmployeeForm() {
   const router = useRouter()
@@ -21,6 +26,9 @@ export function CreateEmployeeForm() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [employeeStatus, setEmployeeStatus] = useState<string>(EmployeeStatus.FULL_TIME)
+  const [gender, setGender] = useState<string>("MALE")
+  const [dateOfBirth, setDateOfBirth] = useState<Date>()
+  const [joinedDate, setJoinedDate] = useState<Date>()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -35,6 +43,21 @@ export function CreateEmployeeForm() {
       setIsLoading(true)
       const form = e.target as HTMLFormElement
       const formData = new FormData(form)
+
+      // Add select fields explicitly
+      formData.append('status', employeeStatus)
+      formData.append('gender', gender)
+
+      // Add date fields explicitly
+      if (dateOfBirth) {
+        formData.append('dateOfBirth', dateOfBirth.toISOString())
+      }
+      if (joinedDate) {
+        formData.append('joinedDate', joinedDate.toISOString())
+      }
+
+      // Debug log
+      console.log('Form data being sent:', Object.fromEntries(formData.entries()))
 
       const result = await createEmployee(formData)
 
@@ -127,6 +150,84 @@ export function CreateEmployeeForm() {
             <div className="space-y-2">
               <Label htmlFor="address">Address*</Label>
               <Textarea id="address" name="address" required />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="email">Email Address</Label>
+                <Input id="email" name="email" type="email" />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="gender">Gender*</Label>
+                <Select name="gender" value={gender} onValueChange={setGender}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select gender" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="MALE">Male</SelectItem>
+                    <SelectItem value="FEMALE">Female</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Date of Birth</Label>
+                <DatePicker
+                  date={dateOfBirth}
+                  onDateChange={(date) => {
+                    setDateOfBirth(date)
+                  }}
+                  label="Select birth date"
+                />
+                <Input 
+                  type="hidden" 
+                  name="dateOfBirth" 
+                  value={dateOfBirth?.toISOString() ?? ''} 
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Joined Date</Label>
+                <DatePicker
+                  date={joinedDate}
+                  onDateChange={(date) => {
+                    setJoinedDate(date)
+                  }}
+                  label="Select join date"
+                />
+                <Input 
+                  type="hidden" 
+                  name="joinedDate" 
+                  value={joinedDate?.toISOString() ?? ''} 
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="birthLocation">Birth Location</Label>
+                <Input id="birthLocation" name="birthLocation" />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="lastEducation">Last Education</Label>
+                <Input id="lastEducation" name="lastEducation" />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="religion">Religion</Label>
+                <Input id="religion" name="religion" />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="bank">Bank Name</Label>
+                <Input id="bank" name="bank" />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="bankNumber">Bank Account Number</Label>
+              <Input id="bankNumber" name="bankNumber" type="number" />
             </div>
           </CardContent>
           <CardFooter className="flex justify-end gap-4 border-t pt-4">

@@ -223,7 +223,7 @@ export function EmployeeDetailView({ employee }: EmployeeDetailViewProps) {
                 className="col-span-2 group flex items-center gap-2 cursor-pointer hover:text-primary"
                 onClick={() => copyToClipboard(
                   employee.bank && employee.bankNumber 
-                    ? `${employee.bank} - ${employee.bankNumber.toString()}`
+                    ? `${employee.bank} - ${employee.bankNumber}`
                     : employee.bank 
                     ? employee.bank 
                     : 'Not specified',
@@ -231,7 +231,7 @@ export function EmployeeDetailView({ employee }: EmployeeDetailViewProps) {
                 )}
               >
                 {employee.bank && employee.bankNumber 
-                  ? `${employee.bank} - ${employee.bankNumber.toString()}`
+                  ? `${employee.bank} - ${employee.bankNumber}`
                   : employee.bank 
                   ? employee.bank 
                   : 'Not specified'}

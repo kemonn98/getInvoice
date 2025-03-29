@@ -94,15 +94,15 @@ export function InvoiceList() {
   const getStatusColor = (status: InvoiceStatusEnum) => {
     switch (status) {
       case InvoiceStatusEnum.PENDING:
-        return "bg-yellow-100 text-yellow-800 hover:bg-yellow-100/80"
+        return "bg-yellow-800/20 text-yellow-200 hover:bg-yellow-800/30"
       case InvoiceStatusEnum.PAID:
-        return "bg-green-100 text-green-800 hover:bg-green-100/80"
+        return "bg-green-800/20 text-green-200 hover:bg-green-800/30"
       case InvoiceStatusEnum.OVERDUE:
-        return "bg-red-100 text-red-800 hover:bg-red-100/80"
+        return "bg-red-800/20 text-red-200 hover:bg-red-800/30"
       case InvoiceStatusEnum.CANCELLED:
-        return "bg-gray-100 text-gray-800 hover:bg-gray-100/80"
+        return "bg-gray-800/20 text-gray-200 hover:bg-gray-800/30"
       default:
-        return "bg-gray-100 text-gray-800 hover:bg-gray-100/80"
+        return "bg-gray-800/20 text-gray-200 hover:bg-gray-800/30"
     }
   }
 

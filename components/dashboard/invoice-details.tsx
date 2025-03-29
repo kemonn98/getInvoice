@@ -160,15 +160,15 @@ export function InvoiceDetailView({ invoice }: InvoiceDetailViewProps) {
   const getStatusColor = (status: string) => {
     switch (status.toUpperCase()) {
       case "PENDING":
-        return "bg-yellow-100 text-yellow-800 border-yellow-600/20"
+        return "bg-yellow-800/20 text-yellow-200 hover:bg-yellow-800/30"
       case "PAID":
-        return "bg-green-100 text-green-800 border-green-600/20"
+        return "bg-green-800/20 text-green-200 hover:bg-green-800/30"
       case "OVERDUE":
-        return "bg-red-100 text-red-800 border-red-600/20"
+        return "bg-red-800/20 text-red-200 hover:bg-red-800/30"
       case "CANCELLED":
-        return "bg-slate-100 text-slate-800 border-slate-600/20"
+        return "bg-gray-800/20 text-gray-200 hover:bg-gray-800/30"
       default:
-        return "bg-gray-100 text-gray-800 border-gray-600/20"
+        return "bg-gray-800/20 text-gray-200 hover:bg-gray-800/30"
     }
   }
 

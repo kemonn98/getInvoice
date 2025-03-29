@@ -60,13 +60,13 @@ export function EmployeeDetailView({ employee }: EmployeeDetailViewProps) {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "FULL_TIME":
-        return "bg-green-100 text-green-800"
+        return "bg-green-800/20 text-green-200"
       case "PROBATION":
-        return "bg-yellow-100 text-yellow-800"
+        return "bg-yellow-800/20 text-yellow-200"
       case "CONTRACT":
-        return "bg-blue-100 text-blue-800"
+        return "bg-blue-800/20 text-blue-200"
       default:
-        return "bg-gray-100 text-gray-800"
+        return "bg-gray-800/20 text-gray-200"
     }
   }
 

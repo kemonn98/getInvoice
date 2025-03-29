@@ -63,13 +63,13 @@ export function EmployeeList() {
   const getStatusColor = (status: EmployeeStatus) => {
     switch (status) {
       case EmployeeStatus.FULL_TIME:
-        return "bg-green-100 text-green-800 hover:bg-green-100/80"
+        return "bg-green-800/20 text-green-200 hover:bg-green-800/30"
       case EmployeeStatus.PROBATION:
-        return "bg-yellow-100 text-yellow-800 hover:bg-yellow-100/80"
+        return "bg-yellow-800/20 text-yellow-200 hover:bg-yellow-800/30"
       case EmployeeStatus.CONTRACT:
-        return "bg-blue-100 text-blue-800 hover:bg-blue-100/80"
+        return "bg-blue-800/20 text-blue-200 hover:bg-blue-800/30"
       default:
-        return "bg-gray-100 text-gray-800 hover:bg-gray-100/80"
+        return "bg-gray-800/20 text-gray-200 hover:bg-gray-800/30"
     }
   }
 
@@ -145,7 +145,7 @@ export function EmployeeList() {
                   </TableCell>
                   <TableCell>{employee.email || 'Not specified'}</TableCell>
                   <TableCell>
-                    <span className="px-2 py-1 rounded-md bg-gray-100 text-gray-800 text-sm">
+                    <span className="px-2 py-1 rounded-md bg-gray-100/10 text-white text-xs"> 
                       {employee.gender?.charAt(0).toUpperCase() + employee.gender?.slice(1).toLowerCase() || 'Not specified'}
                     </span>
                   </TableCell>

@@ -7,9 +7,9 @@ interface EmployeeStatusBadgeProps {
 
 export function EmployeeStatusBadge({ status }: EmployeeStatusBadgeProps) {
   const statusStyles = {
-    FULL_TIME: "bg-green-100 text-green-700 border-green-200",
-    PROBATION: "bg-yellow-100 text-yellow-700 border-yellow-200",
-    CONTRACT: "bg-blue-100 text-blue-700 border-blue-200",
+    FULL_TIME: "bg-green-800/20 text-green-200",
+    PROBATION: "bg-yellow-800/20 text-yellow-200",
+    CONTRACT: "bg-blue-800/20 text-blue-200",
   }
 
   const statusLabels = {

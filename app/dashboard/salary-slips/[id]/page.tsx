@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation"
-import { SalarySlipDetailView } from "@/components/dashboard/salary-slip-details"
+import { SalarySlipDetailView } from "@/components/dashboard/salary-details"
 import { DashboardHeader } from "@/components/dashboard/dashboard-header"
 import { DashboardShell } from "@/components/dashboard/dashboard-shell"
 import { getSalarySlipById } from "@/app/actions/salary"

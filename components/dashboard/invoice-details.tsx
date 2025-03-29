@@ -86,38 +86,64 @@ export function InvoiceDetailView({ invoice }: InvoiceDetailViewProps) {
       const invoiceElement = document.getElementById("invoice-container")
       if (!invoiceElement) return
 
+      // Temporarily add a dark-mode class for PDF generation
+      const originalClass = invoiceElement.className
+      invoiceElement.className = `${originalClass} dark-mode`
+      
+      // Add temporary styles for PDF generation
+      const style = document.createElement('style')
+      style.textContent = `
+        .dark-mode {
+          border: 0 0% 14.9%;
+          background-color: hsl(0 0% 9%) !important;
+        }
+        .dark-mode * {
+          border: 0 0% 14.9%;
+          background-color: hsl(0 0% 9%) !important;
+        }
+        #invoice-container {
+          background-color: hsl(0 0% 9%) !important;
+        }
+      `
+      document.head.appendChild(style)
+
       const canvas = await html2canvas(invoiceElement, {
         scale: 2,
         useCORS: true,
         logging: false,
+        backgroundColor: 'hsl(0 0% 9%)',
       })
 
-      // Define margins in mm
-      const margin = 15 // 15mm margins
+      // Clean up temporary styles
+      document.head.removeChild(style)
+      invoiceElement.className = originalClass
 
-      // A4 measurements
-      const imgWidth = 210 - margin * 2 // A4 width minus margins
-      const pageHeight = 297 - margin * 2 // A4 height minus margins
+      // Create PDF with dark background
+      const pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "mm",
+        format: "a4",
+        compress: true
+      })
 
-      // Calculate dimensions with margins
+      // Fill entire page with dark background
+      pdf.setFillColor(23, 23, 23) // RGB equivalent of hsl(0 0% 9%)
+      pdf.rect(0, 0, 210, 297, 'F')
+
+      const margin = 15
+      const imgWidth = 210 - margin * 2
       const imgHeight = (canvas.height * imgWidth) / canvas.width
 
-      // Create PDF
-      const pdf = new jsPDF("p", "mm", "a4")
-
-      // Add the image with margin offset
       pdf.addImage(
         canvas.toDataURL("image/png"),
         "PNG",
-        margin, // X position (left margin)
-        margin, // Y position (top margin)
+        margin,
+        margin,
         imgWidth,
         imgHeight,
       )
 
-      // Format the filename with the invoice number
       const fileName = `${invoice.invoiceNo}-${format(new Date(), "yyyy-MM-dd")}.pdf`
-
       pdf.save(fileName)
     } catch (error) {
       console.error("Error generating PDF:", error)

@@ -26,7 +26,7 @@ import JSZip from 'jszip'
 import html2canvas from 'html2canvas'
 import jsPDF from 'jspdf'
 import ReactDOM from 'react-dom/client'
-import { SalarySlipView } from "@/components/dashboard/salary-slip-view"
+import { SalarySlipView } from "@/components/dashboard/salary-view"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
 
 const MONTHS = [
@@ -259,7 +259,7 @@ export function SalarySlipList() {
       tempContainer.style.position = 'absolute'
       tempContainer.style.left = '-9999px'
       // Set a fixed width to control the output size
-      tempContainer.style.width = '900px' // Adjust this value as needed
+      tempContainer.style.width = '1048px' // Adjust this value as needed
       document.body.appendChild(tempContainer)
 
       // Generate PDF for each salary slip
@@ -280,17 +280,11 @@ export function SalarySlipList() {
           useCORS: true,
           logging: false,
           imageTimeout: 0,
-          backgroundColor: '#ffffff',
+          backgroundColor: 'hsl(0 0% 9%)',
         })
 
-        // Define margins in mm
-        const margin = 15 // 15mm margins
-
-        // A4 measurements
-        const imgWidth = 210 - margin * 2 // A4 width minus margins
-        const pageHeight = 297 - margin * 2 // A4 height minus margins
-
-        // Calculate dimensions with margins
+        const margin = 9
+        const imgWidth = 210 - margin * 2
         const imgHeight = (canvas.height * imgWidth) / canvas.width
 
         // Create PDF with compression
@@ -301,16 +295,17 @@ export function SalarySlipList() {
           compress: true
         })
 
+        pdf.setFillColor(23, 23, 23) // RGB equivalent of hsl(0 0% 9%)
+        pdf.rect(0, 0, 210, 297, 'F')
+
         // Add the image with optimized settings
         pdf.addImage(
-          canvas.toDataURL("image/jpeg", 0.7), // Use JPEG instead of PNG, with 0.7 quality
-          "JPEG",
+          canvas.toDataURL("image/png"),
+          "PNG",
           margin,
           margin,
           imgWidth,
           imgHeight,
-          undefined,
-          'FAST'
         )
 
         // Add PDF to zip with compression

@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { Pencil, Trash2, FileText } from "lucide-react"
+import { Pencil, Trash2, FileText, Copy } from "lucide-react"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -19,6 +19,7 @@ import { Badge } from "@/components/ui/badge"
 import { deleteEmployee } from "@/app/actions/employee"
 import type { Employee } from "@/types"
 import Link from "next/link"
+import { toast } from "sonner"
 
 interface EmployeeDetailViewProps {
   employee: Employee
@@ -69,6 +70,18 @@ export function EmployeeDetailView({ employee }: EmployeeDetailViewProps) {
     }
   }
 
+  const copyToClipboard = (text: string, label: string) => {
+    navigator.clipboard.writeText(text).then(
+      () => {
+        toast.success(`Copied ${label} to clipboard`)
+      },
+      (err) => {
+        console.error('Failed to copy text: ', err)
+        toast.error('Failed to copy to clipboard')
+      }
+    )
+  }
+
   return (
     <div className="space-y-6">
       {error && <div className="bg-red-50 text-red-600 p-3 rounded-md mb-4">{error}</div>}
@@ -101,36 +114,141 @@ export function EmployeeDetailView({ employee }: EmployeeDetailViewProps) {
       {/* Employee Details */}
       <Card>
         <CardHeader>
-          <CardTitle>Employee Information</CardTitle>
+          <CardTitle>Employee Details</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-3">
-              <div>
-                <h3 className="text-sm font-medium text-muted-foreground">Full Name</h3>
-                <p className="text-lg">{employee.name}</p>
-              </div>
-              <div>
-                <h3 className="text-sm font-medium text-muted-foreground">National ID</h3>
-                <p>{employee.nationalId}</p>
-              </div>
-              <div>
-                <h3 className="text-sm font-medium text-muted-foreground">Position</h3>
-                <p>{employee.position}</p>
+        <CardContent>
+          <div className="divide-y divide-border">
+            <div className="grid grid-cols-3 py-3">
+              <div className="text-sm text-muted-foreground">Full Name</div>
+              <div 
+                className="col-span-2 font-medium group flex items-center gap-2 cursor-pointer hover:text-primary"
+                onClick={() => copyToClipboard(employee.name, 'name')}
+              >
+                {employee.name}
+                <Copy className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity" />
               </div>
             </div>
-            <div className="space-y-3">
-              <div>
-                <h3 className="text-sm font-medium text-muted-foreground">Status</h3>
-                <p>{formatEmployeeStatus(employee.status)}</p>
+
+            <div className="grid grid-cols-3 py-3">
+              <div className="text-sm text-muted-foreground">Position</div>
+              <div 
+                className="col-span-2 group flex items-center gap-2 cursor-pointer hover:text-primary"
+                onClick={() => copyToClipboard(employee.position, 'position')}
+              >
+                {employee.position}
+                <Copy className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity" />
               </div>
-              <div>
-                <h3 className="text-sm font-medium text-muted-foreground">Phone</h3>
-                <p>{employee.phone}</p>
+            </div>
+
+            <div className="grid grid-cols-3 py-3">
+              <div className="text-sm text-muted-foreground">Employment Status</div>
+              <div className="col-span-2">
+                <Badge variant="outline" className={getStatusColor(employee.status)}>
+                  {formatEmployeeStatus(employee.status)}
+                </Badge>
               </div>
-              <div>
-                <h3 className="text-sm font-medium text-muted-foreground">Address</h3>
-                <p className="whitespace-pre-line">{employee.address}</p>
+            </div>
+
+            <div className="grid grid-cols-3 py-3">
+              <div className="text-sm text-muted-foreground">National ID</div>
+              <div 
+                className="col-span-2 group flex items-center gap-2 cursor-pointer hover:text-primary"
+                onClick={() => copyToClipboard(employee.nationalId, 'National ID')}
+              >
+                {employee.nationalId}
+                <Copy className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity" />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-3 py-3">
+              <div className="text-sm text-muted-foreground">Gender</div>
+              <div className="col-span-2">
+                {employee.gender 
+                  ? employee.gender.charAt(0).toUpperCase() + employee.gender.slice(1).toLowerCase() 
+                  : 'Not specified'}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-3 py-3">
+              <div className="text-sm text-muted-foreground">Date of Birth</div>
+              <div 
+                className="col-span-2 group flex items-center gap-2 cursor-pointer hover:text-primary"
+                onClick={() => copyToClipboard(
+                  employee.dateOfBirth ? new Date(employee.dateOfBirth).toLocaleDateString() : 'Not specified',
+                  'date of birth'
+                )}
+              >
+                {employee.dateOfBirth ? new Date(employee.dateOfBirth).toLocaleDateString() : 'Not specified'}
+                {employee.dateOfBirth && <Copy className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity" />}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-3 py-3">
+              <div className="text-sm text-muted-foreground">Joined Date</div>
+              <div className="col-span-2">
+                {employee.joinedDate ? new Date(employee.joinedDate).toLocaleDateString() : 'Not specified'}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-3 py-3">
+              <div className="text-sm text-muted-foreground">Religion</div>
+              <div className="col-span-2">{employee.religion || 'Not specified'}</div>
+            </div>
+
+            <div className="grid grid-cols-3 py-3">
+              <div className="text-sm text-muted-foreground">Email</div>
+              <div 
+                className="col-span-2 group flex items-center gap-2 cursor-pointer hover:text-primary"
+                onClick={() => copyToClipboard(employee.email || '', 'email')}
+              >
+                {employee.email || 'Not specified'}
+                {employee.email && <Copy className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity" />}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-3 py-3">
+              <div className="text-sm text-muted-foreground">Phone</div>
+              <div 
+                className="col-span-2 group flex items-center gap-2 cursor-pointer hover:text-primary"
+                onClick={() => copyToClipboard(employee.phone, 'phone number')}
+              >
+                {employee.phone}
+                <Copy className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity" />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-3 py-3">
+              <div className="text-sm text-muted-foreground">Bank Account</div>
+              <div 
+                className="col-span-2 group flex items-center gap-2 cursor-pointer hover:text-primary"
+                onClick={() => copyToClipboard(
+                  employee.bank && employee.bankNumber 
+                    ? `${employee.bank} - ${employee.bankNumber.toString()}`
+                    : employee.bank 
+                    ? employee.bank 
+                    : 'Not specified',
+                  'bank account'
+                )}
+              >
+                {employee.bank && employee.bankNumber 
+                  ? `${employee.bank} - ${employee.bankNumber.toString()}`
+                  : employee.bank 
+                  ? employee.bank 
+                  : 'Not specified'}
+                {(employee.bank || employee.bankNumber) && 
+                  <Copy className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity" />
+                }
+              </div>
+            </div>
+
+            <div className="grid grid-cols-3 py-3">
+              <div className="text-sm text-muted-foreground">Address</div>
+              <div 
+                className="col-span-2 group flex items-center gap-2 cursor-pointer hover:text-primary whitespace-pre-line"
+                onClick={() => copyToClipboard(employee.address, 'address')}
+              >
+                {employee.address}
+                <Copy className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
               </div>
             </div>
           </div>
@@ -157,4 +275,5 @@ export function EmployeeDetailView({ employee }: EmployeeDetailViewProps) {
     </div>
   )
 }
+
 

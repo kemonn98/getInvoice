@@ -1,4 +1,4 @@
-import { CreateSalarySlipForm } from "@/components/dashboard/salary-slip-create"
+import { CreateSalarySlipForm } from "@/components/dashboard/salary-create"
 import { DashboardHeader } from "@/components/dashboard/dashboard-header"
 import { DashboardShell } from "@/components/dashboard/dashboard-shell"
 import { getEmployees } from "@/app/actions/salary"

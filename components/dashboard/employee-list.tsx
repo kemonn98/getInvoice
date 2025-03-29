@@ -129,30 +129,36 @@ export function EmployeeList() {
             </TableHeader>
             <TableBody>
               {sortedEmployees.map((employee) => (
-                <TableRow key={employee.id.toString()} className="hover:bg-muted/50">
-                  <TableCell className="font-medium">{employee.name}</TableCell>
+                <TableRow 
+                  key={employee.id.toString()} 
+                  className="hover:bg-muted/50 cursor-pointer"
+                  onClick={() => router.push(`/dashboard/employees/${employee.id}`)}
+                >
+                  <TableCell className="font-medium">
+                    {employee.name}
+                  </TableCell>
                   <TableCell>{employee.position}</TableCell>
                   <TableCell>
                     <Badge variant="outline" className={getStatusColor(employee.status)}>
                       {formatStatus(employee.status)}
                     </Badge>
                   </TableCell>
-                  <TableCell>{employee.email}</TableCell>
+                  <TableCell>{employee.email || 'Not specified'}</TableCell>
                   <TableCell>
                     <span className="px-2 py-1 rounded-md bg-gray-100 text-gray-800 text-sm">
-                      {employee.gender.charAt(0).toUpperCase() + employee.gender.slice(1).toLowerCase()}
+                      {employee.gender?.charAt(0).toUpperCase() + employee.gender?.slice(1).toLowerCase() || 'Not specified'}
                     </span>
                   </TableCell>
                   <TableCell>{employee.phone}</TableCell>
                   <TableCell className="text-right">
                     <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
+                      <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
                         <Button variant="ghost" className="h-8 w-8 p-0">
                           <span className="sr-only">Open menu</span>
                           <MoreHorizontal className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
+                      <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                         <DropdownMenuItem asChild>
                           <Link href={`/dashboard/employees/${employee.id}/edit`}>

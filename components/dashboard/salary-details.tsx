@@ -16,7 +16,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { deleteSalarySlip } from "@/app/actions/salary"
-import { SalarySlipView } from "@/components/dashboard/salary-slip-view"
+import { SalarySlipView } from "@/components/dashboard/salary-view"
 import type { SalarySlip as PrismaSalarySlip, Employee as PrismaEmployee } from "@prisma/client"
 import html2canvas from "html2canvas"
 import jsPDF from "jspdf"
@@ -91,23 +91,39 @@ export function SalarySlipDetailView({ salarySlip }: SalarySlipDetailViewProps) 
       const salarySlipElement = document.getElementById("salary-slip-container")
       if (!salarySlipElement) return
 
+      // Temporarily add a dark-mode class for PDF generation
+      const originalClass = salarySlipElement.className
+      salarySlipElement.className = `${originalClass} dark-mode`
+      
+      // Add temporary styles for PDF generation
+      const style = document.createElement('style')
+      style.textContent = `
+        .dark-mode {
+          border: 0 0% 14.9%;
+          background-color: hsl(0 0% 9%) !important;
+        }
+        .dark-mode * {
+          border: 0 0% 14.9%;
+          background-color: hsl(0 0% 9%) !important;
+        }
+        #salary-slip-container {
+          background-color: hsl(0 0% 9%) !important;
+        }
+      `
+      document.head.appendChild(style)
+
       const canvas = await html2canvas(salarySlipElement, {
         scale: 2,
         useCORS: true,
         logging: false,
+        backgroundColor: 'hsl(0 0% 9%)',
       })
 
-      // Define margins in mm
-      const margin = 15 // 15mm margins
+      // Clean up temporary styles
+      document.head.removeChild(style)
+      salarySlipElement.className = originalClass
 
-      // A4 measurements
-      const imgWidth = 210 - margin * 2 // A4 width minus margins
-      const pageHeight = 297 - margin * 2 // A4 height minus margins
-
-      // Calculate dimensions with margins
-      const imgHeight = (canvas.height * imgWidth) / canvas.width
-
-      // Create PDF
+      // Create PDF with dark background
       const pdf = new jsPDF({
         orientation: "portrait",
         unit: "mm",
@@ -115,19 +131,24 @@ export function SalarySlipDetailView({ salarySlip }: SalarySlipDetailViewProps) 
         compress: true
       })
 
-      // Add the image with margin offset
+      // Fill entire page with dark background
+      pdf.setFillColor(23, 23, 23) // RGB equivalent of hsl(0 0% 9%)
+      pdf.rect(0, 0, 210, 297, 'F')
+
+      const margin = 15
+      const imgWidth = 210 - margin * 2
+      const imgHeight = (canvas.height * imgWidth) / canvas.width
+
       pdf.addImage(
         canvas.toDataURL("image/png"),
         "PNG",
-        margin, // X position (left margin)
-        margin, // Y position (top margin)
+        margin,
+        margin,
         imgWidth,
         imgHeight,
       )
 
-      // Format the filename with the employee name and period
       const fileName = `Salary-${salarySlip.employee.name}-${salarySlip.month}-${salarySlip.year}.pdf`
-
       pdf.save(fileName)
     } catch (error) {
       console.error("Error generating PDF:", error)

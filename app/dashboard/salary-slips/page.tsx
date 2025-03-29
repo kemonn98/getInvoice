@@ -1,7 +1,7 @@
 import { Suspense } from "react"
 import { DashboardHeader } from "@/components/dashboard/dashboard-header"
 import { DashboardShell } from "@/components/dashboard/dashboard-shell"
-import { SalarySlipList } from "@/components/dashboard/salary-slip-list"
+import { SalarySlipList } from "@/components/dashboard/salary-list"
 import { Loading } from "@/components/loading"
 import { getServerSession } from "next-auth/next"
 import { redirect } from "next/navigation"

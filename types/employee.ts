@@ -17,6 +17,13 @@ export interface Employee {
   updatedAt: Date
   gender: string
   email: string
+  dateOfBirth: Date
+  birthLocation: string
+  joinedDate: Date
+  lastEducation: string
+  religion: string
+  bank: string
+  bankNumber: string
 }
 
 export interface SalarySlip {

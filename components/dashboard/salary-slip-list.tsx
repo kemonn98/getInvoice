@@ -67,7 +67,7 @@ export function SalarySlipList() {
           setIsLoading(true)
           setError(null)
           const data = await getSalarySlips()
-          setSalarySlips(data as SalarySlip[])
+          setSalarySlips(data as unknown as SalarySlip[])
         } catch (err) {
           console.error("Error fetching salary slips:", err)
           if (err instanceof Error) {
@@ -184,7 +184,7 @@ export function SalarySlipList() {
 
       // Refresh the data
       const newData = await getSalarySlips()
-      setSalarySlips(newData as SalarySlip[])
+      setSalarySlips(newData as unknown as SalarySlip[])
       toast.success(`Successfully copied salary slips to ${targetMonth}`)
     } catch (error) {
       console.error('Error copying salary slips:', error)

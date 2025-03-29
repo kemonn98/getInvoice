@@ -54,7 +54,34 @@ export function SalarySlipDetailView({ salarySlip }: SalarySlipDetailViewProps) 
   }
 
   const handlePrint = () => {
+    // Add print-specific styles before printing
+    const style = document.createElement('style')
+    style.textContent = `
+      @media print {
+        @page {
+          size: A4;
+          margin: 15mm;
+        }
+        
+        body {
+          margin: 0;
+          padding: 0;
+        }
+
+        #salary-slip-container {
+          zoom: 0.65;
+          width: 100% !important;
+          margin: 0 !important;
+          padding: 0 !important;
+        }
+      }
+    `
+    document.head.appendChild(style)
+
     window.print()
+
+    // Clean up the style after printing
+    document.head.removeChild(style)
   }
 
   const handleDownloadPDF = async () => {
@@ -146,7 +173,7 @@ export function SalarySlipDetailView({ salarySlip }: SalarySlipDetailViewProps) 
       <Card className="overflow-hidden print:shadow-none print:border-none">
         <div className="p-8 print:p-0">
           <div id="salary-slip-container">
-            <SalarySlipView salarySlip={salarySlip as SalarySlip} />
+            <SalarySlipView salarySlip={salarySlip as unknown as SalarySlip} /> 
           </div>
         </div>
       </Card>

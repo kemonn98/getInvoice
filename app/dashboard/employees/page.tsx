@@ -7,7 +7,8 @@ import { getServerSession } from "next-auth/next"
 import { redirect } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
-import { UserPlus } from "lucide-react"
+import { UserPlus, Download } from "lucide-react"
+import { ExportButton } from "@/components/dashboard/csv-export"
 
 // Mark the page as a Server Component
 export const dynamic = "force-dynamic"
@@ -24,12 +25,15 @@ export default async function EmployeesPage() {
   return (
     <DashboardShell>
       <DashboardHeader heading="Employees" text="Manage your employees.">
-        <Link href="/dashboard/employees/new">
-          <Button size="sm">
-            <UserPlus className="mr-2 h-4 w-4" />
-            New Employee
-          </Button>
-        </Link>
+        <div className="flex items-center gap-4">
+          <ExportButton />
+          <Link href="/dashboard/employees/new">
+            <Button size="sm">
+              <UserPlus className="mr-2 h-4 w-4" />
+              New Employee
+            </Button>
+          </Link>
+        </div>
       </DashboardHeader>
       <div className="grid gap-4 md:gap-8">
         <Suspense fallback={<Loading />}>

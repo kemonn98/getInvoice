@@ -19,6 +19,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge"
 import { getEmployees } from "@/app/actions/salary"
 import { type Employee, EmployeeStatus } from "@/types/employee"
+import { toast } from "sonner"
 
 export function EmployeeList() {
   const router = useRouter()
@@ -119,11 +120,10 @@ export function EmployeeList() {
             <TableHeader>
               <TableRow>
                 <TableHead>Name</TableHead>
-                <TableHead>Position</TableHead>
                 <TableHead>Status</TableHead>
+                <TableHead>Position</TableHead>
                 <TableHead>Email</TableHead>
                 <TableHead>Gender</TableHead>
-                <TableHead>Phone</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -137,19 +137,18 @@ export function EmployeeList() {
                   <TableCell className="font-medium">
                     {employee.name}
                   </TableCell>
-                  <TableCell>{employee.position}</TableCell>
                   <TableCell>
                     <Badge variant="outline" className={getStatusColor(employee.status)}>
                       {formatStatus(employee.status)}
                     </Badge>
                   </TableCell>
+                  <TableCell>{employee.position}</TableCell>
                   <TableCell>{employee.email || 'Not specified'}</TableCell>
                   <TableCell>
                     <span className="px-2 py-1 rounded-md bg-gray-100/10 text-white text-xs"> 
                       {employee.gender?.charAt(0).toUpperCase() + employee.gender?.slice(1).toLowerCase() || 'Not specified'}
                     </span>
                   </TableCell>
-                  <TableCell>{employee.phone}</TableCell>
                   <TableCell className="text-right">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>

@@ -136,10 +136,10 @@ model Employee {
   userId         String
   name           String
   nationalId     String
-  position       String
+  position       Strings
   status         EmployeeStatus @default(FULL_TIME)
   address        String
-  phone          String
+  phone          Strings
   email          String?
   gender         Gender?
   dateOfBirth    DateTime?

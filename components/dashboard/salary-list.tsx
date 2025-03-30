@@ -512,18 +512,18 @@ export function SalarySlipList() {
                       <>
                         {/* Headers */}
                         <div className="grid grid-cols-12 gap-4 px-4 py-2 border-b text-sm font-medium group">
-                          <div className="col-span-4">
+                          <div className="col-span-4 text-muted-foreground">
                             <SortableHeader field="name">Employee Name</SortableHeader>
                           </div>
-                          <div className="col-span-3">
+                          <div className="col-span-3 text-muted-foreground">
                             <SortableHeader field="position">Position</SortableHeader>
                           </div>
-                          <div className="col-span-2">
+                          <div className="col-span-2 text-muted-foreground">
                             <SortableHeader field="status">Status</SortableHeader>
                           </div>
                           <div className="col-span-3 text-right">
                             <SortableHeader field="salary">
-                              <span className="text-primary font-medium">Salary</span>
+                              <span className="text-muted-foreground font-medium">Salary</span>
                             </SortableHeader>
                           </div>
                         </div>

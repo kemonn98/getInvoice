@@ -25,7 +25,7 @@ export default async function SalarySlipsPage() {
     <DashboardShell>
       <DashboardHeader heading="Salary Slips" text="Manage employee salary slips.">
         <Link href="/dashboard/salary-slips/new">
-          <Button size="sm">
+          <Button size="sm" className="bg-gray-100/10 text-white hover:bg-gray-100/20">
             <PlusCircle className="mr-2 h-4 w-4" />
             New Salary Slip
           </Button>

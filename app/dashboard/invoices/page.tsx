@@ -25,7 +25,7 @@ export default async function EmployeesPage() {
     <DashboardShell>
       <DashboardHeader heading="Invoices" text="Manage your invoices.">
         <Link href="/dashboard/invoices/new">
-          <Button size="sm">
+          <Button size="sm" className="bg-gray-100/10 text-white hover:bg-gray-100/20">
             <PlusCircle className="mr-2 h-4 w-4" />
             New Invoice
           </Button>

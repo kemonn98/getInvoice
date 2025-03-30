@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { UserPlus, Download } from "lucide-react"
 import { ExportButton } from "@/components/dashboard/csv-export"
+import { ImportButton } from "@/components/dashboard/csv-import"
 
 // Mark the page as a Server Component
 export const dynamic = "force-dynamic"
@@ -26,9 +27,10 @@ export default async function EmployeesPage() {
     <DashboardShell>
       <DashboardHeader heading="Employees" text="Manage your employees.">
         <div className="flex items-center gap-4">
+          <ImportButton />
           <ExportButton />
           <Link href="/dashboard/employees/new">
-            <Button size="sm">
+            <Button size="sm" className="bg-gray-100/10 text-white hover:bg-gray-100/20">
               <UserPlus className="mr-2 h-4 w-4" />
               New Employee
             </Button>

@@ -12,7 +12,7 @@ export function DashboardShell({ children }: DashboardShellProps) {
       <header className="sticky top-0 z-40 border-b bg-background">
         <div className="container flex h-16 items-center justify-between py-4">
           <div className="flex items-center gap-2 font-bold">
-            <span className="text-primary">Invoice</span>Generator
+            <span className="text-primary">SlabPixel</span> <span className="text-muted-foreground font-light">SuperApp</span>
           </div>
           <UserNav />
         </div>
@@ -21,7 +21,7 @@ export function DashboardShell({ children }: DashboardShellProps) {
         <aside className="hidden w-[200px] flex-col md:flex lg:w-[240px]">
           <DashboardNav />
         </aside>
-        <main className="flex w-full flex-1 flex-col overflow-hidden py-6">{children}</main>
+        <main className="flex w-full flex-1 flex-col overflow-hidden py-6 gap-y-6">{children}</main>
       </div>
     </div>
   )

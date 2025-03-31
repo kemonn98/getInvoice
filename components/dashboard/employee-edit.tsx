@@ -74,18 +74,18 @@ export function EditEmployeeForm({ employee }: EditEmployeeFormProps) {
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="name">Full Name*</Label>
-              <Input id="name" name="name" defaultValue={employee.name} required />
+              <Input id="name" name="name" defaultValue={employee.name || ''} required />
             </div>
             <div className="space-y-2">
               <Label htmlFor="nationalId">National Identity Number*</Label>
-              <Input id="nationalId" name="nationalId" defaultValue={employee.nationalId} required />
+              <Input id="nationalId" name="nationalId" defaultValue={employee.nationalId || ''} required />
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="position">Position*</Label>
-              <Input id="position" name="position" defaultValue={employee.position} required />
+              <Input id="position" name="position" defaultValue={employee.position || ''} required />
             </div>
             <div className="space-y-2">
               <Label htmlFor="status">Employment Status*</Label>
@@ -104,12 +104,12 @@ export function EditEmployeeForm({ employee }: EditEmployeeFormProps) {
 
           <div className="space-y-2">
             <Label htmlFor="phone">Phone Number*</Label>
-            <Input id="phone" name="phone" defaultValue={employee.phone} required />
+            <Input id="phone" name="phone" defaultValue={employee.phone || ''} required />
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="address">Address*</Label>
-            <Textarea id="address" name="address" defaultValue={employee.address} required />
+            <Textarea id="address" name="address" defaultValue={employee.address || ''} required />
           </div>
 
           <div className="grid grid-cols-2 gap-4">

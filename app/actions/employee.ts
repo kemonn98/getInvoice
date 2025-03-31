@@ -434,7 +434,7 @@ export async function importEmployeesFromCsv(csvData: string) {
                   phone: data.phone ?? undefined,
                   email: data.email ?? undefined,
                   gender: data.gender,
-                  bankName: data.bankName ?? undefined,
+                  bank: data.bank ?? undefined,
                   bankNumber: data.bankNumber ?? undefined
                 }
               });

@@ -153,7 +153,7 @@ export function EmployeeDetailView({ employee }: EmployeeDetailViewProps) {
               <div className="text-sm text-muted-foreground">National ID</div>
               <div 
                 className="col-span-2 group flex items-center gap-2 cursor-pointer hover:text-primary"
-                onClick={() => copyToClipboard(employee.nationalId, 'National ID')}
+                onClick={() => copyToClipboard(employee.nationalId || '', 'National ID')}
               >
                 {employee.nationalId}
                 <Copy className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -210,7 +210,7 @@ export function EmployeeDetailView({ employee }: EmployeeDetailViewProps) {
               <div className="text-sm text-muted-foreground">Phone</div>
               <div 
                 className="col-span-2 group flex items-center gap-2 cursor-pointer hover:text-primary"
-                onClick={() => copyToClipboard(employee.phone, 'phone number')}
+                onClick={() => copyToClipboard(employee.phone || '', 'phone number')}
               >
                 {employee.phone}
                 <Copy className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -245,7 +245,7 @@ export function EmployeeDetailView({ employee }: EmployeeDetailViewProps) {
               <div className="text-sm text-muted-foreground">Address</div>
               <div 
                 className="col-span-2 group flex items-center gap-2 cursor-pointer hover:text-primary whitespace-pre-line"
-                onClick={() => copyToClipboard(employee.address, 'address')}
+                onClick={() => copyToClipboard(employee.address || '', 'address')}
               >
                 {employee.address}
                 <Copy className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />

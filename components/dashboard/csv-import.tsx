@@ -1,7 +1,7 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { Upload, Download } from "lucide-react"
+import { Upload, Download, Loader2 } from "lucide-react"
 import { importEmployeesFromCsv } from "@/app/actions/employee"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
@@ -49,6 +49,7 @@ export function ImportButton() {
       "This will:\n" +
       "- Update existing employees\n" +
       "- Add new employees\n" +
+      
       "- Remove employees not in the CSV (only if they have no salary slips)\n\n" +
       "Do you want to continue?"
     )) {
@@ -70,7 +71,12 @@ export function ImportButton() {
       
       if (result.success) {
         toast.success("Employees imported successfully")
-        router.refresh()
+        // Add a small delay before refreshing
+        setTimeout(() => {
+          router.refresh()
+          // Force a full page refresh as fallback
+          window.location.reload()
+        }, 1000)
       } else {
         toast.error(result.error || "Failed to import employees")
         console.error("Import error:", result.error)
@@ -101,7 +107,6 @@ export function ImportButton() {
           variant="outline" 
           className="bg-dark-100/10 text-white hover:bg-gray-100/10"
           onClick={() => {
-            // Directly trigger file input click
             const fileInput = document.getElementById('csvInput') as HTMLInputElement
             if (fileInput) {
               fileInput.click()
@@ -109,7 +114,11 @@ export function ImportButton() {
           }}
           disabled={isLoading}
         >
-          <Upload className={`mr-2 h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+          {isLoading ? (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          ) : (
+            <Upload className="mr-2 h-4 w-4" />
+          )}
           {isLoading ? 'Importing...' : 'Import CSV'}
         </Button>
         <input

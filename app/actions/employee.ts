@@ -425,8 +425,17 @@ export async function importEmployeesFromCsv(csvData: string) {
               return tx.employee.update({
                 where: { id: existingEmployee.id },
                 data: {
-                  ...data,
                   userId: session?.user?.id || "",
+                  name: data.name ?? undefined,
+                  nationalId: data.nationalId ?? undefined,
+                  position: data.position ?? undefined,
+                  status: data.status,
+                  address: data.address ?? undefined,
+                  phone: data.phone ?? undefined,
+                  email: data.email ?? undefined,
+                  gender: data.gender,
+                  bankName: data.bankName ?? undefined,
+                  bankNumber: data.bankNumber ?? undefined
                 }
               });
             } else {

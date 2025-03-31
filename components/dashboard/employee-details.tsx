@@ -133,7 +133,7 @@ export function EmployeeDetailView({ employee }: EmployeeDetailViewProps) {
               <div className="text-sm text-muted-foreground">Position</div>
               <div 
                 className="col-span-2 group flex items-center gap-2 cursor-pointer hover:text-primary"
-                onClick={() => copyToClipboard(employee.position, 'position')}
+                onClick={() => copyToClipboard(employee.position || '', 'position')}
               >
                 {employee.position}
                 <Copy className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity" />

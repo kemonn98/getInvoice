@@ -134,9 +134,9 @@ enum Gender {
 model Employee {
   id             Int            @id @default(autoincrement())
   userId         String
-  name           String
-  nationalId     String
-  position       String
+  name           String?
+  nationalId     String?
+  position       String?
   status         EmployeeStatus @default(FULL_TIME)
   address        String
   phone          String

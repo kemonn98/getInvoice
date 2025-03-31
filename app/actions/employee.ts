@@ -442,8 +442,17 @@ export async function importEmployeesFromCsv(csvData: string) {
               // Create new employee
               return tx.employee.create({
                 data: {
-                  ...data,
                   userId: session?.user?.id || "",
+                  name: data.name || "",
+                  nationalId: data.nationalId || "",
+                  position: data.position || "",
+                  status: data.status,
+                  address: data.address || "",
+                  phone: data.phone || "",
+                  email: data.email || "",
+                  gender: data.gender,
+                  bank: data.bank || "",
+                  bankNumber: data.bankNumber || null
                 }
               });
             }

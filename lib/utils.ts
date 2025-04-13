@@ -13,7 +13,15 @@ export function formatNumber(value: number): string {
 }
 
 export function formatCurrency(amount: number, currency = "USD"): string {
-  // Using USD currency but German number formatting
+  if (currency === "IDR") {
+    const formattedNumber = amount.toLocaleString('id-ID', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    })
+    return `Rp ${formattedNumber}`
+  }
+  
+  // Default USD formatting
   const formattedNumber = amount.toLocaleString('en-US', {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2

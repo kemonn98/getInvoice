@@ -149,6 +149,7 @@ model Employee {
   religion       String?
   bank           String?
   bankNumber     BigInt?
+  active         Boolean        @default(true)
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt
   user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)

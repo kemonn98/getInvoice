@@ -70,6 +70,12 @@ export function EmployeeDetailView({ employee }: EmployeeDetailViewProps) {
     }
   }
 
+  const getActiveStatusColor = (active: boolean) => {
+    return active 
+      ? "bg-green-800/20 text-green-200" 
+      : "bg-red-800/20 text-red-200"
+  }
+
   const copyToClipboard = (text: string, label: string) => {
     navigator.clipboard.writeText(text).then(
       () => {
@@ -91,6 +97,9 @@ export function EmployeeDetailView({ employee }: EmployeeDetailViewProps) {
         <div className="flex items-center gap-2">
           <Badge variant="outline" className={getStatusColor(employee.status)}>
             {formatEmployeeStatus(employee.status)}
+          </Badge>
+          <Badge variant="outline" className={getActiveStatusColor(employee.active)}>
+            {employee.active ? "Active" : "Inactive"}
           </Badge>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -145,6 +154,15 @@ export function EmployeeDetailView({ employee }: EmployeeDetailViewProps) {
               <div className="col-span-2">
                 <Badge variant="outline" className={getStatusColor(employee.status)}>
                   {formatEmployeeStatus(employee.status)}
+                </Badge>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-3 py-3">
+              <div className="text-sm text-muted-foreground">Status</div>
+              <div className="col-span-2">
+                <Badge variant="outline" className={getActiveStatusColor(employee.active)}>
+                  {employee.active ? "Active" : "Inactive"}
                 </Badge>
               </div>
             </div>

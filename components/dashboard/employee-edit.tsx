@@ -35,6 +35,7 @@ export function EditEmployeeForm({ employee }: EditEmployeeFormProps) {
   const [joinedDate, setJoinedDate] = useState<Date | undefined>(
     employee.joinedDate ? new Date(employee.joinedDate) : undefined
   )
+  const [isActive, setIsActive] = useState<boolean>(employee.active || true)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -44,6 +45,8 @@ export function EditEmployeeForm({ employee }: EditEmployeeFormProps) {
     try {
       const form = e.target as HTMLFormElement
       const formData = new FormData(form)
+      
+      formData.append('active', isActive.toString())
 
       const result = await updateEmployee(employee.id.toString(), formData)
 
@@ -100,6 +103,19 @@ export function EditEmployeeForm({ employee }: EditEmployeeFormProps) {
                 </SelectContent>
               </Select>
             </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="active">Status</Label>
+            <Select name="active" value={isActive ? "true" : "false"} onValueChange={(value) => setIsActive(value === "true")}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="true">Active</SelectItem>
+                <SelectItem value="false">Inactive</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="space-y-2">

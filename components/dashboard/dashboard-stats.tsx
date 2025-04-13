@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { FileText, PieChart, TrendingUp } from "lucide-react"
 import { DollarSign } from "lucide-react"
+import { formatCurrency } from "@/lib/utils"
 
 interface DashboardStats {
   totalRevenue: number
@@ -87,7 +88,7 @@ export function DashboardStats() {
         </CardHeader>
         <CardContent>
           <div className="flex flex-col gap-1">
-            <div className="text-2xl font-bold">${(stats.totalRevenue ?? 0).toFixed(2)}</div>
+            <div className="text-2xl font-bold">{formatCurrency(stats.totalRevenue ?? 0)}</div>
             <p className="text-xs text-muted-foreground">+20.1% from last month</p>
           </div>
         </CardContent>

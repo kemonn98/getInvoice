@@ -24,6 +24,7 @@ export interface Employee {
   religion: string
   bank: string
   bankNumber: string
+  active: boolean
 }
 
 export interface SalarySlip {

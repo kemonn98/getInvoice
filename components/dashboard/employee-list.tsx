@@ -124,6 +124,7 @@ export function EmployeeList() {
                 <TableHead>Position</TableHead>
                 <TableHead>Email</TableHead>
                 <TableHead>Gender</TableHead>
+                <TableHead>Active</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -148,6 +149,17 @@ export function EmployeeList() {
                     <span className="px-2 py-1 rounded-md bg-gray-100/10 text-white text-xs"> 
                       {employee.gender?.charAt(0).toUpperCase() + employee.gender?.slice(1).toLowerCase() || 'Not specified'}
                     </span>
+                  </TableCell>
+                  <TableCell>
+                    <Badge 
+                      variant="outline" 
+                      className={employee.active 
+                        ? "bg-green-800/20 text-green-200" 
+                        : "bg-red-800/20 text-red-200"
+                      }
+                    >
+                      {employee.active ? "Active" : "Inactive"}
+                    </Badge>
                   </TableCell>
                   <TableCell className="text-right">
                     <DropdownMenu>

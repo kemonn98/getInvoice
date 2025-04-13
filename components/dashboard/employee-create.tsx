@@ -29,6 +29,7 @@ export function CreateEmployeeForm() {
   const [gender, setGender] = useState<string>("MALE")
   const [dateOfBirth, setDateOfBirth] = useState<Date>()
   const [joinedDate, setJoinedDate] = useState<Date>()
+  const [isActive, setIsActive] = useState<boolean>(true)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -47,6 +48,7 @@ export function CreateEmployeeForm() {
       // Add select fields explicitly
       formData.append('status', employeeStatus)
       formData.append('gender', gender)
+      formData.append('active', isActive.toString())
 
       // Add date fields explicitly
       if (dateOfBirth) {
@@ -140,6 +142,19 @@ export function CreateEmployeeForm() {
                   </SelectContent>
                 </Select>
               </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="active">Status</Label>
+              <Select name="active" value={isActive ? "true" : "false"} onValueChange={(value) => setIsActive(value === "true")}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="true">Active</SelectItem>
+                  <SelectItem value="false">Inactive</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="space-y-2">

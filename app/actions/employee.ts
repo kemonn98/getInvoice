@@ -119,6 +119,7 @@ export async function createEmployee(formData: FormData) {
         religion: formData.get("religion") as string || null,
         bank: formData.get("bank") as string || null,
         bankNumber: bankNumber ? parseInt(bankNumber as string, 10) : null,
+        active: formData.get("active") === "true",
       },
     })
 
@@ -175,6 +176,7 @@ export async function updateEmployee(id: string, formData: FormData) {
         religion: formData.get("religion") as string || null,
         bank: formData.get("bank") as string || null,
         bankNumber: bankNumber ? parseInt(bankNumber as string, 10) : null,
+        active: formData.get("active") === "true",
       },
     })
 
@@ -435,7 +437,8 @@ export async function importEmployeesFromCsv(csvData: string) {
                   email: data.email ?? undefined,
                   gender: data.gender,
                   bank: data.bank ?? undefined,
-                  bankNumber: data.bankNumber ?? undefined
+                  bankNumber: data.bankNumber ?? undefined,
+                  active: data.active ?? true
                 }
               });
             } else {
@@ -452,7 +455,8 @@ export async function importEmployeesFromCsv(csvData: string) {
                   email: data.email || "",
                   gender: data.gender,
                   bank: data.bank || "",
-                  bankNumber: data.bankNumber || null
+                  bankNumber: data.bankNumber || null,
+                  active: data.active ?? true
                 }
               });
             }

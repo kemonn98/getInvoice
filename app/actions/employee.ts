@@ -311,10 +311,31 @@ type EmployeeCreateInput = {
   religion?: string | null
   bank?: string | null
   bankNumber?: number | null
+  active?: boolean
 }
 
 // Define the type for employee data
 type EmployeeData = Prisma.EmployeeCreateInput; // or use Omit to exclude fields if necessary
+
+// Add type definition for the transformed employee data
+type EmployeeDataTransformed = {
+  name: string | null
+  nationalId: string | null
+  position: string | null
+  status: EmployeeStatus
+  address: string
+  phone: string
+  email: string | null
+  gender: Gender | null
+  dateOfBirth: Date | null
+  birthLocation: string | null
+  joinedDate: Date | null
+  lastEducation: string | null
+  religion: string | null
+  bank: string | null
+  bankNumber: number | null
+  active: boolean
+}
 
 // Import employees from CSV
 export async function importEmployeesFromCsv(csvData: string) {
@@ -380,11 +401,11 @@ export async function importEmployeesFromCsv(csvData: string) {
           name: sanitizeString(rawData.name),
           nationalId: sanitizeString(rawData.nationalid),
           position: sanitizeString(rawData.position),
-          status: rawData.status.toUpperCase(),
-          address: sanitizeString(rawData.address),
-          phone: sanitizeString(rawData.phone),
+          status: rawData.status.toUpperCase() as EmployeeStatus,
+          address: sanitizeString(rawData.address) || "",  // provide default empty string since it's required
+          phone: sanitizeString(rawData.phone) || "",      // provide default empty string since it's required
           email: sanitizeString(rawData.email),
-          gender: rawData.gender?.toUpperCase() || null,
+          gender: rawData.gender?.toUpperCase() as Gender || null,
           dateOfBirth: rawData.dateofbirth ? new Date(rawData.dateofbirth) : null,
           birthLocation: sanitizeString(rawData.birthlocation),
           joinedDate: rawData.joineddate ? new Date(rawData.joineddate) : null,
@@ -395,14 +416,14 @@ export async function importEmployeesFromCsv(csvData: string) {
             (() => {
               const cleaned = rawData.banknumber.replace(/[^\d]/g, '');
               const num = parseInt(cleaned, 10);
-              // Check if the number is within safe integer bounds
               if (isNaN(num) || num > Number.MAX_SAFE_INTEGER) {
                 console.warn(`Bank number ${cleaned} is too large, truncating`);
                 return null;
               }
               return num;
-            })() : null
-        };
+            })() : null,
+          active: rawData.active === 'false' ? false : true
+        } as EmployeeDataTransformed;
       } catch (error) {
         console.error(`Error parsing row ${index + 2}:`
           , error);

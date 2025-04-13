@@ -52,6 +52,7 @@ export function SalarySlipList() {
   const { data: session, status } = useSession()
   const [salarySlips, setSalarySlips] = useState<SalarySlip[]>([])
   const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear())
+  const [selectedMonth, setSelectedMonth] = useState<string>(MONTHS[new Date().getMonth()])
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [sortField, setSortField] = useState<SortField>('salary')
@@ -378,6 +379,25 @@ export function SalarySlipList() {
     }
   }
 
+  const handleMonthChange = (direction: 'prev' | 'next') => {
+    const currentMonthIndex = MONTHS.indexOf(selectedMonth as "January" | "February" | "March" | "April" | "May" | "June" | "July" | "August" | "September" | "October" | "November" | "December")
+    if (direction === 'prev') {
+      if (currentMonthIndex === 0) {
+        setSelectedMonth(MONTHS[11])
+        handleYearChange('prev')
+      } else {
+        setSelectedMonth(MONTHS[currentMonthIndex - 1])
+      }
+    } else if (direction === 'next') {
+      if (currentMonthIndex === 11) {
+        setSelectedMonth(MONTHS[0])
+        handleYearChange('next')
+      } else {
+        setSelectedMonth(MONTHS[currentMonthIndex + 1])
+      }
+    }
+  }
+
   if (error) return <div>Error: {error}</div>
 
   if (isLoading) {
@@ -407,7 +427,30 @@ export function SalarySlipList() {
             </div>
             
             <div className="flex items-center gap-4">
-              {/* Updated Year Navigation */}
+              {/* Month Navigation */}
+              <div className="flex items-center gap-2 bg-muted p-1 rounded-lg">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => handleMonthChange('prev')}
+                  className="h-8 w-8"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <div className="min-w-[120px] text-center font-medium">
+                  {selectedMonth}
+                </div>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => handleMonthChange('next')}
+                  className="h-8 w-8"
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
+
+              {/* Year Navigation */}
               <div className="flex items-center gap-2 bg-muted p-1 rounded-lg">
                 <Button
                   variant="ghost"
@@ -444,23 +487,21 @@ export function SalarySlipList() {
             </div>
           ) : (
             <div className="space-y-4">
-              {MONTHS.map((month, index) => {
-                const monthSlips = filteredAndGroupedSlips[month] || []
+              {(() => {
+                const monthSlips = filteredAndGroupedSlips[selectedMonth] || []
                 const monthTotal = monthSlips.reduce((sum, slip) => sum + slip.totalSalary, 0)
                 
                 // Get previous month's data
-                const prevMonthIndex = (index - 1 + 12) % 12
+                const currentMonthIndex = MONTHS.indexOf(selectedMonth as "January" | "February" | "March" | "April" | "May" | "June" | "July" | "August" | "September" | "October" | "November" | "December")
+                const prevMonthIndex = (currentMonthIndex - 1 + 12) % 12
                 const prevMonth = MONTHS[prevMonthIndex]
                 const prevMonthSlips = filteredAndGroupedSlips[prevMonth] || []
                 const canCopyFromPrevMonth = monthSlips.length === 0 && prevMonthSlips.length > 0
                 
                 return (
-                  <div 
-                    key={month} 
-                    className="rounded-lg border bg-card text-card-foreground shadow-sm"
-                  >
+                  <div className="rounded-lg border bg-card text-card-foreground shadow-sm">
                     <div className="flex items-center justify-between p-4 border-b">
-                      <h3 className="font-semibold text-lg">{month}</h3>
+                      <h3 className="font-semibold text-lg">{selectedMonth}</h3>
                       <div className="flex gap-2">
                         {canCopyFromPrevMonth && (
                           <Button
@@ -468,38 +509,38 @@ export function SalarySlipList() {
                             size="sm"
                             onClick={() => {
                               const sourceSlips = prevMonthSlips
-                              const targetMonth = month
+                              const targetMonth = selectedMonth
                               const targetYear = prevMonthIndex === 11 ? selectedYear - 1 : selectedYear
                               copyLastMonthData(sourceSlips, targetMonth, targetYear)
                             }}
                             className="flex items-center gap-1"
-                            disabled={copyingMonth === month}
+                            disabled={copyingMonth === selectedMonth}
                           >
-                            {copyingMonth === month ? (
+                            {copyingMonth === selectedMonth ? (
                               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current" />
                             ) : (
                               <Calendar className="h-4 w-4" />
                             )}
-                            {copyingMonth === month ? 'Copying...' : `Copy from ${prevMonth}`}
+                            {copyingMonth === selectedMonth ? 'Copying...' : `Copy from ${prevMonth}`}
                           </Button>
                         )}
                         {monthSlips.length > 0 && (
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => generateMonthlySlipsZip(monthSlips, month, selectedYear)}
+                            onClick={() => generateMonthlySlipsZip(monthSlips, selectedMonth, selectedYear)}
                             className="flex items-center gap-1"
-                            disabled={downloadingMonth === month}
+                            disabled={downloadingMonth === selectedMonth}
                           >
-                            {downloadingMonth === month ? (
+                            {downloadingMonth === selectedMonth ? (
                               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current" />
                             ) : (
                               <Download className="h-4 w-4" />
                             )}
-                            {downloadingMonth === month ? 'Downloading...' : 'Download All'}
+                            {downloadingMonth === selectedMonth ? 'Downloading...' : 'Download All'}
                           </Button>
                         )}
-                        <Link href={`/dashboard/salary-slips/new?month=${month}&year=${selectedYear}`}>
+                        <Link href={`/dashboard/salary-slips/new?month=${selectedMonth}&year=${selectedYear}`}>
                           <Button variant="outline" size="sm">
                             <Plus className="h-4 w-4 mr-1" />
                             Create
@@ -602,12 +643,12 @@ export function SalarySlipList() {
                       <div className="flex flex-col items-center justify-center py-8 text-center text-muted-foreground">
                         <Calendar className="h-8 w-8 mb-2 opacity-50" />
                         <p className="text-sm">No salary slips</p>
-                        <p className="text-xs">Create one for {month} {selectedYear}</p>
+                        <p className="text-xs">Create one for {selectedMonth} {selectedYear}</p>
                       </div>
                     )}
                   </div>
                 )
-              })}
+              })()}
             </div>
           )}
         </CardContent>

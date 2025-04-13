@@ -326,7 +326,7 @@ type EmployeeDataTransformed = {
   address: string
   phone: string
   email: string | null
-  gender: Gender | null
+  gender: "MALE" | "FEMALE" | null
   dateOfBirth: Date | null
   birthLocation: string | null
   joinedDate: Date | null
@@ -401,11 +401,11 @@ export async function importEmployeesFromCsv(csvData: string) {
           name: sanitizeString(rawData.name),
           nationalId: sanitizeString(rawData.nationalid),
           position: sanitizeString(rawData.position),
-          status: rawData.status.toUpperCase() as EmployeeStatus,
-          address: sanitizeString(rawData.address) || "",  // provide default empty string since it's required
-          phone: sanitizeString(rawData.phone) || "",      // provide default empty string since it's required
+          status: rawData.status.toUpperCase(),
+          address: sanitizeString(rawData.address),
+          phone: sanitizeString(rawData.phone),
           email: sanitizeString(rawData.email),
-          gender: rawData.gender?.toUpperCase() as Gender || null,
+          gender: rawData.gender?.toUpperCase() || null,
           dateOfBirth: rawData.dateofbirth ? new Date(rawData.dateofbirth) : null,
           birthLocation: sanitizeString(rawData.birthlocation),
           joinedDate: rawData.joineddate ? new Date(rawData.joineddate) : null,
@@ -423,7 +423,7 @@ export async function importEmployeesFromCsv(csvData: string) {
               return num;
             })() : null,
           active: rawData.active === 'false' ? false : true
-        } as EmployeeDataTransformed;
+        };
       } catch (error) {
         console.error(`Error parsing row ${index + 2}:`
           , error);

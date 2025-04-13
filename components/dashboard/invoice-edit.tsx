@@ -13,6 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea"
 import { updateInvoice } from "@/app/actions/invoice"
 import type { Invoice, InvoiceItem, InvoiceStatus } from "@/types"
+import { formatCurrency } from "@/lib/utils"
 
 interface EditInvoiceFormProps {
   invoice: Invoice
@@ -260,9 +261,9 @@ export function EditInvoiceForm({ invoice }: EditInvoiceFormProps) {
                       type="number"
                       min="0"
                       step="0.01"
-                      placeholder="Price"
+                      placeholder="0,00"
                       value={item.price}
-                      onChange={(e) => updateItem(item.id || 0, "price", Number.parseFloat(e.target.value) || 0)}
+                      onChange={(e) => updateItem(item.id || 0, "price", Number.parseFloat(e.target.value.replace(',', '.')) || 0)}
                       required
                     />
                   </div>
@@ -287,15 +288,15 @@ export function EditInvoiceForm({ invoice }: EditInvoiceFormProps) {
           <div className="w-full max-w-[200px] space-y-2">
             <div className="flex justify-between text-sm">
               <span>Subtotal:</span>
-              <span>${calculateSubtotal().toFixed(2)}</span>
+              <span>{formatCurrency(calculateSubtotal())}</span>
             </div>
             <div className="flex justify-between text-sm">
               <span>Tax (10%):</span>
-              <span>${calculateTax().toFixed(2)}</span>
+              <span>{formatCurrency(calculateTax())}</span>
             </div>
             <div className="flex justify-between font-medium">
               <span>Total:</span>
-              <span>${calculateTotal().toFixed(2)}</span>
+              <span>{formatCurrency(calculateTotal())}</span>
             </div>
           </div>
         </CardFooter>

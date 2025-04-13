@@ -1,5 +1,6 @@
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { formatCurrency } from "@/lib/utils"
 
 interface InvoiceItem {
   id: string
@@ -94,8 +95,8 @@ export function InvoicePDF({ invoice }: InvoicePDFProps) {
                 <TableRow key={item.id}>
                   <TableCell>{item.description}</TableCell>
                   <TableCell className="text-right">{item.quantity}</TableCell>
-                  <TableCell className="text-right">${item.price.toFixed(2)}</TableCell>
-                  <TableCell className="text-right">${(item.quantity * item.price).toFixed(2)}</TableCell>
+                  <TableCell className="text-right">{formatCurrency(item.price)}</TableCell>
+                  <TableCell className="text-right">{formatCurrency(item.quantity * item.price)}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -106,15 +107,15 @@ export function InvoicePDF({ invoice }: InvoicePDFProps) {
         <div className="w-full max-w-[300px] space-y-2">
           <div className="flex justify-between text-sm">
             <span>Subtotal:</span>
-            <span>${invoice.subtotal.toFixed(2)}</span>
+            <span>{formatCurrency(invoice.subtotal)}</span>
           </div>
           <div className="flex justify-between text-sm">
             <span>Tax (10%):</span>
-            <span>${invoice.tax.toFixed(2)}</span>
+            <span>{formatCurrency(invoice.tax)}</span>
           </div>
           <div className="flex justify-between font-medium text-lg pt-2 border-t">
             <span>Total:</span>
-            <span>${invoice.total.toFixed(2)}</span>
+            <span>{formatCurrency(invoice.total)}</span>
           </div>
         </div>
 

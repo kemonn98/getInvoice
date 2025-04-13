@@ -20,6 +20,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge"
 import { getInvoices } from "@/app/actions/invoice"
 import { InvoiceStatus as InvoiceStatusEnum } from "@/types"
+import { formatCurrency } from "@/lib/utils"
 
 // Update the interfaces to match Prisma's types
 interface InvoiceItem {
@@ -169,7 +170,7 @@ export function InvoiceList() {
                   <TableCell>{invoice.clientName}</TableCell>
                   <TableCell>{new Date(invoice.date).toLocaleDateString()}</TableCell>
                   <TableCell>{invoice.dueDate ? new Date(invoice.dueDate).toLocaleDateString() : "N/A"}</TableCell>
-                  <TableCell>${calculateTotal(invoice).toFixed(2)}</TableCell>
+                  <TableCell>{formatCurrency(calculateTotal(invoice))}</TableCell>
                   <TableCell>
                     <Badge variant="outline" className={getStatusColor(invoice.status)}>
                       {invoice.status.charAt(0).toUpperCase() + invoice.status.slice(1).toLowerCase()}

@@ -1,4 +1,5 @@
 import type { Invoice, InvoiceItem } from "@/types/invoice" // Import both types
+import { formatCurrency } from "@/lib/utils"
 
 interface InvoiceViewProps {
   invoice: Invoice
@@ -75,8 +76,8 @@ export function InvoiceView({ invoice }: InvoiceViewProps) {
               <tr key={item.id} className="border-b">
                 <td className="py-2">{item.description}</td>
                 <td className="py-2 text-right">{item.quantity}</td>
-                <td className="py-2 text-right">${item.price.toFixed(2)}</td>
-                <td className="py-2 text-right">${(item.quantity * item.price).toFixed(2)}</td>
+                <td className="py-2 text-right">{formatCurrency(item.price)}</td>
+                <td className="py-2 text-right">{formatCurrency(item.quantity * item.price)}</td>
               </tr>
             ))}
           </tbody>
@@ -88,15 +89,15 @@ export function InvoiceView({ invoice }: InvoiceViewProps) {
         <div className="w-full max-w-[200px] space-y-2">
           <div className="flex justify-between text-sm">
             <span>Subtotal:</span>
-            <span>${calculateSubtotal().toFixed(2)}</span>
+            <span>{formatCurrency(calculateSubtotal())}</span>
           </div>
           <div className="flex justify-between text-sm">
             <span>Tax (10%):</span>
-            <span>${calculateTax().toFixed(2)}</span>
+            <span>{formatCurrency(calculateTax())}</span>
           </div>
           <div className="flex justify-between font-medium">
             <span>Total:</span>
-            <span>${calculateTotal().toFixed(2)}</span>
+            <span>{formatCurrency(calculateTotal())}</span>
           </div>
         </div>
       </div>
